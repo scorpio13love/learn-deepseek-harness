@@ -1,0 +1,72 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lessons:
+    name: ${{ matrix.lesson }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        lesson:
+          - s01-agent-loop
+          - s02-session-log
+          - s03-streaming
+          - s04-tools
+          - s05-tool-pipeline
+          - s06-system-prompt
+          - s07-inbox-steering
+          - s08-llm-seam
+          - s09-persistence
+          - s10-compaction
+          - s11-plugin-kernel
+          - s12-composition-boot
+          - s13-capability-seams
+          - s14-subagents-presets
+          - s15-mcp-skills-commands
+          - s16-web
+          - s17-sdk-headless
+          - s18-observability-eval
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Run offline + skipped-live tests
+        working-directory: course/lessons/${{ matrix.lesson }}
+        run: node --test tests/*.test.ts
+
+  site:
+    name: site syntax
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: |
+          node --check site/app.js
+          node --check site/data.js
+          node --check site/serve.mjs
+
+  privacy:
+    name: no private paths committed
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject .env and local-only directories
+        run: |
+          if git ls-files | grep -E '(^|/)\.env$|(^|/)deepseek-harness/|(^|/)course/practice/'; then
+            echo "Private or local-only path is tracked. Remove it and add it to .gitignore."
+            exit 1
+          fi

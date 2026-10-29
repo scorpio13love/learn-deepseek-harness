@@ -1,0 +1,21 @@
+{
+  "name": "dsh-course-s04-tools",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "s04: typed tool schemas, output contracts, conditions, and scopes",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "test": "node --test tests/s04.test.ts",
+    "test:live": "node --test tests/live.test.ts",
+    "test:all": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

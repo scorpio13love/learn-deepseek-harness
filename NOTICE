@@ -1,0 +1,19 @@
+Learn DeepSeek Harness
+======================
+
+This repository is an independent educational course. It is not an official
+DeepSeek project and is not endorsed by DeepSeek.
+
+The course reads, references, and in small places quotes the upstream project
+DeepSeek Harness:
+
+  https://github.com/deepseek-ai/deepseek-harness
+  Copyright (c) 2026 DeepSeek
+  Licensed under the MIT License.
+
+A copy of the upstream license is included in LICENSE-UPSTREAM. The upstream
+source checkout is not redistributed in this repository; readers are expected
+to clone it themselves for source reading.
+
+Course code, lesson text, and the website are licensed under the MIT License in
+LICENSE, Copyright (c) 2026 cph.

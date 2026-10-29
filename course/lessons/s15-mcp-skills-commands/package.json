@@ -1,0 +1,21 @@
+{
+  "name": "dsh-course-s15-mcp-skills-commands",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "s15: MCP tools, skill catalog, and slash commands",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "test": "node --test tests/s15.test.ts",
+    "test:live": "node --test tests/live.test.ts",
+    "test:all": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

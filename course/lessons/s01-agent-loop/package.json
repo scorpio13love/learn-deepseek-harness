@@ -1,0 +1,21 @@
+{
+  "name": "dsh-course-s01-agent-loop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "s01: build the agent loop of a mini DeepSeek Harness",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "test": "node --test tests/s01.test.ts",
+    "test:live": "node --test tests/live.test.ts",
+    "test:all": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

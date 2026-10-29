@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Learn DeepSeek Harness：18 课，从零重写一个生产级 Agent Harness。">
+  <title>Learn DeepSeek Harness · 18 课重写 Agent Harness</title>
+  <script>
+    try {
+      const saved = localStorage.getItem('dsh-course-theme');
+      if (saved) document.documentElement.dataset.theme = saved;
+      else if (matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.dataset.theme = 'dark';
+    } catch {}
+  </script>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <button class="sidebar-scrim" id="sidebar-scrim" aria-label="关闭目录"></button>
+
+  <aside class="sidebar" id="sidebar" aria-label="课程目录">
+    <a class="brand" href="#/" aria-label="课程首页">
+      <span class="brand-mark">DS</span>
+      <span class="brand-copy">
+        <strong>Learn DeepSeek<br>Harness</strong>
+        <small>18 lessons · mini harness</small>
+      </span>
+    </a>
+
+    <div class="sidebar-search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <input id="lesson-search" type="search" placeholder="搜索课程…" autocomplete="off" aria-label="搜索课程">
+    </div>
+
+    <div class="progress-card">
+      <div class="progress-card-head">
+        <span>学习进度</span>
+        <strong id="progress-label">0 / 18</strong>
+      </div>
+      <div class="progress-track"><span id="progress-bar"></span></div>
+    </div>
+
+    <nav class="lesson-nav" id="lesson-nav"></nav>
+
+    <div class="sidebar-foot">
+      <a href="#/docs/architecture">架构阅读笔记</a>
+      <a href="#/docs/course-readme">课程工程说明</a>
+    </div>
+  </aside>
+
+  <div class="layout">
+    <header class="topbar">
+      <button class="icon-button menu-button" id="menu-button" aria-label="打开目录">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+      </button>
+      <nav class="breadcrumb" id="breadcrumb" aria-label="面包屑"></nav>
+      <div class="topbar-actions">
+        <a class="ghost-button" id="source-link" href="#" target="_blank" rel="noreferrer" hidden>查看源码 ↗</a>
+        <button class="theme-button" id="theme-toggle" aria-label="切换深浅色">
+          <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="page" id="page" tabindex="-1">
+      <div id="content" class="content"></div>
+      <footer class="site-footer">
+        <span>Learn DeepSeek Harness · MIT</span>
+        <span class="footer-links">
+          <a href="../LICENSE">License</a>
+          <a href="../SECURITY.md">Security</a>
+          <a href="../CONTRIBUTING.md">Contributing</a>
+          <a href="https://github.com/deepseek-ai/deepseek-harness" target="_blank" rel="noreferrer">Upstream ↗</a>
+        </span>
+      </footer>
+    </main>
+
+    <aside class="toc" id="toc" aria-label="本页目录">
+      <div class="toc-inner">
+        <div class="toc-title">本页目录</div>
+        <ol id="toc-list"></ol>
+      </div>
+    </aside>
+  </div>
+
+  <script src="./data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
