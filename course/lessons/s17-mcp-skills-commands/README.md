@@ -24,6 +24,10 @@ MCP 工具发现/调用、skill catalog、slash command。
 
 ---
 
+![s17 本课地图](../../../docs/visuals/maps/s17.svg)
+
+*本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
+
 ## 0. 先跑起来
 
 ```sh

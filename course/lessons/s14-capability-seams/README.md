@@ -24,6 +24,10 @@ fs、shell、sandbox、approval：agent 如何安全地碰真实世界。
 
 ---
 
+![s14 本课地图](../../../docs/visuals/maps/s14.svg)
+
+*本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
+
 ## 0. 先跑起来
 
 ```sh

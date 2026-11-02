@@ -10,7 +10,7 @@ window.COURSE = {
       "label": "自包含课程"
     },
     {
-      "value": "1,352",
+      "value": "1,350",
       "label": "累计测试运行"
     },
     {

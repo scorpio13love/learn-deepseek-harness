@@ -24,6 +24,10 @@ Context、Service、Fiber、effect、events、scope：把前面课程重构成�
 
 ---
 
+![s12 本课地图](../../../docs/visuals/maps/s12.svg)
+
+*本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
+
 ## 0. 先跑起来
 
 ```sh

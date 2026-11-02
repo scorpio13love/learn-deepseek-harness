@@ -24,6 +24,10 @@ Provider 注册、prepareCall、能力元数据、in-history 与 step 内重试�
 
 ---
 
+![s09 本课地图](../../../docs/visuals/maps/s09.svg)
+
+*本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
+
 ## 0. 先跑起来
 
 ```sh

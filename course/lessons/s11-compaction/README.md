@@ -24,6 +24,10 @@ token 压力、工具结果裁剪、摘要、surface replace、overflow 重试�
 
 ---
 
+![s11 本课地图](../../../docs/visuals/maps/s11.svg)
+
+*本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
+
 ## 0. 先跑起来
 
 ```sh

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-labelledby="title desc">
+  <title id="title">s26 eval / fault injection 本课地图</title>
+  <desc id="desc">可重复的 scenario 与故障矩阵</desc>
+  <defs>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#303a63" stroke-opacity=".04"/></pattern>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10" fill="#c9cfdf"/></marker>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8f9fc"/><stop offset="1" stop-color="#eef2fa"/></linearGradient>
+  </defs>
+  <rect width="1200" height="420" fill="url(#bg)"/><rect width="1200" height="420" fill="url(#grid)"/>
+  <text x="52" y="48" font-size="10" letter-spacing=".12em" font-family="SFMono-Regular, Consolas, monospace" fill="#b33a3a">S26 · QUALITY · LESSON MAP</text>
+  <text x="52" y="82" font-size="25" font-weight="720" letter-spacing="-.02em" fill="#161a2c">eval / fault injection <tspan fill="#b33a3a">/</tspan> <tspan font-size="19" font-weight="500" fill="#343b54">可重复的 scenario 与故障矩阵</tspan></text>
+  <path d="M247 205 H273" stroke="#c9cfdf" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M473 205 H499" stroke="#c9cfdf" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M699 205 H725" stroke="#c9cfdf" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M925 205 H951" stroke="#c9cfdf" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <g>
+      <rect x="53" y="152" width="190" height="106" rx="14" fill="#ffffff" stroke="#dfe3ef"/>
+      <rect x="53" y="152" width="190" height="4" rx="2" fill="#b33a3a"/>
+      <circle cx="75" cy="182" r="12" fill="#fbeaea"/>
+      <text x="75" y="186" text-anchor="middle" font-size="10" font-family="SFMono-Regular, Consolas, monospace" fill="#b33a3a">01</text>
+      <text x="95" y="187" font-size="14" font-weight="650" fill="#161a2c">scenario</text>
+      <text x="69" y="224" font-size="9" font-family="SFMono-Regular, Consolas, monospace" fill="#a0a6b6">step 1</text>
+    </g>
+<g>
+      <rect x="279" y="152" width="190" height="106" rx="14" fill="#ffffff" stroke="#dfe3ef"/>
+      <rect x="279" y="152" width="190" height="4" rx="2" fill="#b33a3a"/>
+      <circle cx="301" cy="182" r="12" fill="#fbeaea"/>
+      <text x="301" y="186" text-anchor="middle" font-size="10" font-family="SFMono-Regular, Consolas, monospace" fill="#b33a3a">02</text>
+      <text x="321" y="187" font-size="14" font-weight="650" fill="#161a2c">record</text>
+      <text x="295" y="224" font-size="9" font-family="SFMono-Regular, Consolas, monospace" fill="#a0a6b6">step 2</text>
+    </g>
+<g>
+      <rect x="505" y="152" width="190" height="106" rx="14" fill="#ffffff" stroke="#dfe3ef"/>
+      <rect x="505" y="152" width="190" height="4" rx="2" fill="#b33a3a"/>
+      <circle cx="527" cy="182" r="12" fill="#fbeaea"/>
+      <text x="527" y="186" text-anchor="middle" font-size="10" font-family="SFMono-Regular, Consolas, monospace" fill="#b33a3a">03</text>
+      <text x="547" y="187" font-size="14" font-weight="650" fill="#161a2c">replay</text>
+      <text x="521" y="224" font-size="9" font-family="SFMono-Regular, Consolas, monospace" fill="#a0a6b6">step 3</text>
+    </g>
+<g>
+      <rect x="731" y="152" width="190" height="106" rx="14" fill="#ffffff" stroke="#dfe3ef"/>
+      <rect x="731" y="152" width="190" height="4" rx="2" fill="#b33a3a"/>
+      <circle cx="753" cy="182" r="12" fill="#fbeaea"/>
+      <text x="753" y="186" text-anchor="middle" font-size="10" font-family="SFMono-Regular, Consolas, monospace" fill="#b33a3a">04</text>
+      <text x="773" y="187" font-size="14" font-weight="650" fill="#161a2c">fault</text>
+      <text x="747" y="224" font-size="9" font-family="SFMono-Regular, Consolas, monospace" fill="#a0a6b6">step 4</text>
+    </g>
+<g>
+      <rect x="957" y="152" width="190" height="106" rx="14" fill="#ffffff" stroke="#dfe3ef"/>
+      <rect x="957" y="152" width="190" height="4" rx="2" fill="#b33a3a"/>
+      <circle cx="979" cy="182" r="12" fill="#fbeaea"/>
+      <text x="979" y="186" text-anchor="middle" font-size="10" font-family="SFMono-Regular, Consolas, monospace" fill="#b33a3a">05</text>
+      <text x="999" y="187" font-size="14" font-weight="650" fill="#161a2c">report</text>
+      <text x="973" y="224" font-size="9" font-family="SFMono-Regular, Consolas, monospace" fill="#a0a6b6">step 5</text>
+    </g>
+  <line x1="52" y1="326" x2="1148" y2="326" stroke="#e3e6ef"/>
+  <text x="52" y="356" font-size="10" letter-spacing=".1em" font-family="SFMono-Regular, Consolas, monospace" fill="#8b91a5">新增边界</text>
+  <text x="52" y="378" font-size="13" fill="#343b54">可重复的 scenario 与故障矩阵</text>
+  <text x="1148" y="356" text-anchor="end" font-size="9" font-family="SFMono-Regular, Consolas, monospace" fill="#8b91a5">SOURCE ANCHOR</text>
+  <text x="1148" y="378" text-anchor="end" font-size="10" font-family="SFMono-Regular, Consolas, monospace" fill="#5b5bd6">docs/testing.zh.md, snapshots</text>
+  <text x="52" y="406" font-size="9" font-family="SFMono-Regular, Consolas, monospace" fill="#a0a6b6">Learn DeepSeek Harness · 28 lessons v3</text>
+</svg>

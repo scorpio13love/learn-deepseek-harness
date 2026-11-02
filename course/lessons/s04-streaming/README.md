@@ -24,6 +24,10 @@ SSE chunk 如何变成可回放的 attempt：block 组装、usage、live 帧、�
 
 ---
 
+![s04 本课地图](../../../docs/visuals/maps/s04.svg)
+
+*本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
+
 ## 0. 先跑起来
 
 ```sh

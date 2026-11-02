@@ -22,6 +22,8 @@ README 里放静态首帧或 GIF；网站里放可交互版本。
 | `s01-loop-poster.png` | 静态首帧，备用封面 |
 | `s02-tools.html` / `.gif` / `.mp4` | s02 tool round-trip 原型 |
 | `s03-surface.html` / `.gif` / `.mp4` | s03 surface/replace 原型 |
+| `maps/s01.svg` … `maps/s28.svg` | 28 张本课机制地图 |
+| `build-maps.mjs` | 生成 28 张地图的脚本 |
 | `build-s01.sh` / `build-s02.sh` / `build-s03.sh` | 从 HTML 重新生成 GIF/MP4 的脚本 |
 
 ## 生成
@@ -38,6 +40,7 @@ ffmpeg -version
 生成：
 
 ```sh
+node docs/visuals/build-maps.mjs
 ./docs/visuals/build-s01.sh
 ./docs/visuals/build-s02.sh
 ./docs/visuals/build-s03.sh
