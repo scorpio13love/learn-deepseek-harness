@@ -287,6 +287,8 @@ body.is-home .page { max-width: 980px; }
 .markdown blockquote { margin: 20px 0; padding: 13px 18px; border-left: 3px solid var(--brand); background: var(--brand-soft); border-radius: 0 10px 10px 0; color: var(--ink-soft); }
 .markdown blockquote p:last-child { margin-bottom: 0; }
 .markdown hr { border: 0; border-top: 1px solid var(--line); margin: 34px 0; }
+.markdown img { display: block; max-width: 100%; height: auto; margin: 18px auto; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow-sm); }
+
 .markdown code { font-family: var(--mono); font-size: .86em; background: var(--bg-soft); border: 1px solid var(--line); padding: 1px 5px; border-radius: 5px; color: var(--ink); }
 .markdown pre { margin: 0; overflow: auto; padding: 18px 20px; background: var(--code-bg); color: var(--code-ink); font-size: 12.5px; line-height: 1.7; }
 .markdown pre code { background: transparent; border: 0; padding: 0; color: inherit; font-size: inherit; }
@@ -322,6 +324,7 @@ body.is-home .page { max-width: 980px; }
   .module-grid { grid-template-columns: 1fr; }
   .feature-grid { grid-template-columns: 1fr; }
   .doc-grid { grid-template-columns: 1fr; }
+  .visual-grid { grid-template-columns: 1fr; }
   .lesson-foot { grid-template-columns: 1fr; }
   .complete-button { margin-left: 0; }
 }
@@ -341,3 +344,13 @@ body.is-home .page { max-width: 980px; }
 .footer-links { display: flex; gap: 14px; flex-wrap: wrap; }
 .footer-links a { color: var(--muted); }
 .footer-links a:hover { color: var(--brand); text-decoration: none; }
+.course-map-link { display: block; border-radius: 16px; border: 1px solid var(--line); overflow: hidden; background: var(--bg-elevated); box-shadow: var(--shadow-sm); }
+.course-map-link:hover { border-color: var(--line-strong); }
+.course-map { display: block; width: 100%; height: auto; }
+.visual-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.visual-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-elevated); color: var(--ink); box-shadow: var(--shadow-sm); }
+.visual-card:hover { text-decoration: none; border-color: color-mix(in srgb, var(--brand) 30%, var(--line)); }
+.visual-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--bg); }
+.visual-card span { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; }
+.visual-card b { font-size: 12.5px; }
+.visual-card small { color: var(--muted); font-size: 10.5px; }

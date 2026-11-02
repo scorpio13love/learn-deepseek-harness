@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>s03 · surface</title>
+<style>
+  :root {
+    --ink: #121629;
+    --ink-soft: #343b54;
+    --muted: #707890;
+    --line: #dfe3ef;
+    --line-strong: #cbd1e2;
+    --paper: #ffffff;
+    --bg: #f4f6fb;
+    --brand: #5b5bd6;
+    --brand-soft: #ecebff;
+    --cyan: #0c93ad;
+    --cyan-soft: #e5f8fb;
+    --amber: #b87412;
+    --amber-soft: #fff3dd;
+    --green: #158a63;
+    --green-soft: #e8f8f1;
+    --red: #b33a3a;
+    --mono: "SFMono-Regular", "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+    --font: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    display: grid; place-items: center; min-height: 100vh; overflow: hidden;
+    background: #e9edf6; color: var(--ink); font-family: var(--font);
+  }
+  .stage {
+    position: relative; width: 1280px; height: 720px; flex: 0 0 auto;
+    overflow: hidden; background:
+      radial-gradient(900px 400px at 95% -10%, rgba(91, 91, 214, .10), transparent 65%),
+      radial-gradient(600px 320px at 0% 100%, rgba(12, 147, 173, .08), transparent 65%),
+      var(--bg);
+    transform-origin: top left;
+  }
+  .stage::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(35, 42, 70, .035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(35, 42, 70, .035) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: linear-gradient(180deg, #000 0%, transparent 92%);
+  }
+  .frame { position: absolute; inset: 0; padding: 26px 34px 22px; display: flex; flex-direction: column; }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+  .eyebrow { display: flex; align-items: center; gap: 8px; color: var(--brand); font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+  .eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 5px rgba(91,91,214,.12); }
+  h1 { margin: 8px 0 4px; font-size: 30px; line-height: 1.08; letter-spacing: -.035em; font-weight: 720; }
+  h1 em { font-style: normal; color: var(--brand); }
+  .subtitle { margin: 0; color: var(--muted); font-size: 12.5px; letter-spacing: .01em; }
+  .badge-live { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.7); color: var(--muted); font-size: 10.5px; font-family: var(--mono); }
+  .badge-live b { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px rgba(21,138,99,.12); }
+
+  .flow { position: relative; display: grid; grid-template-columns: 190px 1fr 210px 1fr 210px 1fr 210px 1fr 190px; align-items: center; gap: 0; margin-top: 18px; height: 70px; }
+  .node { position: relative; height: 58px; border: 1px solid var(--line-strong); border-radius: 13px; background: rgba(255,255,255,.82); box-shadow: 0 5px 16px -12px rgba(21,25,45,.3); padding: 10px 12px; display: flex; gap: 9px; align-items: center; z-index: 2; transition: border-color .15s, box-shadow .15s, background .15s; }
+  .node.active { border-color: color-mix(in srgb, var(--brand) 58%, var(--line)); background: #fff; box-shadow: 0 8px 24px -14px rgba(91,91,214,.65); }
+  .node.done { border-color: color-mix(in srgb, var(--green) 45%, var(--line)); }
+  .node-icon { display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 auto; border-radius: 8px; background: var(--brand-soft); color: var(--brand); font-size: 12px; font-weight: 800; font-family: var(--mono); }
+  .node.done .node-icon { background: var(--green-soft); color: var(--green); }
+  .node b { display: block; font-size: 11.5px; letter-spacing: -.01em; }
+  .node small { display: block; margin-top: 2px; color: var(--muted); font-family: var(--mono); font-size: 9px; }
+  .connector { position: relative; height: 1px; margin: 0 7px; background: var(--line-strong); z-index: 1; }
+  .connector::after { content: ""; position: absolute; right: -1px; top: -3px; width: 6px; height: 6px; border-top: 1px solid var(--line-strong); border-right: 1px solid var(--line-strong); transform: rotate(45deg); }
+  .connector.hot { background: linear-gradient(90deg, var(--brand), var(--cyan)); }
+  .connector.hot::after { border-color: var(--cyan); }
+  .packet { position: absolute; top: -4px; width: 9px; height: 9px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px rgba(91,91,214,.16); opacity: 0; z-index: 3; }
+  .packet.on { opacity: 1; }
+
+  .main { display: grid; grid-template-columns: 384px 1fr 436px; gap: 14px; margin-top: 12px; flex: 1; min-height: 0; }
+  .panel { position: relative; display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.88); box-shadow: 0 12px 34px -28px rgba(23,29,52,.5); overflow: hidden; }
+  .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 13px 9px; border-bottom: 1px solid var(--line); background: rgba(249,250,253,.75); }
+  .panel-head b { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+  .panel-head span { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+  .panel-body { position: relative; flex: 1; min-height: 0; padding: 12px; overflow: hidden; }
+
+  .prompt-line { display: flex; gap: 7px; align-items: center; margin: 0 0 9px; padding: 7px 8px; border-radius: 7px; background: var(--brand-soft); color: var(--ink-soft); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prompt-line span { flex: 0 0 auto; padding: 1px 5px; border-radius: 4px; background: var(--brand); color: #fff; font-family: var(--mono); font-size: 8px; text-transform: uppercase; }
+  .stream-row { display: grid; grid-template-columns: 22px 1fr; gap: 8px; margin-bottom: 7px; opacity: .18; transform: translateY(2px); }
+  .stream-row.on { opacity: 1; transform: none; }
+  .stream-row .idx { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 6px; background: var(--bg); color: var(--muted); font-family: var(--mono); font-size: 9px; border: 1px solid var(--line); }
+  .stream-row.on .idx { background: var(--brand-soft); color: var(--brand); border-color: transparent; }
+  .stream-card { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 6px 8px; }
+  .stream-card code { display: block; color: var(--ink-soft); font-family: var(--mono); font-size: 9.5px; line-height: 1.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tag { display: inline-block; margin-right: 5px; padding: 1px 5px; border-radius: 4px; font-size: 8px; font-family: var(--mono); letter-spacing: .02em; background: var(--brand-soft); color: var(--brand); vertical-align: 1px; }
+  .tag.text { background: var(--cyan-soft); color: var(--cyan); }
+  .tag.tool { background: var(--amber-soft); color: var(--amber); }
+  .tag.end { background: var(--green-soft); color: var(--green); }
+  .stream-cursor { display: flex; align-items: center; gap: 6px; margin-top: 6px; color: var(--muted); font-family: var(--mono); font-size: 8.5px; opacity: 0; }
+  .stream-cursor.on { opacity: 1; }
+  .stream-cursor i { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: .2; } }
+
+  .assembler { display: flex; flex-direction: column; gap: 7px; }
+  .block { border: 1px solid var(--line); border-radius: 9px; background: #fff; padding: 7px 9px; opacity: .12; }
+  .block.on { opacity: 1; }
+  .block-head { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-family: var(--mono); font-size: 8px; }
+  .block-head b { color: var(--ink-soft); font-weight: 600; }
+  .block p { margin: 4px 0 0; color: var(--ink-soft); font-size: 10px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .block.reasoning { border-left: 3px solid var(--brand); }
+  .block.text { border-left: 3px solid var(--cyan); }
+  .block.tool { border-left: 3px solid var(--amber); }
+  .assembler-foot { margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--line); color: var(--muted); font-family: var(--mono); font-size: 9px; display: flex; justify-content: space-between; }
+  .assembler-foot b { color: var(--ink-soft); font-weight: 500; }
+
+  .event-list { display: flex; flex-direction: column; gap: 5px; }
+  .event { display: grid; grid-template-columns: 25px 1fr auto; gap: 8px; align-items: center; padding: 5px 7px; border-radius: 7px; border: 1px solid transparent; opacity: .10; }
+  .event.on { opacity: 1; background: #fff; border-color: var(--line); }
+  .event .seq { color: var(--muted); font-family: var(--mono); font-size: 8px; }
+  .event .type { color: var(--ink-soft); font-family: var(--mono); font-size: 9px; }
+  .event .surface { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--line-strong); display: grid; place-items: center; color: var(--muted); font-family: var(--mono); font-size: 7px; }
+  .event.surface .surface { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .event.new { border-color: color-mix(in srgb, var(--brand) 35%, var(--line)); background: color-mix(in srgb, var(--brand-soft) 50%, #fff); }
+  .event.tool-result .type { color: var(--amber); }
+  .answer { position: absolute; left: 12px; right: 12px; bottom: 11px; border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line)); border-radius: 9px; background: var(--green-soft); padding: 7px 9px; display: flex; justify-content: space-between; align-items: center; opacity: 0; transform: translateY(4px); }
+  .answer.on { opacity: 1; transform: none; }
+  .answer span { color: var(--green); font-size: 9px; font-family: var(--mono); letter-spacing: .06em; }
+  .answer b { color: var(--ink); font-size: 14px; letter-spacing: -.02em; }
+
+  .loop-arrow { position: absolute; left: 690px; top: 330px; width: 150px; height: 178px; opacity: 0; color: var(--amber); z-index: 4; pointer-events: none; }
+  .loop-arrow.on { opacity: 1; }
+  .loop-label { position: absolute; left: 662px; top: 500px; padding: 4px 7px; border-radius: 6px; background: var(--amber-soft); color: var(--amber); font-family: var(--mono); font-size: 8px; opacity: 0; z-index: 5; }
+  .loop-label.on { opacity: 1; }
+
+  .bottom { display: grid; grid-template-columns: 1.1fr 1fr 1fr 1.4fr; gap: 12px; align-items: end; margin-top: 12px; }
+  .caption { min-width: 0; }
+  .caption .kicker { color: var(--brand); font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+  .caption h2 { margin: 3px 0 2px; font-size: 17px; letter-spacing: -.02em; }
+  .caption p { margin: 0; color: var(--muted); font-size: 10.5px; line-height: 1.45; }
+  .code-line { border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,.7); padding: 8px 10px; color: var(--ink-soft); font-family: var(--mono); font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .code-line b { color: var(--brand); font-weight: 600; }
+  .progress { display: flex; align-items: center; gap: 6px; padding-bottom: 8px; }
+  .seg { flex: 1; height: 5px; border-radius: 999px; background: var(--line); }
+  .seg.on { background: linear-gradient(90deg, var(--brand), var(--cyan)); }
+  .seg.done { background: var(--line-strong); }
+  .progress-label { min-width: 52px; text-align: right; color: var(--muted); font-family: var(--mono); font-size: 8.5px; }
+
+  .controls { position: fixed; left: 50%; bottom: 4px; transform: translateX(-50%); display: flex; gap: 8px; align-items: center; padding: 7px 10px; border-radius: 10px; background: rgba(18,22,41,.86); color: #fff; backdrop-filter: blur(10px); z-index: 20; font-size: 11px; }
+  .controls button { border: 1px solid rgba(255,255,255,.22); background: transparent; color: #fff; border-radius: 6px; padding: 4px 8px; cursor: pointer; font: inherit; white-space: nowrap; }
+  .controls button:hover { background: rgba(255,255,255,.1); }
+  .stage-jump { display: flex; gap: 3px; padding: 0 4px; border-left: 1px solid rgba(255,255,255,.18); border-right: 1px solid rgba(255,255,255,.18); }
+  .stage-jump button { border-color: transparent; color: #aab2d0; padding: 3px 5px; font-size: 9px; white-space: nowrap; }
+  .stage-jump button.active { background: rgba(139,139,245,.3); color: #fff; border-color: rgba(139,139,245,.55); }
+  .controls input { width: 100px; accent-color: #8b8bf5; }
+  .controls span { min-width: 54px; color: #c8cdea; font-family: var(--mono); font-size: 9px; }
+  body:not(.capture) .stage { margin-bottom: 64px; }
+  .capture .controls { display: none; }
+  .capture .stage { box-shadow: none; }
+
+  .log-list { display: flex; flex-direction: column; gap: 6px; }
+  .log-card { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 6px 8px; opacity: .12; }
+  .log-card.on { opacity: 1; }
+  .log-card.shadowed { border-style: dashed; background: transparent; opacity: .35; }
+  .log-card .row1 { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-family: var(--mono); font-size: 8px; }
+  .log-card .row1 b { color: var(--ink-soft); font-weight: 500; }
+  .log-card p { margin: 3px 0 0; color: var(--ink-soft); font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .log-card.replace { border-color: color-mix(in srgb, var(--brand) 35%, var(--line)); background: color-mix(in srgb, var(--brand-soft) 55%, #fff); }
+  .replace-badge { display: inline-block; margin-left: 4px; padding: 1px 4px; border-radius: 4px; background: var(--brand); color: #fff; font-size: 7px; }
+  .surface-wrap { display: flex; flex-direction: column; gap: 9px; height: 100%; }
+  .surface-row { display: flex; align-items: center; gap: 6px; opacity: .12; }
+  .surface-row.on { opacity: 1; }
+  .surface-row.hidden-row { display: none; }
+  .hidden-row { display: none; }
+  .surface-node { flex: 1; border: 1px solid var(--line-strong); border-radius: 9px; background: #fff; padding: 7px 8px; }
+  .surface-node .s { color: var(--brand); font-family: var(--mono); font-size: 8px; }
+  .surface-node b { display: block; margin-top: 2px; color: var(--ink-soft); font-size: 9px; }
+  .surface-arrow { text-align: center; color: var(--muted); font-family: var(--mono); font-size: 10px; opacity: .12; }
+  .surface-arrow.on { opacity: 1; }
+  .surface-meta { border-top: 1px dashed var(--line); padding-top: 7px; color: var(--muted); font-family: var(--mono); font-size: 8px; line-height: 1.6; }
+  .surface-meta b { color: var(--ink-soft); font-weight: 500; }
+  .surface-meta .badge { color: var(--brand); }
+  .message-list { display: flex; flex-direction: column; gap: 6px; }
+  .message-card { border: 1px solid var(--line); border-left: 3px solid var(--brand); border-radius: 8px; background: #fff; padding: 7px 8px; opacity: .12; }
+  .message-card.on { opacity: 1; }
+  .message-card.tool { border-left-color: var(--amber); }
+  .message-card.assistant { border-left-color: var(--cyan); }
+  .message-card .role { color: var(--muted); font-family: var(--mono); font-size: 8px; }
+  .message-card p { margin: 3px 0 0; color: var(--ink-soft); font-size: 9px; line-height: 1.45; }
+  .counts { margin-top: 8px; display: flex; justify-content: space-between; color: var(--muted); font-family: var(--mono); font-size: 8px; }
+  .counts b { color: var(--ink-soft); font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="frame">
+    <div class="top">
+      <div>
+        <div class="eyebrow"><i></i> s03 · session log · source-guided</div>
+        <h1>日志不改写，<em>surface 决定模型看到什么</em></h1>
+        <p class="subtitle">append-only 事件日志是事实；surface 是当前视图；replace 只改变视图，不删除历史</p>
+      </div>
+      <div class="badge-live"><b></b> SURFACE TRACE</div>
+    </div>
+
+    <div class="flow">
+      <div class="node" data-node="events"><div class="node-icon">01</div><div><b>events[]</b><small>append-only</small></div></div>
+      <div class="connector" data-conn="0"></div>
+      <div class="node" data-node="surface"><div class="node-icon">02</div><div><b>surface[]</b><small>seq 视图</small></div></div>
+      <div class="connector" data-conn="1"></div>
+      <div class="node" data-node="derive"><div class="node-icon">03</div><div><b>deriveMessages</b><small>Message[]</small></div></div>
+      <div class="connector" data-conn="2"></div>
+      <div class="node" data-node="agent"><div class="node-icon">04</div><div><b>Agent</b><small>request</small></div></div>
+      <div class="connector" data-conn="3"></div>
+      <div class="node" data-node="request"><div class="node-icon">05</div><div><b>ChatRequest</b><small>messages</small></div></div>
+      <div class="packet" id="packet"></div>
+    </div>
+
+    <div class="main">
+      <section class="panel">
+        <div class="panel-head"><b>event log</b><span>raw facts</span></div>
+        <div class="panel-body">
+          <div class="log-list" id="logs">
+            <div class="log-card" data-log="0"><div class="row1"><b>#00 user/message</b><span>surface</span></div><p>分析这份日志</p></div>
+            <div class="log-card" data-log="1"><div class="row1"><b>#01 tool/result</b><span>surface</span></div><p>很长的工具输出 …</p></div>
+            <div class="log-card" data-log="2"><div class="row1"><b>#02 assistant/message</b><span>surface</span></div><p>日志显示服务已恢复</p></div>
+            <div class="log-card replace" data-log="3"><div class="row1"><b>#03 user/message</b><span>replace 0..1</span></div><p>摘要：用户要求分析日志，工具输出显示服务恢复</p></div>
+          </div>
+          <div class="counts"><span>raw events</span><b id="raw-count">0</b></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><b>surface</b><span>当前模型视图</span></div>
+        <div class="panel-body">
+          <div class="surface-wrap">
+            <div class="surface-row" id="before-row">
+              <div class="surface-node"><span class="s">#00</span><b>user</b></div>
+              <div class="surface-node"><span class="s">#01</span><b>tool</b></div>
+              <div class="surface-node"><span class="s">#02</span><b>assistant</b></div>
+            </div>
+            <div class="surface-arrow" id="arrow">replace 0..1 ↓</div>
+            <div class="surface-row" id="after-row">
+              <div class="surface-node" style="border-color:var(--brand)"><span class="s">#03</span><b>summary</b></div>
+              <div class="surface-node"><span class="s">#02</span><b>assistant</b></div>
+            </div>
+            <div class="surface-meta" id="meta">
+              surface = <b id="surface-text">[0, 1, 2]</b><br>
+              <span class="badge" id="source">sourceEventSeqs = [0, 1]</span><br>
+              contentGeneration = <b id="generation">0</b>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><b>deriveMessages()</b><span>模型历史</span></div>
+        <div class="panel-body">
+          <div class="message-list">
+            <div class="message-card" data-msg-before="0"><div class="role">user</div><p>分析这份日志</p></div>
+            <div class="message-card tool" data-msg-before="1"><div class="role">tool</div><p>很长的工具输出 …</p></div>
+            <div class="message-card assistant" data-msg-before="2"><div class="role">assistant</div><p>日志显示服务已恢复</p></div>
+          </div>
+          <div class="message-list" id="after-messages" style="margin-top:8px">
+            <div class="message-card" data-msg-after="0"><div class="role">user · summary</div><p>摘要：用户要求分析日志，工具输出显示服务恢复</p></div>
+            <div class="message-card assistant" data-msg-after="1"><div class="role">assistant</div><p>日志显示服务已恢复</p></div>
+          </div>
+          <div class="counts"><span>messages</span><b id="msg-count">0</b></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="bottom">
+      <div class="caption">
+        <div class="kicker" id="stage-kicker">STAGE 01 / 07</div>
+        <h2 id="stage-title">追加事实</h2>
+        <p id="stage-desc">user、tool、assistant 依次进入日志，surface 只记录可见节点。</p>
+      </div>
+      <div class="code-line" id="code-line">append(<b>'user/message'</b>)</div>
+      <div class="code-line" id="code-line-2">surface = <b>[0, 1, 2]</b></div>
+      <div class="progress" id="progress">
+        <div class="seg" data-seg="0"></div><div class="seg" data-seg="1"></div><div class="seg" data-seg="2"></div><div class="seg" data-seg="3"></div><div class="seg" data-seg="4"></div><div class="seg" data-seg="5"></div><div class="seg" data-seg="6"></div>
+        <span class="progress-label" id="progress-label">0%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="play">暂停</button>
+  <button id="prev">← 上一幕</button>
+  <button id="next">下一幕 →</button>
+  <div class="stage-jump" id="stage-jump"></div>
+  <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="进度">
+  <span id="counter">0 / 119</span>
+</div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const capture = params.get('capture') === '1' || params.has('frame');
+  const initialFrame = Number(params.get('frame') ?? 0);
+  const TOTAL = 120;
+  const STAGE_NAMES = ['事实', 'surface', 'derive', 'before', 'replace', 'after', '请求'];
+  let frame = Number.isFinite(initialFrame) ? Math.max(0, Math.min(TOTAL - 1, initialFrame)) : 0;
+  let playing = !capture;
+  let raf = 0;
+  let last = 0;
+  if (capture) document.body.classList.add('capture');
+
+  const els = {
+    nodes: [...document.querySelectorAll('[data-node]')],
+    conns: [...document.querySelectorAll('[data-conn]')],
+    logs: [...document.querySelectorAll('[data-log]')],
+    before: [...document.querySelectorAll('[data-msg-before]')],
+    after: [...document.querySelectorAll('[data-msg-after]')],
+    segs: [...document.querySelectorAll('[data-seg]')],
+    packet: document.getElementById('packet'),
+    beforeRow: document.getElementById('before-row'),
+    afterRow: document.getElementById('after-row'),
+    arrow: document.getElementById('arrow'),
+    source: document.getElementById('source'),
+    surfaceText: document.getElementById('surface-text'),
+    generation: document.getElementById('generation'),
+    rawCount: document.getElementById('raw-count'),
+    msgCount: document.getElementById('msg-count'),
+    kicker: document.getElementById('stage-kicker'),
+    title: document.getElementById('stage-title'),
+    desc: document.getElementById('stage-desc'),
+    code: document.getElementById('code-line'),
+    code2: document.getElementById('code-line-2'),
+    progress: document.getElementById('progress-label'),
+  };
+  const jump = document.getElementById('stage-jump');
+  jump.innerHTML = STAGE_NAMES.map((name, index) => `<button data-stage="${index}" aria-label="跳到第 ${index + 1} 幕">${index + 1} ${name}</button>`).join('');
+  const jumpButtons = [...jump.querySelectorAll('[data-stage]')];
+
+  const stages = [
+    { at: 0.00, kicker: 'STAGE 01 / 07', title: '追加事实', desc: 'user、tool、assistant 依次进入日志，surface 只记录可见节点。', code: "append(<b>'user/message'</b>)", code2: 'surface = <b>[0]</b>' },
+    { at: 0.13, kicker: 'STAGE 02 / 07', title: '追加 tool/result', desc: '工具结果也是 surface 事件；它会进入下一步请求。', code: "append(<b>'tool/result'</b>)", code2: 'surface = <b>[0, 1]</b>' },
+    { at: 0.27, kicker: 'STAGE 03 / 07', title: '追加 assistant', desc: 'assistant message 同样是 surface 节点。', code: "append(<b>'assistant/message'</b>)", code2: 'surface = <b>[0, 1, 2]</b>' },
+    { at: 0.40, kicker: 'STAGE 04 / 07', title: '派生当前历史', desc: 'deriveMessages 按 surface 读取，原始日志顺序不是模型顺序。', code: '<b>deriveMessages</b>()', code2: 'messages = <b>user, tool, assistant</b>' },
+    { at: 0.54, kicker: 'STAGE 05 / 07', title: 'replace 0..1', desc: 'compaction 用一条摘要替换旧前缀；原事件仍在日志。', code: "<b>replace</b>(0..1)", code2: 'sourceEventSeqs = <b>[0, 1]</b>' },
+    { at: 0.68, kicker: 'STAGE 06 / 07', title: '新的 surface', desc: '新节点占据被替换区间的起始位置：surface = [3, 2]。', code: 'surface = <b>[3, 2]</b>', code2: 'contentGeneration += 1' },
+    { at: 0.84, kicker: 'STAGE 07 / 07', title: '模型看到摘要', desc: '旧消息不再进入请求，但审计、回放、fork 仍能看到原始事件。', code: '<b>deriveMessages</b>()', code2: 'messages = <b>summary, assistant</b>' },
+  ];
+  const reveal = {
+    logs: [0.02, 0.15, 0.29, 0.56],
+    beforeRow: 0.34,
+    beforeMsgs: [0.36, 0.39, 0.42],
+    afterRow: 0.68,
+    afterMsgs: [0.80, 0.83],
+  };
+
+  function stageAt(t) {
+    let index = 0;
+    for (let i = 0; i < stages.length; i += 1) if (t >= stages[i].at) index = i;
+    return index;
+  }
+
+  function render(t) {
+    const stage = stageAt(t);
+    els.kicker.textContent = stages[stage].kicker;
+    els.title.textContent = stages[stage].title;
+    els.desc.textContent = stages[stage].desc;
+    els.code.innerHTML = stages[stage].code;
+    els.code2.innerHTML = stages[stage].code2;
+    els.progress.textContent = `${Math.round(t * 100)}%`;
+
+    const active = stage < 3 ? 'events' : stage === 3 ? 'derive' : stage < 6 ? 'surface' : 'agent';
+    const order = ['events', 'surface', 'derive', 'agent', 'request'];
+    els.nodes.forEach(node => {
+      node.classList.toggle('active', node.dataset.node === active);
+      node.classList.toggle('done', order.indexOf(node.dataset.node) < order.indexOf(active));
+    });
+    els.conns.forEach((conn, i) => conn.classList.toggle('hot', i < stage));
+
+    const packetOn = t > 0.12 && t < 0.88;
+    els.packet.classList.toggle('on', packetOn);
+    if (packetOn) {
+      const p = Math.min(1, Math.max(0, (t - 0.12) / 0.74));
+      els.packet.style.left = `${180 + p * 905}px`;
+      els.packet.style.top = `${35 + Math.sin(p * Math.PI * 3) * 2}px`;
+    }
+
+    els.logs.forEach((card, i) => {
+      const on = t >= reveal.logs[i];
+      card.classList.toggle('on', on);
+      card.classList.toggle('new', on && t < reveal.logs[i] + 0.04);
+      card.classList.toggle('shadowed', t >= reveal.afterRow && (i === 0 || i === 1));
+    });
+    const after = t >= reveal.afterRow;
+    const beforeVisible = t >= reveal.beforeRow && !after;
+    els.beforeRow.classList.toggle('on', beforeVisible);
+    els.beforeRow.classList.toggle('hidden-row', !beforeVisible);
+    els.before.forEach((msg, i) => {
+      const visible = t >= reveal.beforeMsgs[i] && !after;
+      msg.classList.toggle('on', visible);
+      msg.classList.toggle('hidden-row', !visible);
+    });
+    els.afterRow.classList.toggle('on', after);
+    els.afterRow.classList.toggle('hidden-row', !after);
+    els.after.forEach((msg, i) => {
+      const visible = t >= reveal.afterMsgs[i];
+      msg.classList.toggle('on', visible);
+      msg.classList.toggle('hidden-row', !visible);
+    });
+    els.arrow.classList.toggle('on', t >= 0.54 && t < 0.70);
+    els.surfaceText.textContent = after ? '[3, 2]' : t < reveal.logs[1] ? '[0]' : t < reveal.logs[2] ? '[0, 1]' : '[0, 1, 2]';
+    els.source.textContent = t >= 0.54 ? 'sourceEventSeqs = [0, 1]' : 'sourceEventSeqs = —';
+    els.generation.textContent = t >= 0.68 ? '1' : '0';
+    els.rawCount.textContent = String(reveal.logs.filter(value => t >= value).length);
+    const visibleMessages = after
+      ? reveal.afterMsgs.filter(value => t >= value).length
+      : reveal.beforeMsgs.filter(value => t >= value).length;
+    els.msgCount.textContent = String(visibleMessages);
+    els.segs.forEach((seg, i) => { seg.classList.toggle('done', i < stage); seg.classList.toggle('on', i === stage); });
+    jumpButtons.forEach((button, index) => button.classList.toggle('active', index === stage));
+  }
+
+  function setFrame(next) {
+    frame = (next + TOTAL) % TOTAL;
+    render(frame / (TOTAL - 1));
+    document.getElementById('scrub').value = String(Math.round((frame / (TOTAL - 1)) * 1000));
+    document.getElementById('counter').textContent = `${frame} / ${TOTAL - 1}`;
+  }
+  function pause() { playing = false; document.getElementById('play').textContent = '播放'; cancelAnimationFrame(raf); }
+  function goStage(index) { pause(); const bounded = (index + stages.length) % stages.length; setFrame(Math.round(stages[bounded].at * (TOTAL - 1))); }
+  function tick(time) {
+    if (!playing) return;
+    if (!last) last = time;
+    if (time - last > 1000 / 10) { last = time; setFrame(frame + 1); }
+    raf = requestAnimationFrame(tick);
+  }
+  function fit() {
+    if (capture) return;
+    const scale = Math.min(window.innerWidth / 1280, (window.innerHeight - 80) / 720);
+    document.getElementById('stage').style.transform = `scale(${scale})`;
+    document.body.style.height = `${720 * scale + 70}px`;
+  }
+  document.getElementById('play').addEventListener('click', (event) => {
+    playing = !playing; event.currentTarget.textContent = playing ? '暂停' : '播放';
+    if (playing) { last = 0; raf = requestAnimationFrame(tick); } else cancelAnimationFrame(raf);
+  });
+  document.getElementById('prev').addEventListener('click', () => goStage(stageAt(frame / (TOTAL - 1)) - 1));
+  document.getElementById('next').addEventListener('click', () => goStage(stageAt(frame / (TOTAL - 1)) + 1));
+  jumpButtons.forEach(button => button.addEventListener('click', () => goStage(Number(button.dataset.stage))));
+  document.getElementById('scrub').addEventListener('input', (event) => { pause(); setFrame(Math.round(Number(event.currentTarget.value) / 1000 * (TOTAL - 1))); });
+  window.addEventListener('resize', fit);
+  fit(); setFrame(frame);
+  if (playing) { document.getElementById('play').textContent = '暂停'; raf = requestAnimationFrame(tick); }
+</script>
+</body>
+</html>

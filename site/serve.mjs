@@ -32,6 +32,8 @@ const types = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.gif': 'image/gif',
+  '.mp4': 'video/mp4',
   '.woff2': 'font/woff2',
 }
 

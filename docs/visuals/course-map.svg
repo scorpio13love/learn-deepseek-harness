@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1040" viewBox="0 0 1600 1040" role="img" aria-labelledby="title desc">
+  <title id="title">Learn DeepSeek Harness 28 课课程地图</title>
+  <desc id="desc">六条学习主线：内核、上下文、组合、执行、产品、质量。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7f8fc"/>
+      <stop offset="1" stop-color="#eef2fa"/>
+    </linearGradient>
+    <linearGradient id="center" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#171b35"/>
+      <stop offset="1" stop-color="#2c3568"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#1b2340" flood-opacity=".12"/>
+    </filter>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#303a63" stroke-opacity=".045"/>
+    </pattern>
+    <style>
+      .font { font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", -apple-system, sans-serif; }
+      .mono { font-family: "SFMono-Regular", "JetBrains Mono", Consolas, monospace; }
+      .title { font-size: 22px; font-weight: 700; fill: #161a2c; }
+      .sub { font-size: 12px; fill: #6f778d; }
+      .item { font-size: 14px; fill: #343b54; }
+      .num { font-size: 11px; fill: #8b91a5; font-family: "SFMono-Regular", "JetBrains Mono", Consolas, monospace; }
+      .card { fill: #fff; stroke: #e1e5ef; stroke-width: 1; }
+      .conn { fill: none; stroke: #c9cfdf; stroke-width: 1.5; stroke-dasharray: 5 5; }
+      .label { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-family: "SFMono-Regular", "JetBrains Mono", Consolas, monospace; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1040" fill="url(#bg)"/>
+  <rect width="1600" height="1040" fill="url(#grid)"/>
+
+  <text x="70" y="58" class="font sub">LEARN DEEPSEEK HARNESS · COURSE MAP v3</text>
+  <text x="70" y="92" class="font title" font-size="30">从 loop 到 computer use：六条主线</text>
+  <text x="70" y="118" class="font sub">每节课只增加一个架构边界；先理解内核，再进入上下文、组合、执行、产品与质量。</text>
+
+  <!-- connectors -->
+  <path class="conn" d="M640 500 C540 500 520 330 470 330"/>
+  <path class="conn" d="M960 500 C1060 500 1080 330 1130 330"/>
+  <path class="conn" d="M640 560 C540 560 520 740 470 740"/>
+  <path class="conn" d="M960 560 C1060 560 1080 740 1130 740"/>
+  <path class="conn" d="M300 845 V875"/>
+  <path class="conn" d="M1300 940 V960"/>
+
+  <!-- center -->
+  <g filter="url(#shadow)">
+    <rect x="640" y="430" width="320" height="190" rx="24" fill="url(#center)"/>
+    <text x="800" y="490" text-anchor="middle" class="mono" font-size="11" fill="#aab4dd">MINI HARNESS</text>
+    <text x="800" y="530" text-anchor="middle" class="font" font-size="28" font-weight="700" fill="#fff">28 节课</text>
+    <text x="800" y="560" text-anchor="middle" class="font" font-size="13" fill="#c7cff0">可视化 · 可运行 · 对照真实源码</text>
+    <text x="800" y="590" text-anchor="middle" class="mono" font-size="10" fill="#8f9bc9">session / agent loop / tools / seams</text>
+  </g>
+
+  <!-- 01 core -->
+  <g filter="url(#shadow)">
+    <rect x="70" y="150" width="470" height="300" rx="18" class="card"/>
+    <rect x="70" y="150" width="6" height="300" rx="3" fill="#5b5bd6"/>
+    <text x="100" y="190" class="label" fill="#5b5bd6">PART 01 · CORE</text>
+    <text x="100" y="220" class="font title">内核：先让 loop 跑起来</text>
+    <text x="100" y="244" class="font sub">状态机、事件日志、流式、工具契约</text>
+    <text x="100" y="282" class="num">01</text><text x="135" y="282" class="font item">agent loop</text>
+    <text x="100" y="310" class="num">02</text><text x="135" y="310" class="font item">tool round-trip</text>
+    <text x="100" y="338" class="num">03</text><text x="135" y="338" class="font item">session log / surface</text>
+    <text x="100" y="366" class="num">04</text><text x="135" y="366" class="font item">stream &amp; attempt</text>
+    <text x="100" y="394" class="num">05</text><text x="135" y="394" class="font item">tool contract</text>
+    <text x="100" y="422" class="num">06</text><text x="135" y="422" class="font item">tool runtime</text>
+  </g>
+
+  <!-- 02 context -->
+  <g filter="url(#shadow)">
+    <rect x="1060" y="150" width="470" height="300" rx="18" class="card"/>
+    <rect x="1524" y="150" width="6" height="300" rx="3" fill="#0c93ad"/>
+    <text x="1090" y="190" class="label" fill="#0c93ad">PART 02 · CONTEXT</text>
+    <text x="1090" y="220" class="font title">上下文：让请求装得下</text>
+    <text x="1090" y="244" class="font sub">提示词、输入调度、模型路由、持久化</text>
+    <text x="1090" y="282" class="num">07</text><text x="1125" y="282" class="font item">system prompt</text>
+    <text x="1090" y="310" class="num">08</text><text x="1125" y="310" class="font item">inbox / steering</text>
+    <text x="1090" y="338" class="num">09</text><text x="1125" y="338" class="font item">LLM seam</text>
+    <text x="1090" y="366" class="num">10</text><text x="1125" y="366" class="font item">persistence</text>
+    <text x="1090" y="394" class="num">11</text><text x="1125" y="394" class="font item">compaction</text>
+  </g>
+
+  <!-- 03 composition -->
+  <g filter="url(#shadow)">
+    <rect x="70" y="610" width="470" height="235" rx="18" class="card"/>
+    <rect x="70" y="610" width="6" height="235" rx="3" fill="#8b5cf6"/>
+    <text x="100" y="650" class="label" fill="#8b5cf6">PART 03 · COMPOSITION</text>
+    <text x="100" y="680" class="font title">组合：把对象变成插件</text>
+    <text x="100" y="704" class="font sub">Context、Fiber、effect、profile、boot</text>
+    <text x="100" y="742" class="num">12</text><text x="135" y="742" class="font item">plugin kernel</text>
+    <text x="100" y="770" class="num">13</text><text x="135" y="770" class="font item">composition / boot</text>
+    <text x="100" y="798" class="num">+</text><text x="135" y="798" class="font sub">mind map / 架构图 / 生命周期动画</text>
+  </g>
+
+  <!-- 04 execution -->
+  <g filter="url(#shadow)">
+    <rect x="1060" y="610" width="470" height="330" rx="18" class="card"/>
+    <rect x="1524" y="610" width="6" height="330" rx="3" fill="#b87412"/>
+    <text x="1090" y="650" class="label" fill="#b87412">PART 04 · EXECUTION</text>
+    <text x="1090" y="680" class="font title">执行：碰得到真实世界</text>
+    <text x="1090" y="704" class="font sub">文件、Shell、子 agent、MCP、浏览器、桌面</text>
+    <text x="1090" y="742" class="num">14</text><text x="1125" y="742" class="font item">capability seams</text>
+    <text x="1090" y="768" class="num">15</text><text x="1125" y="768" class="font item">subagents / presets</text>
+    <text x="1090" y="794" class="num">16</text><text x="1125" y="794" class="font item">PTC / programmatic tools</text>
+    <text x="1090" y="820" class="num">17</text><text x="1125" y="820" class="font item">MCP</text>
+    <text x="1090" y="846" class="num">18</text><text x="1125" y="846" class="font item">skills / commands</text>
+    <text x="1090" y="872" class="num">19</text><text x="1125" y="872" class="font item">browser use</text>
+    <text x="1090" y="898" class="num">20</text><text x="1125" y="898" class="font item">computer use I</text>
+    <text x="1090" y="924" class="num">21</text><text x="1125" y="924" class="font item">computer use II</text>
+  </g>
+
+  <!-- 05 product -->
+  <g filter="url(#shadow)">
+    <rect x="70" y="875" width="470" height="120" rx="18" class="card"/>
+    <rect x="70" y="875" width="6" height="120" rx="3" fill="#158a63"/>
+    <text x="100" y="910" class="label" fill="#158a63">PART 05 · PRODUCT</text>
+    <text x="100" y="938" class="font item" font-size="15">22–24 · web · SDK / headless · client UI</text>
+    <text x="100" y="962" class="font sub">projection、SSE、JSON-RPC、审批 UI</text>
+  </g>
+
+  <!-- 06 quality -->
+  <g filter="url(#shadow)">
+    <rect x="1060" y="960" width="470" height="70" rx="18" class="card"/>
+    <rect x="1524" y="960" width="6" height="70" rx="3" fill="#b33a3a"/>
+    <text x="1090" y="990" class="label" fill="#b33a3a">PART 06 · QUALITY</text>
+    <text x="1090" y="1015" class="font item" font-size="14">25–28 · observability · eval · security · capstone</text>
+  </g>
+
+  <text x="70" y="1025" class="font sub">图例：靛蓝 = 内核 / 模型 · 青 = 上下文 / 流 · 紫 = 组合 · 琥珀 = 工具 / 桌面 · 绿 = 产品 · 红 = 质量</text>
+</svg>

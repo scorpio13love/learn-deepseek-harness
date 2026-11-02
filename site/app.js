@@ -388,7 +388,7 @@
 
     $('#content').innerHTML = `<div class="home">
       <section class="hero">
-        <span class="eyebrow">18 lessons · source-guided</span>
+        <span class="eyebrow">18 lessons live · 28 planned</span>
         <h1>从零重写一个<br><em>生产级 Agent Harness</em></h1>
         <p>${escapeHtml(C.description)} 每课一个可运行快照，对照真实源码解释「为什么生产实现要这么做」。</p>
         <div class="hero-actions">
@@ -397,6 +397,31 @@
         </div>
         <div class="hero-stats">
           ${C.stats.map(stat => `<div class="hero-stat"><strong>${escapeHtml(stat.value)}</strong><span>${escapeHtml(stat.label)}</span></div>`).join('')}
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div><h2>一张图看全课</h2><p>v3 的 28 课规划：内核 → 上下文 → 组合 → 执行 → 产品 → 质量</p></div></div>
+        <a class="course-map-link" href="../docs/visuals/course-map.svg" target="_blank" rel="noreferrer">
+          <img class="course-map" src="../docs/visuals/course-map.svg" alt="Learn DeepSeek Harness 28 课课程地图">
+        </a>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div><h2>机制动画</h2><p>点开可单步：chunk → message → event / tool round-trip / surface</p></div></div>
+        <div class="visual-grid">
+          <a class="visual-card" href="../docs/visuals/s01-loop.html" target="_blank" rel="noreferrer">
+            <img src="../docs/visuals/s01-loop.gif" alt="s01 agent loop 动画" loading="lazy">
+            <span><b>s01 · agent loop</b><small>chunk → assembler → message → event</small></span>
+          </a>
+          <a class="visual-card" href="../docs/visuals/s02-tools.html" target="_blank" rel="noreferrer">
+            <img src="../docs/visuals/s02-tools.gif" alt="s02 tool round-trip 动画" loading="lazy">
+            <span><b>s02 · tool round-trip</b><small>tool-call → execute → tool/result</small></span>
+          </a>
+          <a class="visual-card" href="../docs/visuals/s03-surface.html" target="_blank" rel="noreferrer">
+            <img src="../docs/visuals/s03-surface.gif" alt="s03 surface 动画" loading="lazy">
+            <span><b>s03 · surface</b><small>event log → surface → derive</small></span>
+          </a>
         </div>
       </section>
 

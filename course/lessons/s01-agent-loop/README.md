@@ -8,6 +8,52 @@
 
 ---
 
+## 开篇 · 本课定位
+
+### 这一课学什么
+
+不是“调一次模型”，而是把一个 coding agent 的最小闭环写成可观察的状态机：
+
+- 一个 `turn` 如何拆成多个 `step`
+- 模型流式返回的 chunk 如何组装成一条 assistant message
+- 工具调用如何写回日志，并驱动下一步
+- 失败和取消为什么也必须以 `turn/end` 收口
+
+### DeepSeek 为什么这么做
+
+因为真实 coding agent 不是一次问答，而是**在外部世界里执行有副作用的操作**：
+
+- 模型可能连续调用多个工具，必须知道每一步属于哪个 turn/step
+- 用户可能在中途取消，已经看到的文本不能凭空消失
+- 进程可能崩溃，恢复后必须知道哪些工具调用已经发生
+- 工具失败、模型空回复、未知工具都必须成为可回放的事实，而不是抛出一个没人记录的异常
+
+所以 DSH 把循环写成显式的 `turn()` / `step()` 状态机，并把每个可观察事实追加到 Session 日志；取消是协作式的，已经流式交付的前缀会保留。参考：
+
+- [`agent-loop` 的中文说明](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/core/agent-loop/README.zh.md)
+- [`session` 子系统](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/session.zh.md)
+- [`assistant-stream`](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/core/agent-loop/src/assistant-stream.ts)
+
+### 服务的场景
+
+这节对应的是“在真实仓库里让 agent 改代码”的最底层：
+
+```text
+用户提出任务 → 模型读/写/跑测试 → 工具结果回到历史 → 模型继续
+```
+
+没有这层状态机，后面的 tool pipeline、persistence、subagents、SDK 都只是孤立模块。
+
+### 先看一张动图
+
+![s01 agent loop：chunk → message → event](../../../docs/visuals/s01-loop.gif)
+
+*一次 turn 的完整轨迹：SSE chunk 进入 assembler，组装成 message，再作为事件进入 surface。*
+
+[交互版（下载后用浏览器打开）](../../../docs/visuals/s01-loop.html) · [MP4](../../../docs/visuals/s01-loop.mp4)
+
+---
+
 ## 0. 先跑起来
 
 ```sh

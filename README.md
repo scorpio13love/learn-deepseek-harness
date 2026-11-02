@@ -99,6 +99,8 @@ deepseek-harness/   上游源码 clone（不提交，仅本地阅读）
 | [`docs/01-course-design.zh.md`](docs/01-course-design.zh.md) | 18 课设计：设计原则、课程地图、每课目标/源码锚点/产出/验收、与真实 DSH 的差异 |
 | [`course/README.md`](course/README.md) | 课程工程说明、运行方式、代码约定 |
 | [`course/lessons/`](course/lessons) | 18 课自包含讲义：每课 README 含源码阅读路径、实现说明、验收、练习与带答案的思考题 |
+| [`docs/02-course-v3.zh.md`](docs/02-course-v3.zh.md) | v3 课程设计：28 课、computer use、每课开篇模板与可视化规范 |
+| [`docs/visuals/README.md`](docs/visuals/README.md) | 可视化规范与 s01 动图的重新生成方式 |
 
 ## 课程网站
 
@@ -112,6 +114,12 @@ node site/serve.mjs
 站点直接读取 `course/lessons/*/README.md` 与 `docs/*.md`，不提交打包后的讲义副本或 bundle；只保留一张首页截图用于文档预览。必须通过本地服务器访问；站点包含课程地图、讲义阅读页、页内目录、学习进度、搜索与深浅色主题，说明见 [`site/README.md`](site/README.md)。
 
 ![课程首页截图](docs/assets/course-home.png)
+
+## 课程地图（v3 规划）
+
+当前 18 课已可运行；下面是 28 课 v3 的六条主线规划，详细拆解见 [`docs/02-course-v3.zh.md`](docs/02-course-v3.zh.md)。
+
+![28 课课程地图](docs/visuals/course-map.svg)
 
 ## 课程进度
 

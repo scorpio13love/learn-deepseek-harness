@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>s01 · agent loop</title>
+<style>
+  :root {
+    --ink: #121629;
+    --ink-soft: #343b54;
+    --muted: #707890;
+    --line: #dfe3ef;
+    --line-strong: #cbd1e2;
+    --paper: #ffffff;
+    --bg: #f4f6fb;
+    --brand: #5b5bd6;
+    --brand-soft: #ecebff;
+    --cyan: #0c93ad;
+    --cyan-soft: #e5f8fb;
+    --amber: #b87412;
+    --amber-soft: #fff3dd;
+    --green: #158a63;
+    --green-soft: #e8f8f1;
+    --red: #b33a3a;
+    --mono: "SFMono-Regular", "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+    --font: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    display: grid; place-items: center; min-height: 100vh; overflow: hidden;
+    background: #e9edf6; color: var(--ink); font-family: var(--font);
+  }
+  .stage {
+    position: relative; width: 1280px; height: 720px; flex: 0 0 auto;
+    overflow: hidden; background:
+      radial-gradient(900px 400px at 95% -10%, rgba(91, 91, 214, .10), transparent 65%),
+      radial-gradient(600px 320px at 0% 100%, rgba(12, 147, 173, .08), transparent 65%),
+      var(--bg);
+    transform-origin: top left;
+  }
+  .stage::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(35, 42, 70, .035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(35, 42, 70, .035) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: linear-gradient(180deg, #000 0%, transparent 92%);
+  }
+  .frame { position: absolute; inset: 0; padding: 26px 34px 22px; display: flex; flex-direction: column; }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+  .eyebrow { display: flex; align-items: center; gap: 8px; color: var(--brand); font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+  .eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 5px rgba(91,91,214,.12); }
+  h1 { margin: 8px 0 4px; font-size: 30px; line-height: 1.08; letter-spacing: -.035em; font-weight: 720; }
+  h1 em { font-style: normal; color: var(--brand); }
+  .subtitle { margin: 0; color: var(--muted); font-size: 12.5px; letter-spacing: .01em; }
+  .badge-live { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.7); color: var(--muted); font-size: 10.5px; font-family: var(--mono); }
+  .badge-live b { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px rgba(21,138,99,.12); }
+
+  .flow { position: relative; display: grid; grid-template-columns: 190px 1fr 210px 1fr 210px 1fr 210px 1fr 190px; align-items: center; gap: 0; margin-top: 18px; height: 70px; }
+  .node { position: relative; height: 58px; border: 1px solid var(--line-strong); border-radius: 13px; background: rgba(255,255,255,.82); box-shadow: 0 5px 16px -12px rgba(21,25,45,.3); padding: 10px 12px; display: flex; gap: 9px; align-items: center; z-index: 2; transition: border-color .15s, box-shadow .15s, background .15s; }
+  .node.active { border-color: color-mix(in srgb, var(--brand) 58%, var(--line)); background: #fff; box-shadow: 0 8px 24px -14px rgba(91,91,214,.65); }
+  .node.done { border-color: color-mix(in srgb, var(--green) 45%, var(--line)); }
+  .node-icon { display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 auto; border-radius: 8px; background: var(--brand-soft); color: var(--brand); font-size: 12px; font-weight: 800; font-family: var(--mono); }
+  .node.done .node-icon { background: var(--green-soft); color: var(--green); }
+  .node b { display: block; font-size: 11.5px; letter-spacing: -.01em; }
+  .node small { display: block; margin-top: 2px; color: var(--muted); font-family: var(--mono); font-size: 9px; }
+  .connector { position: relative; height: 1px; margin: 0 7px; background: var(--line-strong); z-index: 1; }
+  .connector::after { content: ""; position: absolute; right: -1px; top: -3px; width: 6px; height: 6px; border-top: 1px solid var(--line-strong); border-right: 1px solid var(--line-strong); transform: rotate(45deg); }
+  .connector.hot { background: linear-gradient(90deg, var(--brand), var(--cyan)); }
+  .connector.hot::after { border-color: var(--cyan); }
+  .packet { position: absolute; top: -4px; width: 9px; height: 9px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 4px rgba(91,91,214,.16); opacity: 0; z-index: 3; }
+  .packet.on { opacity: 1; }
+
+  .main { display: grid; grid-template-columns: 384px 1fr 436px; gap: 14px; margin-top: 12px; flex: 1; min-height: 0; }
+  .panel { position: relative; display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--line); border-radius: 14px; background: rgba(255,255,255,.88); box-shadow: 0 12px 34px -28px rgba(23,29,52,.5); overflow: hidden; }
+  .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 13px 9px; border-bottom: 1px solid var(--line); background: rgba(249,250,253,.75); }
+  .panel-head b { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+  .panel-head span { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+  .panel-body { position: relative; flex: 1; min-height: 0; padding: 12px; overflow: hidden; }
+
+  .prompt-line { display: flex; gap: 7px; align-items: center; margin: 0 0 9px; padding: 7px 8px; border-radius: 7px; background: var(--brand-soft); color: var(--ink-soft); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prompt-line span { flex: 0 0 auto; padding: 1px 5px; border-radius: 4px; background: var(--brand); color: #fff; font-family: var(--mono); font-size: 8px; text-transform: uppercase; }
+  .stream-row { display: grid; grid-template-columns: 22px 1fr; gap: 8px; margin-bottom: 7px; opacity: .18; transform: translateY(2px); }
+  .stream-row.on { opacity: 1; transform: none; }
+  .stream-row .idx { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 6px; background: var(--bg); color: var(--muted); font-family: var(--mono); font-size: 9px; border: 1px solid var(--line); }
+  .stream-row.on .idx { background: var(--brand-soft); color: var(--brand); border-color: transparent; }
+  .stream-card { border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 6px 8px; }
+  .stream-card code { display: block; color: var(--ink-soft); font-family: var(--mono); font-size: 9.5px; line-height: 1.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tag { display: inline-block; margin-right: 5px; padding: 1px 5px; border-radius: 4px; font-size: 8px; font-family: var(--mono); letter-spacing: .02em; background: var(--brand-soft); color: var(--brand); vertical-align: 1px; }
+  .tag.text { background: var(--cyan-soft); color: var(--cyan); }
+  .tag.tool { background: var(--amber-soft); color: var(--amber); }
+  .tag.end { background: var(--green-soft); color: var(--green); }
+  .stream-cursor { display: flex; align-items: center; gap: 6px; margin-top: 6px; color: var(--muted); font-family: var(--mono); font-size: 8.5px; opacity: 0; }
+  .stream-cursor.on { opacity: 1; }
+  .stream-cursor i { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: .2; } }
+
+  .assembler { display: flex; flex-direction: column; gap: 7px; }
+  .block { border: 1px solid var(--line); border-radius: 9px; background: #fff; padding: 7px 9px; opacity: .12; }
+  .block.on { opacity: 1; }
+  .block-head { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-family: var(--mono); font-size: 8px; }
+  .block-head b { color: var(--ink-soft); font-weight: 600; }
+  .block p { margin: 4px 0 0; color: var(--ink-soft); font-size: 10px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .block.reasoning { border-left: 3px solid var(--brand); }
+  .block.text { border-left: 3px solid var(--cyan); }
+  .block.tool { border-left: 3px solid var(--amber); }
+  .assembler-foot { margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--line); color: var(--muted); font-family: var(--mono); font-size: 9px; display: flex; justify-content: space-between; }
+  .assembler-foot b { color: var(--ink-soft); font-weight: 500; }
+
+  .event-list { display: flex; flex-direction: column; gap: 5px; }
+  .event { display: grid; grid-template-columns: 25px 1fr auto; gap: 8px; align-items: center; padding: 5px 7px; border-radius: 7px; border: 1px solid transparent; opacity: .10; }
+  .event.on { opacity: 1; background: #fff; border-color: var(--line); }
+  .event .seq { color: var(--muted); font-family: var(--mono); font-size: 8px; }
+  .event .type { color: var(--ink-soft); font-family: var(--mono); font-size: 9px; }
+  .event .surface { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--line-strong); display: grid; place-items: center; color: var(--muted); font-family: var(--mono); font-size: 7px; }
+  .event.surface .surface { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .event.new { border-color: color-mix(in srgb, var(--brand) 35%, var(--line)); background: color-mix(in srgb, var(--brand-soft) 50%, #fff); }
+  .event.tool-result .type { color: var(--amber); }
+  .answer { position: absolute; left: 12px; right: 12px; bottom: 11px; border: 1px solid color-mix(in srgb, var(--green) 30%, var(--line)); border-radius: 9px; background: var(--green-soft); padding: 7px 9px; display: flex; justify-content: space-between; align-items: center; opacity: 0; transform: translateY(4px); }
+  .answer.on { opacity: 1; transform: none; }
+  .answer span { color: var(--green); font-size: 9px; font-family: var(--mono); letter-spacing: .06em; }
+  .answer b { color: var(--ink); font-size: 14px; letter-spacing: -.02em; }
+
+  .loop-arrow { position: absolute; left: 690px; top: 330px; width: 150px; height: 178px; opacity: 0; color: var(--amber); z-index: 4; pointer-events: none; }
+  .loop-arrow.on { opacity: 1; }
+  .loop-label { position: absolute; left: 662px; top: 500px; padding: 4px 7px; border-radius: 6px; background: var(--amber-soft); color: var(--amber); font-family: var(--mono); font-size: 8px; opacity: 0; z-index: 5; }
+  .loop-label.on { opacity: 1; }
+
+  .bottom { display: grid; grid-template-columns: 1.1fr 1fr 1fr 1.4fr; gap: 12px; align-items: end; margin-top: 12px; }
+  .caption { min-width: 0; }
+  .caption .kicker { color: var(--brand); font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+  .caption h2 { margin: 3px 0 2px; font-size: 17px; letter-spacing: -.02em; }
+  .caption p { margin: 0; color: var(--muted); font-size: 10.5px; line-height: 1.45; }
+  .code-line { border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,.7); padding: 8px 10px; color: var(--ink-soft); font-family: var(--mono); font-size: 9.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .code-line b { color: var(--brand); font-weight: 600; }
+  .progress { display: flex; align-items: center; gap: 6px; padding-bottom: 8px; }
+  .seg { flex: 1; height: 5px; border-radius: 999px; background: var(--line); }
+  .seg.on { background: linear-gradient(90deg, var(--brand), var(--cyan)); }
+  .seg.done { background: var(--line-strong); }
+  .progress-label { min-width: 52px; text-align: right; color: var(--muted); font-family: var(--mono); font-size: 8.5px; }
+
+  .controls { position: fixed; left: 50%; bottom: 4px; transform: translateX(-50%); display: flex; gap: 8px; align-items: center; padding: 7px 10px; border-radius: 10px; background: rgba(18,22,41,.86); color: #fff; backdrop-filter: blur(10px); z-index: 20; font-size: 11px; }
+  .controls button { border: 1px solid rgba(255,255,255,.22); background: transparent; color: #fff; border-radius: 6px; padding: 4px 8px; cursor: pointer; font: inherit; white-space: nowrap; }
+  .controls button:hover { background: rgba(255,255,255,.1); }
+  .stage-jump { display: flex; gap: 3px; padding: 0 4px; border-left: 1px solid rgba(255,255,255,.18); border-right: 1px solid rgba(255,255,255,.18); }
+  .stage-jump button { border-color: transparent; color: #aab2d0; padding: 3px 5px; font-size: 9px; white-space: nowrap; }
+  .stage-jump button.active { background: rgba(139,139,245,.3); color: #fff; border-color: rgba(139,139,245,.55); }
+  .controls input { width: 100px; accent-color: #8b8bf5; }
+  .controls span { min-width: 54px; color: #c8cdea; font-family: var(--mono); font-size: 9px; }
+  body:not(.capture) .stage { margin-bottom: 64px; }
+  .capture .controls { display: none; }
+  .capture .stage { box-shadow: none; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="frame">
+    <div class="top">
+      <div>
+        <div class="eyebrow"><i></i> s01 · agent loop · source-guided</div>
+        <h1>一个 turn 如何走完：<em>chunk → message → event</em></h1>
+        <p class="subtitle">真实 DeepSeek 流式输出 · turn/step 状态机 · 工具结果写回 · append-only 会话日志</p>
+      </div>
+      <div class="badge-live"><b></b> LIVE TRACE</div>
+    </div>
+
+    <div class="flow" id="flow">
+      <div class="node" data-node="user"><div class="node-icon">01</div><div><b>User</b><small>prompt</small></div></div>
+      <div class="connector" data-conn="0"></div>
+      <div class="node" data-node="model"><div class="node-icon">02</div><div><b>DeepSeek</b><small>SSE stream</small></div></div>
+      <div class="connector" data-conn="1"></div>
+      <div class="node" data-node="assembler"><div class="node-icon">03</div><div><b>Assembler</b><small>blocks()</small></div></div>
+      <div class="connector" data-conn="2"></div>
+      <div class="node" data-node="agent"><div class="node-icon">04</div><div><b>Agent</b><small>turn / step</small></div></div>
+      <div class="connector" data-conn="3"></div>
+      <div class="node" data-node="session"><div class="node-icon">05</div><div><b>Session</b><small>events + surface</small></div></div>
+      <div class="packet" id="packet"></div>
+    </div>
+
+    <div class="main">
+      <section class="panel">
+        <div class="panel-head"><b>DeepSeek SSE</b><span>StreamChunk[]</span></div>
+        <div class="panel-body">
+          <div class="prompt-line"><span>user</span> 请计算 (12 + 30) * 2</div>
+          <div class="stream-row" data-chunk="0">
+            <span class="idx">1</span>
+            <div class="stream-card"><code><span class="tag">reasoning-delta</span>{"text":"先算括号"}</code></div>
+          </div>
+          <div class="stream-row" data-chunk="1">
+            <span class="idx">2</span>
+            <div class="stream-card"><code><span class="tag text">text-delta</span>{"text":"我来计算"}</code></div>
+          </div>
+          <div class="stream-row" data-chunk="2">
+            <span class="idx">3</span>
+            <div class="stream-card"><code><span class="tag tool">tool-call-delta</span>{"name":"calc","argumentsDelta":"…"}</code></div>
+          </div>
+          <div class="stream-row" data-chunk="3">
+            <span class="idx">4</span>
+            <div class="stream-card"><code><span class="tag end">block-end</span>{"block":{"type":"tool-call"}}</code></div>
+          </div>
+          <div class="stream-cursor" id="cursor"><i></i> awaiting next chunk…</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><b>StreamAssembler</b><span>push(chunk) → blocks()</span></div>
+        <div class="panel-body">
+          <div class="assembler">
+            <div class="block reasoning" data-block="0">
+              <div class="block-head"><b>reasoning</b><span>block 0</span></div>
+              <p>先算括号</p>
+            </div>
+            <div class="block text" data-block="1">
+              <div class="block-head"><b>text</b><span>block 1</span></div>
+              <p>我来计算</p>
+            </div>
+            <div class="block tool" data-block="2">
+              <div class="block-head"><b>tool-call · calc</b><span>block 2</span></div>
+              <p>{"expression":"(12 + 30) * 2"}</p>
+            </div>
+          </div>
+          <div class="assembler-foot"><span>assembler.blocks()</span><b id="block-count">0 blocks</b></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><b>Session log</b><span>seq / surface</span></div>
+        <div class="panel-body">
+          <div class="event-list" id="events">
+            <div class="event" data-event="0"><span class="seq">#00</span><span class="type">turn/start</span><span class="surface"></span></div>
+            <div class="event" data-event="1"><span class="seq">#01</span><span class="type">step/start</span><span class="surface"></span></div>
+            <div class="event surface" data-event="2"><span class="seq">#02</span><span class="type">user/message</span><span class="surface">S</span></div>
+            <div class="event" data-event="3"><span class="seq">#03</span><span class="type">request/header</span><span class="surface"></span></div>
+            <div class="event surface" data-event="4"><span class="seq">#04</span><span class="type">assistant/message</span><span class="surface">S</span></div>
+            <div class="event" data-event="5"><span class="seq">#05</span><span class="type">tool/call</span><span class="surface"></span></div>
+            <div class="event surface" data-event="6"><span class="seq">#06</span><span class="type">tool/result</span><span class="surface">S</span></div>
+            <div class="event surface" data-event="7"><span class="seq">#07</span><span class="type">assistant/message</span><span class="surface">S</span></div>
+            <div class="event" data-event="8"><span class="seq">#08</span><span class="type">turn/end</span><span class="surface"></span></div>
+          </div>
+          <div class="answer" id="answer"><span>final answer</span><b>84</b></div>
+        </div>
+      </section>
+    </div>
+
+    <svg class="loop-arrow" viewBox="0 0 150 178" fill="none" aria-hidden="true">
+      <path d="M132 8 C132 92 100 124 42 124" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 5"/>
+      <path d="M48 118 L38 124 L48 130" stroke="currentColor" stroke-width="1.5" fill="none"/>
+    </svg>
+    <div class="loop-label" id="loop-label">tool/result → next step</div>
+
+    <div class="bottom">
+      <div class="caption">
+        <div class="kicker" id="stage-kicker">STAGE 01 / 07</div>
+        <h2 id="stage-title">发起轮次</h2>
+        <p id="stage-desc">用户输入先进入日志，再成为下一步请求的历史。</p>
+      </div>
+      <div class="code-line" id="code-line"><b>agent.run</b>(prompt)</div>
+      <div class="code-line" id="code-line-2">session.append(<b>'turn/start'</b>)</div>
+      <div class="progress" id="progress">
+        <div class="seg" data-seg="0"></div><div class="seg" data-seg="1"></div><div class="seg" data-seg="2"></div><div class="seg" data-seg="3"></div><div class="seg" data-seg="4"></div><div class="seg" data-seg="5"></div><div class="seg" data-seg="6"></div>
+        <span class="progress-label" id="progress-label">0%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="play">暂停</button>
+  <button id="prev">← 上一幕</button>
+  <button id="next">下一幕 →</button>
+  <div class="stage-jump" id="stage-jump"></div>
+  <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="进度">
+  <span id="counter">0 / 119</span>
+</div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const capture = params.get('capture') === '1' || params.has('frame');
+  const initialFrame = Number(params.get('frame') ?? 0);
+  const TOTAL = 120;
+  const STAGE_NAMES = ['轮次', '请求', 'chunk', 'message', '工具', 'step 2', '收口'];
+  let frame = Number.isFinite(initialFrame) ? Math.max(0, Math.min(TOTAL - 1, initialFrame)) : 0;
+  let playing = !capture;
+  let raf = 0;
+  let last = 0;
+
+  if (capture) document.body.classList.add('capture');
+
+  const els = {
+    nodes: [...document.querySelectorAll('[data-node]')],
+    conns: [...document.querySelectorAll('[data-conn]')],
+    chunks: [...document.querySelectorAll('[data-chunk]')],
+    blocks: [...document.querySelectorAll('[data-block]')],
+    events: [...document.querySelectorAll('[data-event]')],
+    segs: [...document.querySelectorAll('[data-seg]')],
+    packet: document.getElementById('packet'),
+    cursor: document.getElementById('cursor'),
+    answer: document.getElementById('answer'),
+    loop: document.querySelector('.loop-arrow'),
+    loopLabel: document.getElementById('loop-label'),
+    kicker: document.getElementById('stage-kicker'),
+    title: document.getElementById('stage-title'),
+    desc: document.getElementById('stage-desc'),
+    code: document.getElementById('code-line'),
+    code2: document.getElementById('code-line-2'),
+    count: document.getElementById('block-count'),
+    progress: document.getElementById('progress-label'),
+  };
+
+  const jump = document.getElementById('stage-jump');
+  jump.innerHTML = STAGE_NAMES.map((name, index) => `<button data-stage="${index}" aria-label="跳到第 ${index + 1} 幕">${index + 1} ${name}</button>`).join('');
+  const jumpButtons = [...jump.querySelectorAll('[data-stage]')];
+
+  const stages = [
+    { at: 0.00, kicker: 'STAGE 01 / 07', title: '发起轮次', desc: '用户输入先进入日志，再成为下一步请求的历史。', code: '<b>agent.run</b>(prompt)', code2: "session.append(<b>'turn/start'</b>)" },
+    { at: 0.10, kicker: 'STAGE 02 / 07', title: '组装请求', desc: '不是维护 messages 数组，而是从 surface 重新派生。', code: '<b>deriveMessages</b>()', code2: "append(<b>'request/header'</b>, header)" },
+    { at: 0.20, kicker: 'STAGE 03 / 07', title: '接收 chunk', desc: 'reasoning、text、tool-call 以 delta 形式到达。', code: '<b>assembler.push</b>(chunk)', code2: "for await (chunk of model.stream())" },
+    { at: 0.44, kicker: 'STAGE 04 / 07', title: '结算 message', desc: 'block-end 后组装成 content blocks，再写 surface。', code: '<b>assembler.blocks</b>()', code2: "append(<b>'assistant/message'</b>, { message })" },
+    { at: 0.56, kicker: 'STAGE 05 / 07', title: '执行工具', desc: 'tool/call 与 tool/result 都是日志事实，结果再进入下一步。', code: '<b>tools.execute</b>(call)', code2: "append(<b>'tool/result'</b>, { message })" },
+    { at: 0.66, kicker: 'STAGE 06 / 07', title: '下一步', desc: '同一个 turn 里循环：新的请求包含工具结果，模型继续回答。', code: '<b>step = 2</b>', code2: "deriveMessages() // includes tool result" },
+    { at: 0.88, kicker: 'STAGE 07 / 07', title: '关闭轮次', desc: 'turn/end 一定写入 finally，失败和取消也能回放。', code: '<b>finally</b> { append(<b>\'turn/end\'</b>) }', code2: 'reason = completed' },
+  ];
+
+  const reveal = {
+    events: [0.02, 0.055, 0.08, 0.12, 0.47, 0.54, 0.60, 0.82, 0.90],
+    chunks: [0.23, 0.30, 0.37, 0.43],
+    blocks: [0.27, 0.34, 0.41],
+  };
+
+  function stageAt(t) {
+    let index = 0;
+    for (let i = 0; i < stages.length; i += 1) if (t >= stages[i].at) index = i;
+    return index;
+  }
+
+  function render(t) {
+    const stage = stageAt(t);
+    els.kicker.textContent = stages[stage].kicker;
+    els.title.textContent = stages[stage].title;
+    els.desc.textContent = stages[stage].desc;
+    els.code.innerHTML = stages[stage].code;
+    els.code2.innerHTML = stages[stage].code2;
+    els.progress.textContent = `${Math.round(t * 100)}%`;
+
+    const activeNode =
+      stage === 0 ? 'user' :
+      stage === 1 || stage === 2 ? 'model' :
+      stage === 3 ? 'assembler' :
+      stage === 4 || stage === 5 ? 'agent' : 'session';
+    els.nodes.forEach(node => {
+      node.classList.toggle('active', node.dataset.node === activeNode);
+      const order = ['user', 'model', 'assembler', 'agent', 'session'];
+      node.classList.toggle('done', order.indexOf(node.dataset.node) < order.indexOf(activeNode));
+    });
+    els.conns.forEach((conn, i) => conn.classList.toggle('hot', i < stage));
+
+    const packetOn = t > 0.18 && t < 0.90;
+    els.packet.classList.toggle('on', packetOn);
+    if (packetOn) {
+      const span = 0.72;
+      const p = Math.min(1, Math.max(0, (t - 0.18) / span));
+      const left = 180 + p * 905;
+      els.packet.style.left = `${left}px`;
+      els.packet.style.top = `${35 + Math.sin(p * Math.PI * 3) * 2}px`;
+    }
+
+    els.chunks.forEach((row, i) => row.classList.toggle('on', t >= reveal.chunks[i]));
+    els.blocks.forEach((block, i) => block.classList.toggle('on', t >= reveal.blocks[i]));
+    const blockCount = reveal.blocks.filter(value => t >= value).length;
+    els.count.textContent = `${blockCount} block${blockCount === 1 ? '' : 's'}`;
+    els.cursor.classList.toggle('on', t > 0.20 && t < 0.46);
+
+    els.events.forEach((row, i) => {
+      const on = t >= reveal.events[i];
+      row.classList.toggle('on', on);
+      row.classList.toggle('new', on && t < reveal.events[i] + 0.035);
+    });
+    els.answer.classList.toggle('on', t >= 0.82);
+    els.loop.classList.toggle('on', t >= 0.56 && t < 0.88);
+    els.loopLabel.classList.toggle('on', t >= 0.58 && t < 0.86);
+
+    els.segs.forEach((seg, i) => {
+      seg.classList.toggle('done', i < stage);
+      seg.classList.toggle('on', i === stage);
+    });
+    jumpButtons.forEach((button, index) => button.classList.toggle('active', index === stage));
+  }
+
+  function setFrame(next) {
+    frame = (next + TOTAL) % TOTAL;
+    render(frame / (TOTAL - 1));
+    document.getElementById('scrub').value = String(Math.round((frame / (TOTAL - 1)) * 1000));
+    document.getElementById('counter').textContent = `${frame} / ${TOTAL - 1}`;
+  }
+
+  function tick(time) {
+    if (!playing) return;
+    if (!last) last = time;
+    if (time - last > 1000 / 10) {
+      last = time;
+      setFrame(frame + 1);
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  function fit() {
+    if (capture) return;
+    const scale = Math.min(window.innerWidth / 1280, (window.innerHeight - 80) / 720);
+    document.getElementById('stage').style.transform = `scale(${scale})`;
+    document.body.style.height = `${720 * scale + 70}px`;
+  }
+
+  document.getElementById('play').addEventListener('click', (event) => {
+    playing = !playing;
+    event.currentTarget.textContent = playing ? '暂停' : '播放';
+    if (playing) { last = 0; raf = requestAnimationFrame(tick); }
+    else cancelAnimationFrame(raf);
+  });
+  function pause() {
+    playing = false;
+    document.getElementById('play').textContent = '播放';
+    cancelAnimationFrame(raf);
+  }
+
+  function goStage(index) {
+    pause();
+    const bounded = (index + stages.length) % stages.length;
+    setFrame(Math.round(stages[bounded].at * (TOTAL - 1)));
+  }
+
+  document.getElementById('prev').addEventListener('click', () => goStage(stageAt(frame / (TOTAL - 1)) - 1));
+  document.getElementById('next').addEventListener('click', () => goStage(stageAt(frame / (TOTAL - 1)) + 1));
+  jumpButtons.forEach((button) => button.addEventListener('click', () => goStage(Number(button.dataset.stage))));
+  document.getElementById('scrub').addEventListener('input', (event) => {
+    pause();
+    setFrame(Math.round(Number(event.currentTarget.value) / 1000 * (TOTAL - 1)));
+  });
+  window.addEventListener('resize', fit);
+
+  fit();
+  setFrame(frame);
+  if (playing) { document.getElementById('play').textContent = '暂停'; raf = requestAnimationFrame(tick); }
+</script>
+</body>
+</html>
