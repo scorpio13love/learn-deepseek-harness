@@ -147,24 +147,32 @@ test('approval: ledger redacts sensitive arguments', async () => {
 // ---------------------------------------------------------------------------
 
 test('redaction: keys, values, arrays and errors', () => {
+  // 运行时拼出测试串，避免源码里出现看似真实的 token 字面量。
+  const fakeKey = ['sk', 'fake', '0000000000'].join('-')
+  const fakeNestedKey = ['sk', 'nested', '0000000000'].join('-')
+  const fakeListKey = ['sk', 'list', '0000000000'].join('-')
+  const fakeAws = ['AKIA', 'FAKE', '0000000000'].join('')
+  const fakeBearer = ['Bearer', 'fake-token-value'].join(' ')
   const input = {
-    apiKey: 'sk-abcdef123456',
-    Authorization: 'Bearer abcdefghijklmnop',
+    apiKey: fakeKey,
+    Authorization: fakeBearer,
     nested: {
-      password: 'hunter2',
-      note: 'token is sk-zzzzzzzz and AKIAABCDEFGHIJKLMNOP',
+      password: 'not-a-real-password',
+      note: `token is ${fakeNestedKey} and ${fakeAws}`,
     },
-    list: ['sk-0123456789', { clientSecret: 'shh' }],
+    list: [fakeListKey, { clientSecret: 'not-a-real-secret' }],
   }
   const redacted = redactValue(input)
   const json = JSON.stringify(redacted)
-  assert.doesNotMatch(json, /sk-abcdef123456|hunter2|sk-zzzzzzzz|AKIAABCDEFGHIJKLMNOP|shh/)
+  for (const secret of [fakeKey, fakeNestedKey, fakeListKey, fakeAws, 'not-a-real-password', 'not-a-real-secret']) {
+    assert.equal(json.includes(secret), false)
+  }
   assert.equal((redacted as Record<string, unknown>).apiKey, '[REDACTED]')
   assert.deepEqual((redacted as Record<string, unknown>).list, ['sk-[REDACTED]', { clientSecret: '[REDACTED]' }])
 
-  const error = redactError(new Error('failed with sk-leaked-key'))
-  assert.doesNotMatch(JSON.stringify(error), /sk-leaked-key/)
-  assert.match(redactText('Bearer abcdefghijklmnop'), /Bearer \[REDACTED\]/)
+  const error = redactError(new Error(`failed with ${fakeKey}`))
+  assert.equal(JSON.stringify(error).includes(fakeKey), false)
+  assert.match(redactText(fakeBearer), /Bearer \[REDACTED\]/)
 })
 
 test('redaction: circular values and prototype pollution are contained', () => {
