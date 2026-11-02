@@ -1,10 +1,10 @@
-# s01 · agent loop：模型、工具与轮次状态机
+# s01 · 最小 agent loop：一次真实文本 turn 如何发生
 
 > 本课代码：`src/`（`types.ts`、`session.ts`、`deepseek.ts`、`env.ts`、`tools.ts`、`agent.ts`、`demo.ts`）
 >
-> 测试：`tests/s01.test.ts`（16 个离线用例）+ `tests/live.test.ts`（2 个真实模型用例）
+> 测试：`tests/s01.test.ts`（7 个离线用例）+ `tests/live.test.ts`（1 个真实模型用例）
 >
-> 模型：真实 DeepSeek，不使用假模型。
+> 模型：真实 DeepSeek；离线测试用本地脚本模型，不访问网络。
 
 ---
 
@@ -12,23 +12,26 @@
 
 ### 这一课学什么
 
-不是“调一次模型”，而是把一个 coding agent 的最小闭环写成可观察的状态机：
+把「调一次 DeepSeek」写成 coding agent 的最小闭环，并且让每一步都可以被观察：
 
-- 一个 `turn` 如何拆成多个 `step`
-- 模型流式返回的 chunk 如何组装成一条 assistant message
-- 工具调用如何写回日志，并驱动下一步
-- 失败和取消为什么也必须以 `turn/end` 收口
+- 一次 **turn** 如何打开、如何以 `turn/end` 收口；
+- turn 里的 **step** 是什么，为什么不是简单的 `while (true)`;
+- 模型返回的 SSE chunk 如何被 **StreamAssembler** 组装成一条 assistant message；
+- 用户取消时，已经流式交付的文本前缀如何保留；
+- 为什么请求历史必须每次从 **会话日志派生**，而不是维护一个隐藏的 `messages` 数组。
+
+这一课**不要求工具往返**。`tools.ts` 和 loop 里的工具分发代码保留为内部能力，方便后续课程增量改造；但 demo、README 和主测试只聚焦文本 loop。
 
 ### DeepSeek 为什么这么做
 
-因为真实 coding agent 不是一次问答，而是**在外部世界里执行有副作用的操作**：
+因为 agent 不是一次问答，而是**会持续产生可观察事实的长事务**：
 
-- 模型可能连续调用多个工具，必须知道每一步属于哪个 turn/step
-- 用户可能在中途取消，已经看到的文本不能凭空消失
-- 进程可能崩溃，恢复后必须知道哪些工具调用已经发生
-- 工具失败、模型空回复、未知工具都必须成为可回放的事实，而不是抛出一个没人记录的异常
+- 模型输出是流式的，用户在中途就能看到文本；取消不能把已经看到的内容抹掉；
+- 一次用户请求可能包含多个模型步骤，每一步都需要独立的失败、取消和用量边界；
+- 进程可能崩溃，恢复后必须能从事件日志重建“模型当时看到了什么”；
+- 失败（网络错误、内容过滤、超限）本身也是事实，不能用一个没人记录的异常吞掉。
 
-所以 DSH 把循环写成显式的 `turn()` / `step()` 状态机，并把每个可观察事实追加到 Session 日志；取消是协作式的，已经流式交付的前缀会保留。参考：
+所以 DSH 把循环写成显式的 `turn()` / `step()` 状态机，把每个可观察事实追加到 Session 日志；取消是协作式的，已交付前缀进入历史。参考：
 
 - [`agent-loop` 的中文说明](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/core/agent-loop/README.zh.md)
 - [`session` 子系统](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/session.zh.md)
@@ -36,15 +39,16 @@
 
 ### 服务的场景
 
-这节对应的是“在真实仓库里让 agent 改代码”的最底层：
+这节对应的是所有后续能力的地基：
 
 ```text
-用户提出任务 → 模型读/写/跑测试 → 工具结果回到历史 → 模型继续
+用户提出任务 → 模型流式回答 → 文本进入历史 → 用户看到结果
+                              ↘ 取消 / 失败 / 超时也留下可回放的事实
 ```
 
-没有这层状态机，后面的 tool pipeline、persistence、subagents、SDK 都只是孤立模块。
+没有这层状态机，后面的工具往返、持久化、压缩、subagent、SDK 都只是孤立模块。
 
-### 先看一张动图
+### 先看一张图
 
 ![s01 agent loop：chunk → message → event](../../../docs/visuals/s01-loop.gif)
 
@@ -57,14 +61,14 @@
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s01-agent-loop
+cd course/lessons-v3/s01-agent-loop
 
 cp env.example .env
 # 编辑 .env，至少填入 DEEPSEEK_API_KEY
 
-node src/demo.ts
-node --test tests/s01.test.ts      # 不需要 key
-node --test tests/live.test.ts     # 需要 key；没有则 SKIP
+node src/demo.ts                 # 一次真实文本 turn
+node --test tests/s01.test.ts    # 离线，不需要 key
+node --test tests/live.test.ts   # 需要 key；没有则 SKIP
 
 # 可选：类型检查
 npm install
@@ -81,7 +85,7 @@ npm run typecheck
 | `DEEPSEEK_MAX_TOKENS` | 否 | 不发送 | 单次输出上限 |
 | `DEEPSEEK_TIMEOUT_MS` | 否 | 不超时 | 请求超时 |
 
-Demo 会打印一次真实 turn 的事件序列。因为模型输出不固定，事件的具体条数取决于它调用了几次工具；正常情况下长这样：
+Demo 只发一次纯文本请求，正常情况下事件序列长这样：
 
 ```text
 model: deepseek/deepseek-flash (https://api.deepseek.com)
@@ -90,37 +94,33 @@ model: deepseek/deepseek-flash (https://api.deepseek.com)
 #00 turn/start
 #01 step/start
 #02 user/message
-#03 request/header
-#04 assistant/message
-#05 tool/call          calc({"expression":"(12 + 30) * 2"})
-#06 tool/result        84
-#07 step/end
-#08 step/start
-#09 assistant/message
-#10 step/end
-#11 turn/end
+#03 request/header      deepseek/deepseek-flash tools=[]
+#04 assistant/message   blocks=1
+#05 step/end
+#06 turn/end            {"kind":"completed"}
 
 === 结果 ===
 reason: { kind: 'completed' }
-steps : 2
-answer: (12 + 30) * 2 = 84
+steps : 1
+answer: ...
 ```
 
-请先观察三件事：
+请先确认三件事：
 
-1. 工具调用发生在 `step/end` 之前；
-2. 第二次 `step/start` 之后没有新的 `user/message`，但模型看到了上一次的工具结果；
-3. `turn/end` 是最后一条事件，即使中途出错也会存在。
+1. `turn/end` 是最后一条事件；
+2. 第二次运行不会复用进程内的 messages 数组——请求来自 `deriveMessages()`；
+3. 中间任何一步失败或取消，`step/end` 与 `turn/end` 仍然存在。
 
 ---
 
 ## 1. 这一课要回答的问题
 
-1. 一个 agent loop 的最小正确形状是什么？为什么不是 `while (true) { callModel(); runTools(); }`？
-2. 模型请求应该从哪里来？维护一个 `messages: Message[]`，还是每次从会话日志重新派生？
-3. 工具调用失败时，应该让 loop 崩掉，还是让模型看到错误结果？
-4. 用户取消时，已经流式输出一半的文本怎么办？
-5. 一次轮次（turn）和一次步骤（step）到底谁包含谁？
+1. 一个 agent loop 的最小正确形状是什么？为什么不是 `while (true) { callModel(); }`？
+2. turn 和 step 谁包含谁？为什么不能用 turn 的开始/结束推断模型调用次数？
+3. 流式 chunk 的 index 为什么不能当作“第几个块”以外的任何东西？
+4. 取消时为什么不把 assembly 直接丢掉，而要保留前缀？
+5. 为什么请求要从事件日志派生，而不是让 loop 自己维护 `messages`？
+6. 模型失败为什么应该变成 `turn/end { kind: 'error' }`，而不是抛给调用方？
 
 ---
 
@@ -130,32 +130,15 @@ answer: (12 + 30) * 2 = 84
 
 | 顺序 | 文件 / 函数 | 读的时候问自己 | 思考题 |
 |---|---|---|---|
-| 1 | [`docs/agent-lifecycle.zh.md`](../../../deepseek-harness/docs/agent-lifecycle.zh.md) | 一次 turn 里到底发生了哪些事件？哪些是持久的，哪些是实时的？ | Q1 |
-| 2 | [`agent.ts` → `turn()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L327) | 为什么 `turn/end` 要放在 `finally`？为什么工具结果要在 `step/end` 之前？ | Q2 |
-| 3 | [`agent.ts` → `preStep()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L283) | 输入在哪里被「领取」？`toolSet` 为什么是步骤级的？ | Q3 |
-| 4 | [`agent.ts` → `step()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L435) | 请求准备好之后，先写 system 还是先写 user？为什么重试不重复组装？ | Q4 |
-| 5 | [`agent.ts` → `prepareRequest()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L613) | `prepareCall` 绑定了什么？为什么 `agent/request` 不能改 provider/model？ | Q5 |
-| 6 | [`agent.ts` → `buildRequest()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L656) | 请求由哪三部分组成？`request/header` 为什么只记录变化？ | Q6 |
-| 7 | [`session/src/types.ts` → `SessionEventMap`](../../../deepseek-harness/packages/core/session/src/types.ts#L287) | 哪些事件进入模型历史？哪些只是日志事实？ | Q7 |
-| 8 | [`session/src/index.ts` → `deriveMessages()`](../../../deepseek-harness/packages/core/session/src/index.ts#L999) | 派生规则是什么？空 assistant 消息为什么被排除？ | Q8 |
-| 9 | [`tools/src/contracts.ts` → `ToolDefinition`](../../../deepseek-harness/packages/core/tools/src/contracts.ts#L26) | 工具为什么返回「规范值」而不是文本？ | Q9 |
-| 10 | [`llm-deepseek`](../../../deepseek-harness/packages/llm/llm-deepseek/) | 真实适配器如何处理 reasoning、tool_calls、cache usage？ | Q10 |
+| 1 | [`docs/agent-lifecycle.zh.md`](../../../deepseek-harness/docs/agent-lifecycle.zh.md) | 一次 turn 里到底发生了哪些事件？哪些是持久的？ | Q1 |
+| 2 | [`agent.ts` → `turn()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts) | 为什么 `turn/end` 要放在 `finally`？ | Q2 |
+| 3 | [`agent.ts` → `step()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts) | 请求准备好之后，先写 system 还是先写 user？ | Q3 |
+| 4 | [`llm/src/assembler.ts`](../../../deepseek-harness/packages/llm/llm/src/assembler.ts) | block-start / delta / block-end 如何对应？ | Q4 |
+| 5 | [`llm/src/types.ts`](../../../deepseek-harness/packages/llm/llm/src/types.ts) | 为什么模型输出是 `ContentBlock[]` 而不是字符串？ | Q5 |
+| 6 | [`session/src/index.ts` → `deriveMessages()`](../../../deepseek-harness/packages/core/session/src/index.ts) | 哪些事件进入历史？空 assistant 为什么被排除？ | Q6 |
+| 7 | [`llm-deepseek`](../../../deepseek-harness/packages/llm/llm-deepseek/) | reasoning、usage、finish_reason 如何映射？ | Q7 |
 
-读完后先回答这 10 个问题，再对照第 9 节的答案；答不上来的，回到对应函数再读一遍。
-
-然后，你应该能不看文档画出这样一条链：
-
-```text
-turn/start
-  step/start
-    user/message (首次)
-    request/header
-    assistant/message
-    tool/call
-    tool/result
-  step/end
-turn/end
-```
+读完后先自己回答第 8 节的 7 个问题，再对照答案。
 
 ---
 
@@ -163,159 +146,90 @@ turn/end
 
 ### 3.1 turn 与 step
 
-- **step** = 一次模型请求 + 它请求的工具。
+- **step** = 一次模型请求（以及它可能请求的工具）。
 - **turn** = 0 个或多个 step；在领取首条输入前打开，在不再欠工作时关闭。
 
-一个 turn 可以没有 step（输入被拒绝、被改写为空、取消）。一个 step 失败后 turn 也可能继续（重试）。所以不能用「turn 开始/结束」推断「模型调用次数」。
+一个 turn 可以没有 step（输入为空、被拒绝、打开前取消）。一个 step 失败后 turn 也可能继续（重试、下一轮）。所以：
 
-真实 loop 的 `turn()` 是一个 `while (true)`：每轮跑一个 step；如果模型没有工具调用、且 `next-step` 没有新输入，就 `break`。s01 用「是否有工具调用」作为继续条件，等价于最小版本。
+```text
+turn/start → step/start → ... → step/end → step/start → ... → step/end → turn/end
+```
+
+不是“一次请求 = 一次 turn”。本课的 `maxSteps` 只是防止脚本化模型无限循环的教学守卫，真实 DSH 用“是否还有欠下的工作”结束 turn。
 
 ### 3.2 日志是唯一真源
 
-s01 的 `Session` 已经是一个事件日志，而不是 `messages` 数组：
+`Session` 是一个仅追加的事件数组，而不是 `messages` 数组：
 
 ```ts
-// src/session.ts
+// src/session.ts（节选）
+append(type, data): SessionEvent { ... }
+
 deriveMessages(): Message[] {
   for (const event of this.#events) {
-    switch (event.type) {
-      case 'system/message':
-      case 'user/message':
-      case 'tool/result':
-        messages.push(event.data.message)
-        break
-      case 'assistant/message':
-        if (event.data.message.content.length > 0) messages.push(event.data.message)
-        break
+    if (event.type === 'user/message') messages.push(event.data.message)
+    if (event.type === 'assistant/message' && event.data.message.content.length > 0) {
+      messages.push(event.data.message)
     }
+    if (event.type === 'tool/result') messages.push(event.data.message)
   }
+  return messages
 }
 ```
 
-这一步看起来「多此一举」，但它是后面所有能力的地基：
+这样做的直接收益：
 
-- **重试**：不重复组装、不重复提交用户消息，因为请求可以从日志重新派生。
-- **恢复**：进程重启后，从磁盘读事件，`deriveMessages()` 得到同一份历史。
-- **压缩**：替换 surface 节点，但不删除原始事件。
-- **审计**：模型看到的每个字节都能从日志重建。
+- 取消、失败、重试都只是追加事实，不需要回滚一个可变数组；
+- 从磁盘恢复后，历史与当时完全一致；
+- 测试可以只断言事件序列，而不依赖内部字段。
 
-真实 DSH 把这条原则写成硬规则：**model-visible ⟺ logged**。
+### 3.3 流式组装：index 是块的身份
 
-### 3.3 请求 = header + 派生历史 + 工具声明
+SSE 的 delta 是交错的：
 
-真实 `buildRequest()` 的请求是：
+```text
+block-start(index=0, reasoning)
+reasoning-delta(index=0)
+block-start(index=1, text)
+text-delta(index=1)
+reasoning-delta(index=0)
+...
+```
+
+`StreamAssembler` 用 `Map<index, openBlock>` 累积，最后按 index 排序输出。`block-end` 携带权威的完整块；如果流被截断、没有 `block-end`，就从 delta 合成。
+
+`index` 不是“第几个 token”，也不是数组下标之外的排序依据——它只是同一次响应内一个内容块的稳定 id。
+
+### 3.4 取消：保留用户已经看到的东西
+
+取消不是“把这次响应丢掉”。用户已经看到的文本必须保留：
+
+- `partialBlocks()` 只保留 `text` / `reasoning`，未完成的 `tool-call` 不进入历史；
+- 追加 `assistant/message` 时带 `interrupted: true`；
+- 如果连一个可见块都没有，就只记录 `assistant/attempt` 失败事实；
+- 无论哪种情况，`step/end` 和 `turn/end { kind: 'aborted' }` 都要写入。
+
+### 3.5 失败是结果，不是穿透的异常
+
+`Agent.run()` 不会把模型错误抛给调用方，而是把它收敛成 `RunResult.reason`：
 
 ```ts
-{
-  ...header.config,          // provider/model/采样/maxTokens
-  messages: session.deriveMessages(),
-  toolHistory: session.toolHistory(),
-  tools: header.tools,       // 本步准入的工具 schema
-  sessionId,
-  signal,
-}
+{ kind: 'error', failure: { message, code } }
 ```
 
-注意：**没有 `system` 字段**。系统提示词是 `messages` 里的 system 节点（surface node 0），由 `system/message` 事件派生。这是 DSH 与很多框架最大的不同之一：提示词不是请求参数，而是历史的一部分。
-
-s01 简化成：
-
-```ts
-{
-  sessionId,
-  provider: model.provider,
-  model: model.model,
-  messages: session.deriveMessages(),
-  tools: tools.schemas(),
-  signal,
-}
-```
-
-### 3.4 失败是结果，不是异常
-
-| 失败 | 真实 DSH | s01 |
-|---|---|---|
-| 模型请求失败 | `assistant/attempt` + `agent/request-error`，可重试 | `assistant/attempt` + `turn/end {error}` |
-| 工具抛错 | 规范化为 `isError` 的 `tool/result` | 同左 |
-| 未知工具 | `UNKNOWN_TOOL` 错误结果 | `Error: unknown tool "x"` |
-| 工具参数非法 | 规范化错误结果 | `Error: ...` |
-| 取消 | `turn/end {aborted}` + 已交付前缀 | 同左 |
-
-关键点：**工具失败不会让轮次失败**。模型需要看到错误，才能决定换一种做法。只有 loop 自身或模型请求失败才会结束轮次。
-
-### 3.5 取消：保留用户已经看到的东西
-
-真实 DSH 的取消契约：
-
-- 取消发生在 `prepareCall` / `agent/request` 期间：system 和 user 都尚未提交，**什么都不写**。
-- 取消发生在流中途：已交付的文本/推理前缀以 `assistant/message { interrupted: true }` 结算，下一次请求能看到用户已经看到的内容。
-- 取消发生在工具调用期间：未分发的调用得到合成的 `tool/call` + `ABORTED_BEFORE_DISPATCH` 结果，保证回放时配对。
-
-s01 实现了第二条（流中途取消保留前缀），第一条/第三条留给 s05、s07。
+同时日志里会有 `assistant/attempt`（这次尝试失败）和 `turn/end`。调用方、UI、持久化都能看到同一个事实。
 
 ---
 
 ## 4. 真实 DeepSeek 适配器
 
-这一课不再使用假模型。`src/deepseek.ts` 直接调用 `POST /chat/completions`，并把 SSE 转成内部 `StreamChunk`。这是整课最长、也最值得逐行读的文件。
+`src/deepseek.ts` 做三件事：
 
-### 4.1 请求映射
+1. 把内部 `Message[]` 投影成 OpenAI-compatible wire messages；
+2. 用 `fetch` 发 `stream: true` 请求，`SseDecoder` 处理跨 chunk 切割与 CRLF；
+3. 把 `delta.content` / `delta.reasoning_content` / `finish_reason` / usage 映射成内部 `StreamChunk`。
 
-```ts
-// src/deepseek.ts
-const body = {
-  model: this.model,
-  messages: toWireMessages(request.messages),
-  stream: true,
-  stream_options: { include_usage: true },
-  tools: toWireTools(request.tools),
-  max_tokens: config.maxTokens,
-}
-```
-
-- 内部 `Message` 有 `system` / `user` / `assistant` / `tool` 四种角色，和 OpenAI wire 一一对应。
-- assistant 的文本和 `tool_calls` 要拆开：文本进 `content`，工具调用进 `tool_calls`。
-- tool 结果必须带 `tool_call_id`，否则 provider 无法配对。
-- 工具的原始参数是字符串，**不做重新序列化**，避免破坏模型给的 JSON 字节。
-
-### 4.2 SSE 解析
-
-```text
-data: {"choices":[{"delta":{"content":"你"}}]}
-data: {"choices":[{"delta":{"content":"好"}}]}
-data: {"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call_1","function":{"name":"calc","arguments":"{\"expr"}}]}}]}
-data: {"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"arguments":"ession\":\"1+1\"}"}}]}}]}
-data: {"choices":[{"finish_reason":"tool_calls"}]}
-data: {"usage":{...}}
-data: [DONE]
-```
-
-`SseDecoder` 处理三件容易出错的事：
-
-1. 一个 chunk 可能只包含半个 `data:` 行；
-2. 换行可能是 `\n` 或 `\r\n`；
-3. 一个 SSE event 可能有多行 `data:`。
-
-### 4.3 工具调用分片
-
-DeepSeek 的 tool call 是**按 index 合并**的：
-
-- 第一片通常带 `id` 和 `function.name`；
-- 后续片只带 `function.arguments` 的增量；
-- 同一 index 的所有 arguments 拼接后才是完整 JSON。
-
-代码里用 `Map<number, {id, name, arguments}>` 累积，流结束时补一个 `block-end`，把完整块交给 assembler。真实 DSH 的 [`assembler.ts`](../../../deepseek-harness/packages/llm/llm/src/assembler.ts) 做的是同一件事，只是更严格。
-
-### 4.4 reasoning 与 cache usage
-
-- 在默认端点上，`deepseek-flash` 默认开启 thinking，会返回 `reasoning_content`；我们把 `reasoning-delta` 映射成 `reasoning` 块。
-- `usage.prompt_tokens = prompt_cache_hit_tokens + prompt_cache_miss_tokens`；我们的 `inputTokens` 只算未命中部分，命中单独记 `cacheReadTokens`。这与真实 DSH 的 `TokenUsage` 语义一致（输入/输出/cache 字段不相交）。
-
-### 4.5 错误与超时
-
-- 非 2xx：读 body，尽量解析 `{ error: { message, code } }`，抛 `DeepSeekError(code, status)`。
-- 网络错误：抛 `NETWORK`，由 loop 记成 `assistant/attempt`。
-- `DEEPSEEK_TIMEOUT_MS`：用 `AbortSignal.timeout` 与调用方 signal 合并，超时后按取消路径结算。
+本课只需要文本路径；`tool_calls` 的分片合并代码保留，但 demo 不触发它。真实适配器还会处理重试、错误分类和能力协商，这些留给后续课程。
 
 ---
 
@@ -323,108 +237,82 @@ DeepSeek 的 tool call 是**按 index 合并**的：
 
 ### 5.1 文件地图
 
-| 文件 | 作用 | 真实对应 |
-|---|---|---|
-| [`src/types.ts`](src/types.ts) | 消息、内容块、流、工具、会话事件 | `dsh-llm` + `dsh-session` + `dsh-tools` 的核心类型 |
-| [`src/session.ts`](src/session.ts) | 事件日志、`append`、`deriveMessages` | `core/session` |
-| [`src/deepseek.ts`](src/deepseek.ts) | 真实 DeepSeek HTTP + SSE 适配器 | `llm/llm-deepseek` + `llm/llm` 的 assembler |
-| [`src/env.ts`](src/env.ts) | `.env` 读取与校验 | 真实 DSH 的 credentials/settings |
-| [`src/tools.ts`](src/tools.ts) | 注册表、参数校验、结果规范化 | `core/tools` 的一小部分 |
-| [`src/agent.ts`](src/agent.ts) | turn/step 状态机、流组装、取消 | `core/agent-loop/src/agent.ts` |
-| [`src/demo.ts`](src/demo.ts) | 计算器 demo | — |
+| 文件 | 作用 |
+|---|---|
+| [`src/types.ts`](src/types.ts) | 消息、内容块、流 chunk、会话事件 |
+| [`src/session.ts`](src/session.ts) | 仅追加日志、稳定 id、`deriveMessages()`、restore |
+| [`src/agent.ts`](src/agent.ts) | `Agent.run()`、`StreamAssembler`、turn/step 状态机 |
+| [`src/deepseek.ts`](src/deepseek.ts) | 真实 DeepSeek SSE 适配器 |
+| [`src/env.ts`](src/env.ts) | 读取 `.env` 并校验配置 |
+| [`src/tools.ts`](src/tools.ts) | 工具注册表（本课内部能力，demo 不使用） |
+| [`src/demo.ts`](src/demo.ts) | 纯文本 loop 演示 |
 
 ### 5.2 run loop 的骨架
 
-[`src/agent.ts` → `run()`](src/agent.ts#L176)：
-
 ```ts
-this.session.append('turn/start', { turn })
-try {
-  for (let step = 1; step <= maxSteps; step++) {
-    this.session.append('step/start', { turn, step })
-    try {
-      if (step === 1) this.session.append('user/message', { message })
-      const outcome = await this.#runStep(turn, step, signal)
-      // 没有工具调用 → 结束
-      // 有工具调用 → 执行，然后进入下一步
-    } finally {
-      this.session.append('step/end', { turn, step })
+async run(prompt, options) {
+  const turn = this.#turn + 1
+  this.session.append('turn/start', { turn })
+  let reason = { kind: 'completed' }
+
+  try {
+    for (let step = 1; step <= this.#maxSteps; step += 1) {
+      signal.throwIfAborted()
+      this.session.append('step/start', { turn, step })
+      try {
+        if (step === 1) this.session.append('user/message', { message })
+        const outcome = await this.#runStep(turn, step, signal)
+        reason = outcome.reason
+        if (outcome.toolCalls === undefined) break
+        // 工具分发：本课不演示，代码保留为内部能力
+      } finally {
+        this.session.append('step/end', { turn, step })
+      }
     }
+  } catch (error) {
+    reason = classify(error, signal)
+  } finally {
+    this.session.append('turn/end', { turn, reason })
   }
-} catch (error) {
-  // abort / model error / unknown error → 记录原因
-} finally {
-  this.session.append('turn/end', { turn, reason })
 }
 ```
 
-三个细节：
+关键点：`turn/end` 在 `finally`，`step/end` 也在 `finally`。这样取消和异常都不会留下半个 turn。
 
-1. **`user/message` 在 `step/start` 之后写**。真实 DSH 更晚：它在 `pre-step` 接纳输入、`step/start` 之后才写。这样如果 `pre-step` 拒绝，日志里不会出现一条「模型从没见过的用户消息」。s01 没有 pre-step，所以放在第一步入口。
-2. **`step/end` 在 `finally`**。模型失败、工具抛错、取消，都必须关闭步骤，否则回放时会出现「打开但永不结束」的步骤。
-3. **`turn/end` 在最外层 `finally`**。这是回放和恢复的锚点；没有它，会话会被判定为崩溃中断。
-
-### 5.3 流组装
-
-[`StreamAssembler`](src/agent.ts#L65) 只做一件事：把 `block-start / delta* / block-end` 拼成 `ContentBlock[]`。
+### 5.3 请求从日志派生
 
 ```ts
-push(chunk) {
-  switch (chunk.type) {
-    case 'block-start': this.#open.set(chunk.index, { ... }); break
-    case 'text-delta': this.#open.get(chunk.index).text += chunk.text; break
-    case 'tool-call-delta':
-      open.id = chunk.id
-      open.args += chunk.argumentsDelta
-      break
-    case 'block-end': this.#blocks.set(chunk.index, chunk.block); break
-    ...
-  }
+#buildRequest(signal) {
+  return Object.freeze({
+    sessionId: this.session.id,
+    provider: this.#model.provider,
+    model: this.#model.model,
+    messages: Object.freeze(this.session.deriveMessages()),
+    tools: Object.freeze(this.#tools.schemas()),
+    signal,
+  })
 }
 ```
 
-为什么需要它？因为模型的流是**交错的**：文本块和多个工具调用块可以同时推进，靠 `index` 关联 delta。真实实现见 [`llm/llm/src/assembler.ts`](../../../deepseek-harness/packages/llm/llm/src/assembler.ts)。
-
-s01 的版本有三个刻意简化：不处理 reasoning 与 text 的交错边界、不校验 tool-call 参数 JSON、不区分 `assistant/attempt` 的完整流。s03 会补齐。
-
-### 5.4 工具结果规范化
-
-[`ToolRegistry.execute()`](src/tools.ts#L87)：
-
-```text
-找不到工具        → Error: unknown tool "x"
-JSON 解析失败     → Error: invalid JSON arguments ...
-required/type 失败 → Error: <path> is required / must be ...
-execute 抛错      → Error: <message>
-取消              → 继续抛，结束轮次
-```
-
-只有最后一种会终止轮次。其余都变成 `isError` 的 `tool/result`，模型在下一步会看到。
+`request/header` 只在 provider/model/tools 变化时记录一次，避免每步重复写相同快照。
 
 ---
 
-## 6. 验收：16 个离线测试 + 2 个真实模型测试
+## 6. 验收：7 个离线测试 + 1 个真实模型测试
 
-离线测试（`tests/s01.test.ts`）不需要 key：
+离线测试（`node --test tests/s01.test.ts`）：
 
-| 组 | 覆盖 |
-|---|---|
-| Session | 派生历史、空 assistant、interrupted 前缀、seq/冻结、重放、消息 id |
-| StreamAssembler | reasoning/text/tool-call 顺序、usage、无 block-end 时从 delta 合成、取消前缀 |
-| ToolRegistry | 成功、schema 投影、注销、未知工具、非法 JSON、缺参、类型错、抛错、重名 |
-| DeepSeek wire | 消息映射、工具映射、SSE 跨 chunk/CRLF/多行 data、cache usage、finish reason |
+| # | 用例 | 证明 |
+|---|---|---|
+| 1 | text turn | 事件序列、usage、派生历史、单次请求 |
+| 2 | model finish error | 失败收敛为 `turn/end`，不抛异常 |
+| 3 | assembler 交错块 | reasoning/text 按 index 排序 |
+| 4 | assembler 无 block-end | 从 delta 合成；取消只保留可见前缀 |
+| 5 | cancel | 保留 `partial ` 前缀、`interrupted: true`、turn 正常收口 |
+| 6 | surface append | 只有消息事件进入派生历史；空 assistant 不进入 |
+| 7 | replay | restore 后历史一致，新 agent 从 turn 2 继续 |
 
-真实模型测试（`tests/live.test.ts`）需要 key，缺少时自动 `SKIP`：
-
-1. **plain chat**：一次请求完成一轮，没有工具调用；
-2. **tool roundtrip**：模型调用 `calc`，第二次请求看到 `tool/result`，最终回答包含 42。
-
-运行：
-
-```sh
-node --test tests/s01.test.ts
-node --test tests/live.test.ts
-```
+真实模型测试（`node --test tests/live.test.ts`）：一次 `pong` 文本 turn，断言 1 个 step、没有工具调用、`turn/end` 是最后一条事件。没有 key 时自动 SKIP。
 
 ---
 
@@ -432,211 +320,69 @@ node --test tests/live.test.ts
 
 | 真实 DSH | s01 | 影响 |
 |---|---|---|
-| `agent/pre-step` waterfall、inbox claim | 无 | 不能在写入前拒绝/改写输入 |
-| `system-prompt` 组装 | 无 | 请求里没有 system 消息 |
-| `request/header` 完整快照 + `request/context` | 只有 provider/model/tools 名 | 不能做能力协商 |
-| 工具流水线（策略/审批/并发） | 直接执行 | 无沙箱、无并发 |
-| `assistant/attempt` 嵌入完整流 | 只记失败 | 不能回放失败流 |
-| 持久化 | 内存 | 进程退出即丢 |
-| 工具 schema DSL | 手写 JSON Schema + 最小校验 | 无类型推导、无嵌套联合 |
-| `whenIdle`、maintenance、多轮唤醒 | 无 | 不支持运行中插入输入 |
-| PTC executor | 无 | 不支持程序化工具调用 |
-| provider seam / retry / 能力协商 | 单一 DeepSeek 适配器 | s08 才做多 provider 抽象 |
-
-这些不是「偷懒」，而是把复杂度留给后面的课。每课只引入一个架构能力，才能看清它到底解决了什么问题。
+| tool pipeline / 策略 / 并发 | `tools.ts` 仅保留最小注册表 | 不演示工具往返 |
+| surface replace / 压缩 | 只有 append 语义 | 压缩留给后续课 |
+| 持久化 / 恢复校验 | `Session.restore()` 简单重放 | 不校验 seq 空洞 |
+| inbox / steering / waterfall | 无 | 一次 run 只领一条输入 |
+| provider 重试 / 能力协商 | 单次请求 | 失败直接进日志 |
+| 多 provider | 只有 DeepSeek | 教学聚焦 |
 
 ---
 
-## 8. 练习
+## 8. 思考题（附源码位置与答案）
 
-### 练习 1：观察 reasoning
+### Q1. 一次 turn 里到底发生了哪些事件？
 
-保持 `DEEPSEEK_MODEL=deepseek-flash` 重新跑 demo，观察 `reasoning` 块。
-
-要求：
-
-- 打印 `assistant/message` 里的 reasoning 块；
-- 确认 `reasoning` 和 `text` 是两个不同 index 的块；
-- 观察 `usage.reasoningTokens`。
-
-提示：demo 里遍历 `event.data.message.content`，按 `block.type` 分支即可。
-
-### 练习 2：429 重试
-
-DeepSeek 在限流时返回 HTTP 429。
-
-要求：
-
-- 在 `DeepSeekModel.stream()` 里检测 429；
-- 读取 `retry-after` 头（秒），等待后最多重试 2 次；
-- 重试耗尽后抛 `DeepSeekError(code='RATE_LIMITED')`；
-- 用一个本地 mock HTTP 服务验证（不要用假模型；这里测的是 HTTP 层）。
-
-提示：把 `fetch` 调用抽成 `#request()`，只对 429/5xx 重试。真实 DSH 的重试在 `llm-retry`，策略与传输分离。
-
-### 练习 3：缺失工具结果的恢复
-
-如果 `#runStep` 在写出 assistant 工具调用之后抛错，日志里会有 `tool/call` 但没有 `tool/result`。下一次请求会得到不配对的工具历史。
-
-要求：
-
-- 在 `step` 失败时，扫描已记录的 `tool/call`，为没有对应 `tool/result` 的调用补一条错误结果；
-- 错误文本分别区分「已开始但结果未知」和「还没开始」。
-
-提示：真实实现叫 `ToolCallRecovery`，在 [`agent.ts`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L363) 注册 `session/event` 观察者；s05 会正式实现。
-
-### 练习 4：真实的多轮 REPL
-
-写一个 `src/repl.ts`：
+最小文本 turn：
 
 ```text
-you> 你好
-agent> 你好！
-you> 帮我算 1+2
-agent> 3
+turn/start → step/start → user/message → request/header
+→ assistant/message → step/end → turn/end
 ```
 
-要求：
+`turn/start`、`step/*`、`request/header` 是日志事实；`user/message`、`assistant/message`、`tool/result` 进入 surface。见 [`docs/agent-lifecycle.zh.md`](../../../deepseek-harness/docs/agent-lifecycle.zh.md)。
 
-- 复用同一个 `Session` 和 `Agent`；
-- 每次输入调用一次 `agent.run()`；
-- 打印每轮的最终回答；
-- 输入 `/events` 打印当前日志类型序列；
-- 输入 `/usage` 汇总每轮 token。
+### Q2. 为什么 `turn/end` 要放在 `finally`？
 
-提示：`run()` 已经支持多轮；你只需要一个 `node:readline` 循环。
+因为 turn 可能因取消、模型错误、工具错误、进程 dispose 提前结束；只有 `finally` 能保证“开头有 turn/start，结尾一定有 turn/end”。否则恢复时会看到永远打开的 turn。
 
-### 练习 5（进阶）：超时与取消
+见 [`agent.ts` → `turn()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts)。
 
-要求：
+### Q3. 为什么请求不直接维护 `messages` 数组？
 
-- 给 `Agent.run()` 传一个 `AbortController`，在 500ms 后取消；
-- 用 `DEEPSEEK_TIMEOUT_MS=500` 观察超时路径；
-- 确认取消后 `turn/end` 是 `aborted`，并且已交付的文本以 `interrupted: true` 进入历史。
+可变数组在取消/重试/压缩/恢复时会产生分叉：UI 看到的历史、模型看到的历史、磁盘上的历史可能不一致。DSH 让日志成为唯一真源，每次请求都重新投影；这样一次 surface replace 会立刻影响下一步请求。
 
-提示：`fetch` 的 signal 会中止 body 读取；loop 的 catch 分支负责结算。
+见 [`session/src/index.ts` → `deriveMessages()`](../../../deepseek-harness/packages/core/session/src/index.ts)。
+
+### Q4. 流式 chunk 的 index 为什么重要？
+
+一次响应里可以同时有 reasoning、text、多个 tool-call；delta 交错到达。index 是它们的稳定身份，assembler 用 index 累积、排序，最后产出 `ContentBlock[]`。
+
+见 [`llm/src/assembler.ts`](../../../deepseek-harness/packages/llm/llm/src/assembler.ts)。
+
+### Q5. 为什么模型输出是 `ContentBlock[]` 而不是字符串？
+
+因为一条 assistant 消息可以同时包含推理、文本和多个工具调用；字符串无法表达顺序、类型和后续的工具配对。`ContentBlock[]` 是模型输出的规范形态，wire 格式只是它的投影。
+
+见 [`llm/src/types.ts`](../../../deepseek-harness/packages/llm/llm/src/types.ts)。
+
+### Q6. 哪些事件进入模型历史？空 assistant 为什么被排除？
+
+只有 `system/message`、`user/message`、`assistant/message`（内容非空）、`tool/result` 进入。空 assistant（只有 finish、没有内容）留在日志里证明“这次请求发生过”，但它对下一轮模型没有信息量，所以不进入 surface。
+
+### Q7. 取消时为什么不能直接丢弃 assembly？
+
+用户已经看到的内容如果从历史里消失，下一轮模型会“失忆”，用户也会觉得界面回退。正确做法是保留可见前缀、标记 `interrupted`，并让 turn 以 `aborted` 正常收口。
 
 ---
 
-## 9. 思考题（附源码位置与答案）
+## 9. 下一课：s02 · tool round-trip
 
-### Q1. 一次 turn 里到底发生了哪些事件？哪些是持久的，哪些是实时的？
+这一课只做了文本 turn。下一课会在这个状态机上加入工具往返：
 
-**持久事实**（`session/event`，重载后仍在）：`turn/start`、`turn/end`、`step/start`、`step/end`、`system/message`、`developer/message`、`user/message`、`assistant/message`、`assistant/attempt`、`tool/call`、`tool/result`、`request/header`、`request/context`、`session/end-seed`。
+- 模型请求工具时，参数分片如何组装？
+- 工具结果如何写回日志，并驱动下一步请求？
+- 工具失败、未知工具、参数错误如何变成模型可见的结果？
+- 为什么工具结果必须在 `step/end` 之前提交？
 
-**实时扩展点**（`agent/*`，进程本地）：`agent/status`、`agent/inbox/*`、`agent/pre-step`、`agent/request`、`agent/request-error`、`agent/turn-stopping`、`agent/assistant-stream`、`agent/created` / `agent/disposed` / `agent/error`。
-
-判断标准：**重载后是否必须存在**。需要回放、审计、恢复的事实进 session；只需要拦截当前这次运行、给 UI 推送状态的进 `agent/*`。`agent/assistant-stream` 的 chunk 是瞬态的，真正的持久结算在 `assistant/message` 或 `assistant/attempt`。
-
-见 [agent-lifecycle 时序图](../../../deepseek-harness/docs/agent-lifecycle.zh.md) 与 [`SessionEventMap`](../../../deepseek-harness/packages/core/session/src/types.ts#L287)。
-
-### Q2. 为什么 `turn/end` 要放在 `finally`？为什么工具结果要在 `step/end` 之前？
-
-`turn/end` 是「这个轮次已经闭合」的唯一持久证据。恢复逻辑靠它判断会话是不是崩在半个轮次里；如果异常、取消、模型失败路径漏写，下一次打开会被永久判定为中断。所以它必须在最外层 `finally`，而不是成功分支。
-
-工具调用属于当前 step 的模型请求结果：`step/start` 与 `step/end` 夹住「一次模型请求 + 它请求的工具」。`tool/call` / `tool/result` 先落日志，下一次请求才能从日志派生到配对的工具历史；写在 `step/end` 之后会让事实落在步骤边界外，回放、统计、恢复都会错位。
-
-见 [`turn()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L327) 的 `finally`、[`step()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L435) 里的工具批次。
-
-### Q3. 输入在哪里被「领取」？`toolSet` 为什么是步骤级的？
-
-`preStep()` 调用 `inbox.claim(target, turn)`：轮次边界领取**全部 `next-step` + 一条 `next-turn`**；步骤之间只领取 `next-step`。claim 是纯删除（不发 discarded），成功后逐条发 `agent/inbox/claimed`。
-
-随后 `ctx.tools.resolve({ agent, modelSelection, signal })` 产生**步骤级** `ResolvedToolSet`。同一份准入同时喂给 prompt 组装和 `tools.execute()`：模型被告知能调用的工具，和实际可执行的工具，必须是同一份快照；条件工具每个步骤只求值一次，重试复用，步骤结束 dispose。否则 prompt 里有的工具执行不到、或执行了 prompt 里没有的工具。
-
-见 [`preStep()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L283)、[`inbox.ts`](../../../deepseek-harness/packages/core/agent-loop/src/inbox.ts) 与 [tools README 的 conditional tools](../../../deepseek-harness/packages/core/tools/README.md#conditional-tools)。
-
-### Q4. 请求准备好之后，先写 system 还是先写 user？为什么重试不重复组装？
-
-先 system，再 user。`step/start` 之后先跑 `agent/request` + `prepareCall()`，然后同步准入：先 `system/message` 对账（按路由能力决定「改写第一个 system 节点」还是 `in-history` 追加），再逐条 `user/message`，最后 `request/header` / `request/context`。首次提示词必须排在用户消息之前；`in-history` 路由允许后续提示词更新追加在已有历史之后，以保留 KV cache 前缀。
-
-重试只重新 `prepareRequest()` 并复用**已经渲染好的 assembly**，不重跑 pre-step、不重新组装、不重复提交用户消息。否则同一句用户输入会被写两遍，下一次请求会看到重复的 prompt。
-
-见 [`step()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L435) 的准入顺序，以及 [agent-loop README 的 retry 说明](../../../deepseek-harness/packages/core/agent-loop/README.md#understand-the-implementation)。
-
-### Q5. `prepareCall` 绑定了什么？为什么 `agent/request` 不能改 provider/model？
-
-`ctx.llm.prepareCall(config, signal)` 用路由解析出适配器实例，校验适配器字段，物化 reasoning effort / maxTokens 的默认值，返回 `PreparedLlmCall`（`config`、`adapterDefaults`、`context`、`systemPromptUpdate`、`toolUpdate`、`retryPolicy`、`stream`）。loop 在 header 记录、提示词准入、最终 dispatch 全程复用这个实例，避免中途换实现。
-
-`agent/request` 在 `prepareCall` 之前运行，只应调整采样等控制参数。provider / model / reasoningEffort 已经在 step 准备时被快照，并用于 prompt 组装、工具准入和 header；此时再改会让日志、提示词、工具集三者不一致。所以 loop 直接抛错，并提示改用 `agent.model.select()` 在 step 准备前改。
-
-见 [`prepareRequest()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L613) 与 [Request headers and adapter defaults](../../../deepseek-harness/packages/core/agent-loop/README.md#request-headers-and-adapter-defaults)。
-
-### Q6. 请求由哪三部分组成？`request/header` 为什么只记录变化？
-
-loop 构造的请求 = **`header.config` + `deriveMessages()` + `header.tools`**，另外带 `toolHistory`、`sessionId`、`signal`；**没有 `system` 字段**。
-
-`request/header` 是完整信封快照（config、adapterDefaults、tools），只在 `initial` / `resume` / `change` / `series` 时追加。未变化的步骤和重试继承最近一份：日志不会因为每个 step 重复同一份 header 而膨胀，回放时「最近一份 header」就能重建请求。`request/context` 单独记录 contextWindow / systemPromptUpdate，只在变化时写。
-
-见 [`buildRequest()`](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L656)、[`EpochHeader`](../../../deepseek-harness/packages/core/session/src/types.ts#L246)、[`request/header`](../../../deepseek-harness/packages/core/session/src/types.ts#L398)。
-
-### Q7. 哪些事件进入模型历史？哪些只是日志事实？
-
-只有 5 种 **surface 事件**进入模型历史：`system/message`、`developer/message`、`user/message`、`assistant/message`、`tool/result`。
-
-其余都是日志事实：`turn/start` / `turn/end`、`step/start` / `step/end`、`assistant/attempt`、`tool/call`、`request/header`、`request/context`、`session/end-seed`。注意 `tool/call` **不在**历史里：工具调用作为 `tool-call` block 存在 assistant message 中；`tool/result` 才是工具结果消息。`deriveMessages()` 只走 surface 折叠结果。
-
-见 [`SurfaceEventType`](../../../deepseek-harness/packages/core/session/src/types.ts#L447) 与 [`deriveMessages()`](../../../deepseek-harness/packages/core/session/src/index.ts#L999)。
-
-### Q8. 派生规则是什么？空 assistant 消息为什么被排除？
-
-`deriveEventMessage()` 的规则：
-
-- `user/message`、`tool/result`：原样返回；
-- `system/message`、`developer/message`、`assistant/message`：内容为空返回 `null`，否则原样返回；
-- 其他事件（边界、attempt、log-only）：返回 `null`。
-
-空 assistant 可能只是一个 `max-tokens` 步骤承载 usage 的锚点，内容为空对 provider 没有意义；放进历史会产生一条没有内容的消息。空 system/developer 节点则保留 surface 位置但不产生 wire message，用于表达「没有系统提示词」和做节点替换。
-
-见 [`deriveEventMessage()`](../../../deepseek-harness/packages/core/session/src/surface.ts#L120) 与 [`deriveMessages()`](../../../deepseek-harness/packages/core/session/src/index.ts#L999)。
-
-### Q9. 工具为什么返回「规范值」而不是文本？
-
-`execute()` 只返回 `output.schema` 声明的**无损 JSON 值**；`output.render(args, value)` 负责把它投影成模型可见内容；`presentationMeta` 负责投影可回放的 UI 数据。这样：
-
-- 程序化调用（PTC / workflow）拿到结构化值，不用解析自然语言；
-- 模型拿到适合阅读的渲染结果；
-- 策略替换 / 屏蔽内容时，规范值仍然完整；
-- 工具的作者可以独立演进渲染和程序化 API。
-
-见 [`ToolOutputDefinition`](../../../deepseek-harness/packages/core/tools/src/contracts.ts#L16) 与 [`ToolDefinition`](../../../deepseek-harness/packages/core/tools/src/contracts.ts#L26)。
-
-### Q10. 真实适配器如何处理 reasoning、tool_calls、cache usage？
-
-真实 `llm-deepseek` 走 DeepSeek 的 Messages 风格 wire：
-
-- `thinking` 块 → `reasoning` 块；`thinking_delta` → reasoning delta；
-- `tool_use` 块 → `tool-call`；finish reason `tool_use` → `tool-calls`；
-- usage 的 `input_tokens` / `output_tokens` / `cache_read_input_tokens` / `cache_creation_input_tokens` 分别映射到 `inputTokens` / `outputTokens` / `cacheReadTokens` / `cacheWriteTokens`，并在最终 finish 前算出 total。
-
-s01 默认模型是 `deepseek-flash`，用的是 OpenAI-compatible Chat Completions，字段名不同但概念相同：`reasoning_content`、`tool_calls`（按 index 合并分片）、`prompt_cache_hit_tokens` / `prompt_cache_miss_tokens`。
-
-见真实 [`translate.ts` 的 usage 映射](../../../deepseek-harness/packages/llm/llm-deepseek/src/translate.ts#L34)、[`thinking` 映射](../../../deepseek-harness/packages/llm/llm-deepseek/src/translate.ts#L51)、[`tool_use` 映射](../../../deepseek-harness/packages/llm/llm-deepseek/src/translate.ts#L55)；s01 实现见 [`deepseek.ts`](src/deepseek.ts#L265)。
-
-### Q11. 为什么工具结果要按模型顺序提交，而不是完成顺序？
-
-模型历史必须与它发出的调用顺序一致：assistant 的 `tool-call` block 顺序、`tool/result` 的顺序、下一次请求的配对都依赖它。按完成顺序提交会让 `tool_call` / `tool_result` 的配对关系依赖时序，回放、UI 和依赖顺序的 provider 校验都会不稳定。
-
-所以 batch 调度允许工具体并发完成，但**提交**只跨「连续的模型顺序槽位」推进；独占工具形成屏障，后续调用在启动前重新分类。
-
-见 [`executeToolBatch()`](../../../deepseek-harness/packages/core/tools/src/batch.ts#L50) 与 [`runGroup()` 的 `committed` 推进](../../../deepseek-harness/packages/core/tools/src/batch.ts#L139)。
-
-### Q12. 为什么请求不直接带 `system` 字段？
-
-因为系统提示词会在一轮中变化：工具增减、压缩、`in-history` 更新、恢复后的重放。把提示词作为 `messages` 里的 `system/message` 节点，才能表达「哪个版本在什么位置生效」，才能做 per-node 替换、压缩遮蔽和缓存友好的追加。
-
-`GenerateOptions.system` 只服务于一次性的、非 loop 的调用者；loop 构造的请求把提示词全部放在 `messages` 里，并显式不设 `system`。
-
-见 [`GenerateOptions`](../../../deepseek-harness/packages/llm/llm/src/types.ts#L555)、[`system/message`](../../../deepseek-harness/packages/core/session/src/types.ts#L338)，以及 [agent-loop README 的 prompt admission](../../../deepseek-harness/packages/core/agent-loop/README.md#understand-the-implementation)。
-
-## 10. 下一课：s02 · session log
-
-s01 的 `deriveMessages()` 只是「按顺序挑消息」。s02 会回答：
-
-- 为什么需要 `surfaceOp: replace`？压缩如何在不删日志的情况下改写模型历史？
-- `request/header` 和 `request/context` 为什么不进历史？
-- `assistant/attempt` 和 `assistant/message` 的边界在哪？
-- 如何从 JSONL 恢复一个 session，并保证 seq 连续、事件合法？
-- 重放（replay）与恢复（resume）的区别是什么？
-
-先读：[`core/session/src/surface.ts`](../../../deepseek-harness/packages/core/session/src/surface.ts) 与 [`docs/subsystems/session.zh.md`](../../../deepseek-harness/docs/subsystems/session.zh.md)。
+先把本课的 `agent.ts` 读透，再进入 s02。

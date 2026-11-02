@@ -4,9 +4,9 @@
 >
 > 课程不是 API 教程，也不教 prompt 技巧。它沿着 DSH 的真实架构，**用零依赖 TypeScript 从空目录重建一个可运行的 mini harness**，每一课只增加一个架构能力，并对照真实源码解释「为什么生产实现要这么做」。
 >
-> 状态：s01-s18 已全部完成并验证。
+> 状态：s01-s28 已全部完成并验证；v3 设计见 [`02-course-v3.zh.md`](02-course-v3.zh.md)。
 
-> v3 规划（28 课、computer use、可视化规范）见 [`02-course-v3.zh.md`](02-course-v3.zh.md)。本文档描述已完成的 18 课基线。
+> v3（28 课、computer use、可视化规范）见 [`02-course-v3.zh.md`](02-course-v3.zh.md)。本文档保留早期 18 课设计作为背景。
 
 ---
 

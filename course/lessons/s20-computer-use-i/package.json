@@ -1,0 +1,19 @@
+{
+  "name": "dsh-course-s20-computer-use-i",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "s20: computer-use registry, mock desktop, AX snapshots, screenshots, cua tool",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "test": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "dsh-course-s24-client-ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "s24: action card and tool-result projection for a client UI",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "serve": "node src/server.ts",
+    "test": "node --test tests/*.test.ts",
+    "test:all": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

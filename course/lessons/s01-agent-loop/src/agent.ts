@@ -59,8 +59,8 @@ export class LlmError extends Error {
 
 /**
  * 把零散的 StreamChunk 组装成模型消息。
- * 真实实现见 `packages/llm/llm/src/assembler.ts`；s03 会补齐交错块、
- * tool-call 参数分片、attempt 与 interrupted 的完整语义。
+ * 真实实现见 `packages/llm/llm/src/assembler.ts`；本课覆盖交错块、
+ * 取消前缀与 attempt 记录，tool-call 参数分片保留为内部能力。
  */
 export class StreamAssembler {
   #blocks = new Map<number, ContentBlock>()
@@ -161,6 +161,8 @@ export class Agent {
     this.#model = model
     this.#tools = tools
     this.#maxSteps = options.maxSteps ?? 8
+    // 从恢复的日志继续时，轮次编号必须接着走，而不是从 1 重新开始。
+    this.#turn = session.lastTurn
   }
 
   get turns(): number {
@@ -246,6 +248,8 @@ export class Agent {
     } catch (error) {
       if (signal.aborted) {
         reason = { kind: 'aborted', reason: cancelReason(signal) }
+        // 取消时 #runStep 已把可见前缀写进日志；把它作为本轮结果返回。
+        finalMessage = this.session.lastAssistantMessage()
       } else if (error instanceof LlmError) {
         reason = { kind: 'error', failure: error.failure }
       } else {

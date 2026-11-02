@@ -1,0 +1,19 @@
+{
+  "name": "dsh-course-s19-browser-use",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "s19: browser-use provider registry, session seam, mock browser and model tools",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "test": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

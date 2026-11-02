@@ -1,0 +1,21 @@
+{
+  "name": "dsh-course-s28-capstone",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "s28 capstone: a real DeepSeek multi-tool run with offline smoke, event log, surface summary and eval report",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "live": "node src/main.ts",
+    "test": "node --test tests/*.test.ts",
+    "test:all": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

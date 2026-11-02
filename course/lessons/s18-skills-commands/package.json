@@ -1,0 +1,20 @@
+{
+  "name": "dsh-course-s18-skills-commands",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "s18: skills catalog + lazy loading + slash commands, without MCP",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "test": "node --test tests/s18.test.ts",
+    "test:all": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

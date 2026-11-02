@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "s01: build the agent loop of a mini DeepSeek Harness",
+  "description": "s01: the minimal DeepSeek agent loop (turn/step, streaming, cancellation)",
   "engines": {
     "node": ">=24"
   },

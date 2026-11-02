@@ -2,35 +2,59 @@
 
 每课一个**自包含文件夹**：讲义、代码、测试、`env.example` 都在该课目录内。
 
-课程按 s01 → s18 递进，后一课复制前一课并增加一个架构能力，因此任意一课都可以单独打开、运行、阅读。
+课程按 s01 → s28 递进，每课都可以单独打开、运行、阅读；后一课在前一课基础上增加一个架构边界。
 
 > `course/practice/` 是本地私有练习目录，已被忽略，不随仓库分发。
 
-- 课程设计：[`../docs/01-course-design.zh.md`](../docs/01-course-design.zh.md)
+- 课程设计：[`../docs/02-course-v3.zh.md`](../docs/02-course-v3.zh.md)
 - 架构阅读笔记：[`../docs/00-architecture.zh.md`](../docs/00-architecture.zh.md)
-- 当前进度：**s01-s18 全部完成**
+- 当前进度：**s01-s28 全部完成**
 - 课程网站：[`../site/`](../site/README.md)（`node site/serve.mjs`）
 
 ## 课程目录
 
 ```text
 course/lessons/
-  s01-agent-loop/          s10-compaction/
-  s02-session-log/         s11-plugin-kernel/
-  s03-streaming/           s12-composition-boot/
-  s04-tools/               s13-capability-seams/
-  s05-tool-pipeline/       s14-subagents-presets/
-  s06-system-prompt/       s15-mcp-skills-commands/
-  s07-inbox-steering/      s16-web/
-  s08-llm-seam/            s17-sdk-headless/
-  s09-persistence/         s18-observability-eval/
+  # I · 内核
+  s01-agent-loop/
+  s02-tool-round-trip/
+  s03-session-log/
+  s04-streaming/
+  s05-tool-contract/
+  s06-tool-runtime/
+  # II · 上下文
+  s07-system-prompt/
+  s08-inbox-steering/
+  s09-llm-seam/
+  s10-persistence/
+  s11-compaction/
+  # III · 组合
+  s12-plugin-kernel/
+  s13-composition-boot/
+  # IV · 执行边界
+  s14-capability-seams/
+  s15-subagents-presets/
+  s16-ptc/
+  s17-mcp-skills-commands/
+  s18-skills-commands/
+  s19-browser-use/
+  s20-computer-use-i/
+  s21-computer-use-ii/
+  # V · 产品面
+  s22-web/
+  s23-sdk-headless/
+  s24-client-ui/
+  # VI · 质量
+  s25-observability-eval/
+  s26-eval/
+  s27-security/
+  s28-capstone/
 ```
-
 每课都有 `README.md`、`env.example`、`package.json`、`tsconfig.json`、`src/`、`tests/`；后一课复制前一课并增量修改。
 
 ## 运行
 
-环境：Node ≥ 24。不需要 `pnpm install`，运行时零依赖。以 s01 为例（s02 把路径换成 `s02-session-log`、测试换成 `tests/s02.test.ts`）：
+环境：Node ≥ 24。不需要 `pnpm install`，运行时零依赖。以 s01 为例（把路径和测试文件名换成对应课号）：
 
 ```sh
 cd course/lessons/s01-agent-loop
@@ -90,11 +114,11 @@ npm run typecheck
 
 | 真实 DSH | 课程 |
 |---|---|
-| Cordis 插件树 | s11 实现子集，并把前 10 课重构为插件 |
-| 13+ 种 session event、格式迁移 | s02/s09 保留核心事件与单版本持久化 |
-| 多种 provider + OAuth + 账户 | 真实 DeepSeek HTTP；s08 做 provider seam |
-| Native + PTC executor | 先 Native；PTC 作为选修 |
-| 完整 Web/Electron 客户端 | s16 极简 HTML + SSE |
-| OTel / 快照门禁 | s18 结构化 span + 录制回放 |
+| Cordis 插件树 | s12 实现子集，并把前 11 课重构为插件 |
+| 13+ 种 session event、格式迁移 | s03/s10 保留核心事件与单版本持久化 |
+| 多种 provider + OAuth + 账户 | 真实 DeepSeek HTTP；s09 做 provider seam |
+| Native + PTC executor | s14 做能力 seam；s16 做 PTC |
+| 完整 Web/Electron 客户端 | s22 极简 HTML + SSE |
+| OTel / 快照门禁 | s25/s26 结构化 span + 录制回放/评测 |
 
 每课讲义都有「刻意简化」小节，明确差异。

@@ -1,0 +1,19 @@
+{
+  "name": "dsh-course-s21-computer-use-ii",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "s21: computer-use actions, coordinates, stale snapshots, window changes and scoped grants",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "test": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}

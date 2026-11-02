@@ -1,153 +1,53 @@
 /**
- * s01 的 demo：一个会调用计算器工具的 agent，使用真实 DeepSeek 模型。
+ * s01 的 demo：一次真实的 DeepSeek 文本 turn。
  *
- * 第一次运行：
- *   cd course/lessons/s01-agent-loop
- *   cp env.example .env
- *   # 编辑 .env，填入 DEEPSEEK_API_KEY
+ * 这个演示只做最小 loop，不调用任何工具：
+ *   1. 用户输入进入日志；
+ *   2. loop 从日志派生请求，向 DeepSeek 发起一次流式调用；
+ *   3. chunk 被组装成 assistant message，再追加回日志；
+ *   4. turn/end 收口，打印完整事件序列。
+ *
+ * 运行：
+ *   cd course/lessons-v3/s01-agent-loop
+ *   cp env.example .env    # 填入 DEEPSEEK_API_KEY
  *   node src/demo.ts
  *
  * 观察三件事：
- * 1. 日志里的事件顺序（turn → step → assistant → tool/call → tool/result → step → turn）；
- * 2. 第二次模型请求看到的历史包含 assistant 的工具调用和 tool 结果；
- * 3. 最终回答来自日志的派生，而不是某个隐藏的变量。
+ *   1. 事件顺序：turn/start → step/start → user/message → request/header
+ *      → assistant/message → step/end → turn/end；
+ *   2. 请求历史来自 `session.deriveMessages()`，不是隐藏的 messages 数组；
+ *   3. 即使模型报错或用户取消，turn/end 也一定存在。
  */
 
-import {
-  Agent,
-  createDeepSeekModel,
-  defineTool,
-  Session,
-  textOf,
-  ToolRegistry,
-} from './index.ts'
+import { Agent, createDeepSeekModel, Session, textOf, ToolRegistry } from './index.ts'
 import type { Message } from './types.ts'
 
-/** 一个只支持 + - * / 和括号的递归下降求值器，避免 eval。 */
-function evaluate(expression: string): number {
-  let index = 0
-  const input = expression
-
-  function skip(): void {
-    while (input[index] === ' ') index += 1
-  }
-
-  function parseNumber(): number {
-    skip()
-    const start = index
-    while (index < input.length && /[0-9.]/.test(input[index] ?? '')) index += 1
-    if (start === index) throw new Error(`expected number at ${index}`)
-    const value = Number(input.slice(start, index))
-    if (!Number.isFinite(value)) throw new Error(`invalid number "${input.slice(start, index)}"`)
-    return value
-  }
-
-  function parseFactor(): number {
-    skip()
-    if (input[index] === '(') {
-      index += 1
-      const value = parseExpr()
-      skip()
-      if (input[index] !== ')') throw new Error(`expected ")" at ${index}`)
-      index += 1
-      return value
-    }
-    if (input[index] === '-') {
-      index += 1
-      return -parseFactor()
-    }
-    return parseNumber()
-  }
-
-  function parseTerm(): number {
-    let value = parseFactor()
-    while (true) {
-      skip()
-      const op = input[index]
-      if (op !== '*' && op !== '/') return value
-      index += 1
-      const right = parseFactor()
-      value = op === '*' ? value * right : value / right
-    }
-  }
-
-  function parseExpr(): number {
-    let value = parseTerm()
-    while (true) {
-      skip()
-      const op = input[index]
-      if (op !== '+' && op !== '-') return value
-      index += 1
-      const right = parseTerm()
-      value = op === '+' ? value + right : value - right
-    }
-  }
-
-  const value = parseExpr()
-  skip()
-  if (index !== input.length) throw new Error(`unexpected character "${input[index]}"`)
-  return value
-}
-
 function roleSummary(message: Message): string {
-  if (message.role === 'tool') return `tool(${message.toolCallId ?? '?'}): ${textOf(message)}`
-  if (message.role === 'assistant') {
-    const calls = message.content.filter(block => block.type === 'tool-call')
-    const suffix = calls.length > 0
-      ? ` [calls: ${calls.map(call => call.name).join(', ')}]`
-      : ''
-    return `assistant: ${textOf(message)}${suffix}`
-  }
   return `${message.role}: ${textOf(message)}`
 }
 
 async function main(): Promise<void> {
   const model = createDeepSeekModel()
   const session = new Session()
+  // 本课不演示工具往返；空注册表让模型只做一次纯文本回答。
   const tools = new ToolRegistry()
+  const agent = new Agent(session, model, tools, { maxSteps: 1 })
 
-  tools.register(defineTool({
-    name: 'calc',
-    description: 'Evaluate an arithmetic expression with + - * / and parentheses.',
-    parameters: {
-      type: 'object',
-      properties: {
-        expression: { type: 'string', description: 'The expression to evaluate.' },
-      },
-      required: ['expression'],
-    },
-    run(args) {
-      const { expression } = args as { expression: string }
-      try {
-        return {
-          content: [{ type: 'text', text: String(evaluate(expression)) }],
-          isError: false,
-        }
-      } catch (error) {
-        return {
-          content: [{
-            type: 'text',
-            text: `Error: ${error instanceof Error ? error.message : String(error)}`,
-          }],
-          isError: true,
-        }
-      }
-    },
-  }))
-
-  const agent = new Agent(session, model, tools, { maxSteps: 6 })
   console.log(`model: ${model.provider}/${model.model} (${model.baseUrl})`)
+  console.log('prompt: 请用三句话解释：一个 agent loop 为什么需要 turn 和 step 两个层级？\n')
 
-  const result = await agent.run('请使用 calc 工具计算 (12 + 30) * 2，然后只用一句话告诉我结果。')
+  const result = await agent.run(
+    '请用三句话解释：一个 agent loop 为什么需要 turn 和 step 两个层级？不要调用任何工具。',
+  )
 
-  console.log('\n=== 事件日志 ===')
+  console.log('=== 事件日志 ===')
   for (const event of session.events) {
     const detail = event.type === 'assistant/message'
-      ? `content=${event.data.message.content.length} 块`
-      : event.type === 'tool/call'
-        ? `${event.data.name}(${event.data.arguments})`
-        : event.type === 'tool/result'
-          ? textOf(event.data.message)
+      ? `blocks=${event.data.message.content.length}${event.data.interrupted === true ? ' interrupted' : ''}`
+      : event.type === 'request/header'
+        ? `${event.data.provider}/${event.data.model} tools=[${event.data.tools.join(', ')}]`
+        : event.type === 'turn/end'
+          ? JSON.stringify(event.data.reason)
           : ''
     console.log(`#${String(event.seq).padStart(2, '0')} ${event.type.padEnd(18)} ${detail}`)
   }

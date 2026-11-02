@@ -5,7 +5,8 @@
  * 1. loop 不直接维护 `messages: Message[]`，它每次从日志派生请求；
  * 2. 消息一旦写入，就带上稳定 id 并深度冻结，后续步骤只能追加新事实。
  *
- * s02 会在这之上加入 surface replace、request/header 折叠、重放校验。
+ * 后续的 s03 会在这之上加入 surface replace 与完整重放校验；
+ * 本课只需要 append 语义。
  */
 
 import { randomUUID } from 'node:crypto'
@@ -47,7 +48,7 @@ export class Session {
     this.id = id
   }
 
-  /** 从已持久化的事件恢复（s01 的简单版本，s02 做完整校验）。 */
+  /** 从已持久化的事件恢复（本课只做简单重放，后续课程做完整校验）。 */
   static restore(id: string, events: readonly SessionEvent[]): Session {
     const session = new Session(id)
     for (const event of events) {
@@ -93,7 +94,7 @@ export class Session {
    * 从日志投影模型历史。
    *
    * 只有消息事件进入历史；turn/step/tool-call/request-header 等是
-   * 「日志事实」而不是「模型可见消息」。这个区分是 s02 的核心。
+   * 「日志事实」而不是「模型可见消息」。这个区分是 surface append 的核心。
    */
   deriveMessages(): Message[] {
     const messages: Message[] = []
@@ -115,6 +116,17 @@ export class Session {
       }
     }
     return messages
+  }
+
+  /** 最近的 assistant 消息（包括取消后保留的前缀）。 */
+  lastAssistantMessage(): Message | undefined {
+    for (let index = this.#events.length - 1; index >= 0; index -= 1) {
+      const event = this.#events[index]
+      if (event?.type === 'assistant/message' && event.data.message.content.length > 0) {
+        return event.data.message
+      }
+    }
+    return undefined
   }
 
   /** 最近的 assistant 文本，供 demo / 测试使用。 */

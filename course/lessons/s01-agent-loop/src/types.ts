@@ -176,7 +176,7 @@ export interface SessionEventDataMap {
     usage?: TokenUsage
     interrupted?: true
   }
-  /** s01 只记录失败事实；s03 会扩展成完整的 attempt 结算。 */
+  /** 本课只记录失败事实；后续课程会扩展成完整的 attempt 结算。 */
   'assistant/attempt': {
     turn: number
     step: number

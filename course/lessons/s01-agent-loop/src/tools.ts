@@ -3,7 +3,8 @@
  *
  * 这一课只做三件事：解析模型给的 JSON、做最小的 required/type 校验、
  * 把工具结果规范化成 `ToolResult`（包括未知工具和抛错的工具）。
- * s04 会把这里升级成 typed schema DSL；s05 会加上策略与并发。
+ * 后续课程会把它升级成 typed schema DSL、策略与并发；本课只保留最小注册表，
+ * demo 与主测试都不触发工具往返。
  */
 
 import type {

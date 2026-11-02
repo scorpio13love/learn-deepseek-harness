@@ -90,6 +90,7 @@
 
   function rewriteHref(href, slug) {
     if (!href || /^(https?:|mailto:|#|data:)/.test(href)) return href;
+    if (slug.startsWith('docs-') && href.startsWith('visuals/')) return `/docs/${href}`;
     if (href.includes('deepseek-harness/')) {
       const [path, anchor] = href.split('#');
       const rest = path.slice(path.indexOf('deepseek-harness/') + 'deepseek-harness/'.length);
@@ -360,7 +361,7 @@
     $('#toc-list').innerHTML = '';
     $('#toc').classList.add('is-hidden');
     $('#breadcrumb').innerHTML = '<span>课程首页</span>';
-    document.title = `${C.title} · 18 课重写 Agent Harness`;
+    document.title = `${C.title} · 28 课重写 Agent Harness`;
 
     const modules = C.parts.map((part, index) => {
       const rows = part.lessons.map(slug => {
@@ -388,7 +389,7 @@
 
     $('#content').innerHTML = `<div class="home">
       <section class="hero">
-        <span class="eyebrow">18 lessons live · 28 planned</span>
+        <span class="eyebrow">28 lessons · source-guided</span>
         <h1>从零重写一个<br><em>生产级 Agent Harness</em></h1>
         <p>${escapeHtml(C.description)} 每课一个可运行快照，对照真实源码解释「为什么生产实现要这么做」。</p>
         <div class="hero-actions">
@@ -401,7 +402,7 @@
       </section>
 
       <section class="section">
-        <div class="section-head"><div><h2>一张图看全课</h2><p>v3 的 28 课规划：内核 → 上下文 → 组合 → 执行 → 产品 → 质量</p></div></div>
+        <div class="section-head"><div><h2>一张图看全课</h2><p>28 课：内核 → 上下文 → 组合 → 执行 → 产品 → 质量</p></div></div>
         <a class="course-map-link" href="../docs/visuals/course-map.svg" target="_blank" rel="noreferrer">
           <img class="course-map" src="../docs/visuals/course-map.svg" alt="Learn DeepSeek Harness 28 课课程地图">
         </a>

@@ -1,0 +1,20 @@
+{
+  "name": "dsh-course-s16-ptc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "s16: programmatic tool calling (PTC) — the model writes code that calls tools",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "demo": "node src/demo.ts",
+    "test": "node --test tests/s16.test.ts",
+    "test:all": "node --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0"
+  }
+}
