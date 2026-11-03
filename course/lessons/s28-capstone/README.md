@@ -197,6 +197,6 @@ node src/main.ts --workspace /absolute/path/to/repo --out /tmp/capstone-run
 
 ![s28 知识导图](../../../docs/visuals/mindmaps/s28.svg)
 
-*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+*用一张图记住本课的知识点：概念、事实、边界与失败模式。*
 
 [总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

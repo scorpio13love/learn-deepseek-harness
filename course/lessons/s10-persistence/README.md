@@ -375,6 +375,6 @@ s09 让会话活过重启。s10 会解决「历史太长，上下文装不下」
 
 ![s10 知识导图](../../../docs/visuals/mindmaps/s10.svg)
 
-*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+*用一张图记住本课的知识点：概念、事实、边界与失败模式。*
 
 [总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

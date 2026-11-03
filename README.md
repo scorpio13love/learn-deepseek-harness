@@ -144,7 +144,7 @@ node site/serve.mjs
 
 ![28 课课程地图](docs/visuals/course-map.svg)
 
-![28 课知识导图](docs/visuals/mindmaps/course.svg)
+![DSH 知识图谱](docs/visuals/mindmaps/course.svg)
 
 [课程知识导图 XMind](docs/visuals/mindmaps/course.xmind) · [OPML](docs/visuals/mindmaps/course.opml)
 

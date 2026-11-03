@@ -1,242 +1,1019 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<opml version="2.0"><head><title>Learn DeepSeek Harness 28 课</title></head><body>
-  <outline text="DSH 运行时 · 28 课">
-  <outline text="I · 内核">
-<outline text="s01 agent loop">
-<outline text="问题：minimal loop">
-</outline>
-<outline text="机制：turn/step / stream / cancel">
-</outline>
-<outline text="代码：core/agent-loop/src/agent.ts">
-</outline>
-</outline>
-<outline text="s02 tool round-trip">
-<outline text="问题：tool-call / result">
-</outline>
-<outline text="机制：tool call / surface / next step">
-</outline>
-<outline text="代码：core/agent-loop/src/agent.ts">
-</outline>
-</outline>
-<outline text="s03 session log">
-<outline text="问题：append-only + surface">
-</outline>
-<outline text="机制：event sourcing / surface / replay">
-</outline>
-<outline text="代码：core/session/src/{index">
-</outline>
-</outline>
-<outline text="s04 stream &amp; attempt">
-<outline text="问题：chunk → attempt">
-</outline>
-<outline text="机制：chunks / attempt / usage">
-</outline>
-<outline text="代码：llm/llm/src/{assembler">
-</outline>
-</outline>
-<outline text="s05 tool contract">
-<outline text="问题：schema + output">
-</outline>
-<outline text="机制：schema / inference / scope">
-</outline>
-<outline text="代码：core/tools/src/{schema">
-</outline>
-</outline>
-<outline text="s06 tool runtime">
-<outline text="问题：policy + batch">
-</outline>
-<outline text="机制：guards / approval / batch">
-</outline>
-<outline text="代码：core/tools/src/{pipeline">
-</outline>
-</outline>
+<opml version="2.0"><head><title>DSH 运行时知识图谱</title></head><body>
+  <outline text="DSH 运行时知识图谱">
+    <outline text="控制平面">
+      <outline text="turn / step / request">
+      </outline>
+      <outline text="cancel 是协作式">
+      </outline>
+      <outline text="请求从日志派生">
+      </outline>
+      <outline text="失败与恢复分离">
+      </outline>
+    </outline>
+    <outline text="事实与上下文">
+      <outline text="append-only session log">
+      </outline>
+      <outline text="surface 是视图">
+      </outline>
+      <outline text="replace 不删历史">
+      </outline>
+      <outline text="compaction 是工作集">
+      </outline>
+    </outline>
+    <outline text="工具与权限">
+      <outline text="模型面 / 执行面 / 投影面">
+      </outline>
+      <outline text="guard 只能收紧">
+      </outline>
+      <outline text="approval fail closed">
+      </outline>
+      <outline text="并发默认独占">
+      </outline>
+    </outline>
+    <outline text="组合与生命周期">
+      <outline text="Context / inject">
+      </outline>
+      <outline text="Fiber / effect">
+      </outline>
+      <outline text="Bundle / Profile / Patch">
+      </outline>
+      <outline text="Definition–Provider–Consumer">
+      </outline>
+    </outline>
+    <outline text="执行边界">
+      <outline text="fs / shell / sandbox">
+      </outline>
+      <outline text="MCP 外部工具">
+      </outline>
+      <outline text="browser / CUA">
+      </outline>
+      <outline text="subagent 预算">
+      </outline>
+    </outline>
+    <outline text="质量与宿主">
+      <outline text="projection / SSE">
+      </outline>
+      <outline text="record / replay">
+      </outline>
+      <outline text="snapshot / eval">
+      </outline>
+      <outline text="Web / SDK / UI">
+      </outline>
+    </outline>
   </outline>
-  <outline text="II · 上下文">
-<outline text="s07 system prompt">
-<outline text="问题：sections + admission">
-</outline>
-<outline text="机制：sections / contexts / KV cache">
-</outline>
-<outline text="代码：core/system-prompt/src/index.ts">
-</outline>
-</outline>
-<outline text="s08 inbox / steering">
-<outline text="问题：next-turn / next-step">
-</outline>
-<outline text="机制：inbox / steering / cancel">
-</outline>
-<outline text="代码：core/agent-loop/src/{inbox">
-</outline>
-</outline>
-<outline text="s09 LLM seam">
-<outline text="问题：provider + prepareCall">
-</outline>
-<outline text="机制：provider / capabilities / retry">
-</outline>
-<outline text="代码：llm/llm/src/{call-config">
-</outline>
-</outline>
-<outline text="s10 persistence">
-<outline text="问题：JSONL + resume">
-</outline>
-<outline text="机制：JSONL / recovery / fork">
-</outline>
-<outline text="代码：session/session-persistence/src/index.ts">
-</outline>
-</outline>
-<outline text="s11 compaction">
-<outline text="问题：prune + summarize">
-</outline>
-<outline text="机制：token meter / prune / summary">
-</outline>
-<outline text="代码：compaction/compaction-basic/src/index.ts">
-</outline>
-</outline>
+
+  <outline text="s01 · 最小 agent loop">
+    <outline text="turn / step">
+      <outline text="turn/start → turn/end">
+      </outline>
+      <outline text="step = 一次模型请求">
+      </outline>
+      <outline text="turn/end 放 finally">
+      </outline>
+    </outline>
+    <outline text="流式组装">
+      <outline text="SSE chunk">
+      </outline>
+      <outline text="block index">
+      </outline>
+      <outline text="StreamAssembler">
+      </outline>
+    </outline>
+    <outline text="取消">
+      <outline text="协作式 AbortSignal">
+      </outline>
+      <outline text="已交付前缀保留">
+      </outline>
+      <outline text="assistant/attempt">
+      </outline>
+    </outline>
+    <outline text="日志">
+      <outline text="deriveMessages()">
+      </outline>
+      <outline text="surface = 模型视图">
+      </outline>
+      <outline text="拒绝隐藏 messages 数组">
+      </outline>
+    </outline>
   </outline>
-  <outline text="III · 组合">
-<outline text="s12 plugin kernel">
-<outline text="问题：Context / Fiber">
-</outline>
-<outline text="机制：Cordis / Fiber / waterfall">
-</outline>
-<outline text="代码：vendor/cordis/src/{context">
-</outline>
-</outline>
-<outline text="s13 composition / boot">
-<outline text="问题：profile / bundle / patch">
-</outline>
-<outline text="机制：profiles / patches / boot">
-</outline>
-<outline text="代码：boot/app-boot">
-</outline>
-</outline>
+  <outline text="s02 · 工具往返">
+    <outline text="调用">
+      <outline text="assistant tool-call">
+      </outline>
+      <outline text="参数是原始 JSON 字符串">
+      </outline>
+      <outline text="模型不执行工具">
+      </outline>
+    </outline>
+    <outline text="执行">
+      <outline text="ToolRegistry">
+      </outline>
+      <outline text="tool/call 事件">
+      </outline>
+      <outline text="结果规范化">
+      </outline>
+    </outline>
+    <outline text="结果">
+      <outline text="tool/result 回到 surface">
+      </outline>
+      <outline text="toolCallId 配对">
+      </outline>
+      <outline text="isError 也是结果">
+      </outline>
+    </outline>
+    <outline text="下一步">
+      <outline text="deriveMessages 带结果">
+      </outline>
+      <outline text="turn/step 归属">
+      </outline>
+      <outline text="失败不终止 turn">
+      </outline>
+    </outline>
   </outline>
-  <outline text="IV · 执行边界">
-<outline text="s14 capability seams">
-<outline text="问题：fs / shell / sandbox">
-</outline>
-<outline text="机制：fs / shell / approval">
-</outline>
-<outline text="代码：fs/tool-fs">
-</outline>
-</outline>
-<outline text="s15 subagents / presets">
-<outline text="问题：delegate + isolate">
-</outline>
-<outline text="机制：spawn / budgets / preset">
-</outline>
-<outline text="代码：subagent/subagent/src/manager.ts">
-</outline>
-</outline>
-<outline text="s16 PTC">
-<outline text="问题：programmatic tools">
-</outline>
-<outline text="机制：run_code / PTC / tools">
-</outline>
-<outline text="代码：ptc-runtime/ptc-runtime">
-</outline>
-</outline>
-<outline text="s17 MCP / skills / commands">
-<outline text="问题：external capability">
-</outline>
-<outline text="机制：MCP / skills / commands">
-</outline>
-<outline text="代码：mcp/mcp-client">
-</outline>
-</outline>
-<outline text="s18 skills / commands">
-<outline text="问题：catalog + slash">
-</outline>
-<outline text="机制：skills / commands / host">
-</outline>
-<outline text="代码：skill/skill">
-</outline>
-</outline>
-<outline text="s19 browser use">
-<outline text="问题：browser provider">
-</outline>
-<outline text="机制：browser / provider / mock">
-</outline>
-<outline text="代码：browser-use/browser-use">
-</outline>
-</outline>
-<outline text="s20 computer use I">
-<outline text="问题：app / window / AX">
-</outline>
-<outline text="机制：CUA / macOS / AX">
-</outline>
-<outline text="代码：computer-use/computer-use">
-</outline>
-</outline>
-<outline text="s21 computer use II">
-<outline text="问题：actions + permissions">
-</outline>
-<outline text="机制：actions / coordinates / permissions">
-</outline>
-<outline text="代码：experimental/cua-macos">
-</outline>
-</outline>
+  <outline text="s03 · Session Log">
+    <outline text="事实">
+      <outline text="append-only events">
+      </outline>
+      <outline text="seq 连续递增">
+      </outline>
+      <outline text="事件不可原地修改">
+      </outline>
+    </outline>
+    <outline text="surface">
+      <outline text="当前模型视图">
+      </outline>
+      <outline text="deriveMessages()">
+      </outline>
+      <outline text="append / replace">
+      </outline>
+    </outline>
+    <outline text="replace">
+      <outline text="摘要遮蔽旧视图">
+      </outline>
+      <outline text="sourceEventSeqs">
+      </outline>
+      <outline text="原始事件保留">
+      </outline>
+    </outline>
+    <outline text="恢复">
+      <outline text="Session.restore()">
+      </outline>
+      <outline text="重放">
+      </outline>
+      <outline text="fork 前缀">
+      </outline>
+    </outline>
   </outline>
-  <outline text="V · 产品面">
-<outline text="s22 web">
-<outline text="问题：projection + SSE">
-</outline>
-<outline text="机制：projection / SSE / reconnect">
-</outline>
-<outline text="代码：session/session-projection">
-</outline>
-</outline>
-<outline text="s23 SDK / headless">
-<outline text="问题：JSON-RPC over stdio">
-</outline>
-<outline text="机制：JSON-RPC / stdio / SDK">
-</outline>
-<outline text="代码：sdk/protocol">
-</outline>
-</outline>
-<outline text="s24 client UI">
-<outline text="问题：action cards">
-</outline>
-<outline text="机制：projection / action cards / UI">
-</outline>
-<outline text="代码：client/ui-renderer">
-</outline>
-</outline>
+  <outline text="s04 · 流式与 attempt">
+    <outline text="chunk">
+      <outline text="text/reasoning/tool delta">
+      </outline>
+      <outline text="按 block index 归位">
+      </outline>
+      <outline text="live 帧先给 UI">
+      </outline>
+    </outline>
+    <outline text="组装">
+      <outline text="block-start / delta / end">
+      </outline>
+      <outline text="完整 assistant/message">
+      </outline>
+      <outline text="stream 一并持久化">
+      </outline>
+    </outline>
+    <outline text="attempt">
+      <outline text="失败/取消也结算">
+      </outline>
+      <outline text="保留已交付前缀">
+      </outline>
+      <outline text="不进模型历史">
+      </outline>
+    </outline>
+    <outline text="usage / 重放">
+      <outline text="usage 在 finish 前">
+      </outline>
+      <outline text="取消可解释">
+      </outline>
+      <outline text="stream 可回放">
+      </outline>
+    </outline>
   </outline>
-  <outline text="VI · 质量">
-<outline text="s25 observability / eval">
-<outline text="问题：spans + snapshots">
-</outline>
-<outline text="机制：telemetry / replay / snapshot">
-</outline>
-<outline text="代码：telemetry/otel">
-</outline>
-</outline>
-<outline text="s26 eval / fault injection">
-<outline text="问题：scenario + replay">
-</outline>
-<outline text="机制：eval / fault / replay">
-</outline>
-<outline text="代码：docs/testing.zh.md">
-</outline>
-</outline>
-<outline text="s27 security / permissions">
-<outline text="问题：fail closed">
-</outline>
-<outline text="机制：security / approval / redaction">
-</outline>
-<outline text="代码：sandbox">
-</outline>
-</outline>
-<outline text="s28 capstone">
-<outline text="问题：full harness">
-</outline>
-<outline text="机制：capstone / eval / real task">
-</outline>
-<outline text="代码：core/agent-loop/src/agent.ts">
-</outline>
-</outline>
+  <outline text="s05 · 工具契约">
+    <outline text="作者 DSL">
+      <outline text="TypeScript 参数">
+      </outline>
+      <outline text="编译成 JSON Schema">
+      </outline>
+      <outline text="模型只看 schema">
+      </outline>
+    </outline>
+    <outline text="参数校验">
+      <outline text="validateParameters">
+      </outline>
+      <outline text="执行前拒绝">
+      </outline>
+      <outline text="isError 给模型看">
+      </outline>
+    </outline>
+    <outline text="输出契约">
+      <outline text="规范值">
+      </outline>
+      <outline text="output.schema">
+      </outline>
+      <outline text="render 投影">
+      </outline>
+    </outline>
+    <outline text="作用域">
+      <outline text="scoped 工具">
+      </outline>
+      <outline text="conditions">
+      </outline>
+      <outline text="restrictions">
+      </outline>
+    </outline>
   </outline>
+  <outline text="s06 · 工具运行时">
+    <outline text="前置闸门">
+      <outline text="pre-execute">
+      </outline>
+      <outline text="单调 guard 只能收紧">
+      </outline>
+      <outline text="ask / deny / allow">
+      </outline>
+    </outline>
+    <outline text="审批">
+      <outline text="approval/request">
+      </outline>
+      <outline text="绑定参数与调用者">
+      </outline>
+      <outline text="fail closed">
+      </outline>
+    </outline>
+    <outline text="执行">
+      <outline text="tools/execute">
+      </outline>
+      <outline text="显式并发声明">
+      </outline>
+      <outline text="exclusive batch">
+      </outline>
+    </outline>
+    <outline text="结果">
+      <outline text="post-execute">
+      </outline>
+      <outline text="finalizeContent">
+      </outline>
+      <outline text="tools/result 只读">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s07 · 系统提示词">
+    <outline text="sections">
+      <outline text="name / order / text">
+      </outline>
+      <outline text="稳定前缀">
+      </outline>
+      <outline text="KV cache">
+      </outline>
+    </outline>
+    <outline text="动态上下文">
+      <outline text="variables">
+      </outline>
+      <outline text="contexts">
+      </outline>
+      <outline text="toolOrder">
+      </outline>
+    </outline>
+    <outline text="准入">
+      <outline text="head admission">
+      </outline>
+      <outline text="system head 替换/追加">
+      </outline>
+      <outline text="in-history">
+      </outline>
+    </outline>
+    <outline text="泄露风险">
+      <outline text="不要塞临时秘密">
+      </outline>
+      <outline text="renderContextMessage">
+      </outline>
+      <outline text="可重放">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s08 · Inbox / steering">
+    <outline text="两条队列">
+      <outline text="next-turn">
+      </outline>
+      <outline text="next-step">
+      </outline>
+      <outline text="claim 是纯删除">
+      </outline>
+    </outline>
+    <outline text="三种输入">
+      <outline text="followup 唤醒">
+      </outline>
+      <outline text="steer 改变当前路径">
+      </outline>
+      <outline text="inject 不唤醒">
+      </outline>
+    </outline>
+    <outline text="边界">
+      <outline text="turn 边界领取全部 next-step">
+      </outline>
+      <outline text="step 边界只领 next-step">
+      </outline>
+      <outline text="step/end 之后进入历史">
+      </outline>
+    </outline>
+    <outline text="取消">
+      <outline text="keepInbox">
+      </outline>
+      <outline text="取消不是删除">
+      </outline>
+      <outline text="whenIdle 跨轮次">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s09 · LLM seam">
+    <outline text="统一词汇">
+      <outline text="Message / ContentBlock">
+      </outline>
+      <outline text="StreamChunk">
+      </outline>
+      <outline text="loop 不出现 provider 分支">
+      </outline>
+    </outline>
+    <outline text="prepareCall">
+      <outline text="绑定 config">
+      </outline>
+      <outline text="capabilities">
+      </outline>
+      <outline text="retryPolicy">
+      </outline>
+    </outline>
+    <outline text="Messages">
+      <outline text="/v1/messages">
+      </outline>
+      <outline text="tool_use / tool_result">
+      </outline>
+      <outline text="thinking / usage">
+      </outline>
+    </outline>
+    <outline text="失败与重试">
+      <outline text="失败事实归一化">
+      </outline>
+      <outline text="step 内重试">
+      </outline>
+      <outline text="不重跑 pre-step">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s10 · JSONL 持久化">
+    <outline text="写入">
+      <outline text="append 到 buffer">
+      </outline>
+      <outline text="flush + fsync">
+      </outline>
+      <outline text="显式持久屏障">
+      </outline>
+    </outline>
+    <outline text="文件">
+      <outline text="session.jsonl">
+      </outline>
+      <outline text="一行一个事件">
+      </outline>
+      <outline text="不压缩/不校验和">
+      </outline>
+    </outline>
+    <outline text="修复">
+      <outline text="torn tail">
+      </outline>
+      <outline text="丢弃无效后缀">
+      </outline>
+      <outline text="未闭合 turn 补 interrupted">
+      </outline>
+    </outline>
+    <outline text="fork">
+      <outline text="复制前缀">
+      </outline>
+      <outline text="forked closer">
+      </outline>
+      <outline text="session/end-seed">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s11 · Compaction">
+    <outline text="触发">
+      <outline text="token estimate">
+      </outline>
+      <outline text="thresholdRatio">
+      </outline>
+      <outline text="beforeStep / overflow">
+      </outline>
+    </outline>
+    <outline text="prune">
+      <outline text="超长 tool/result">
+      </outline>
+      <outline text="语义损失小">
+      </outline>
+      <outline text="先裁剪再摘要">
+      </outline>
+    </outline>
+    <outline text="summary">
+      <outline text="独立模型请求">
+      </outline>
+      <outline text="保留目标/约束">
+      </outline>
+      <outline text="不污染主历史">
+      </outline>
+    </outline>
+    <outline text="replace">
+      <outline text="surfaceOp: replace">
+      </outline>
+      <outline text="sourceEventSeqs">
+      </outline>
+      <outline text="旧事件仍在">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s12 · Plugin kernel">
+    <outline text="Plugin">
+      <outline text="函数/类/对象">
+      </outline>
+      <outline text="贡献能力">
+      </outline>
+      <outline text="不占主流程">
+      </outline>
+    </outline>
+    <outline text="Context">
+      <outline text="服务键">
+      </outline>
+      <outline text="extend / isolate">
+      </outline>
+      <outline text="作用域">
+      </outline>
+    </outline>
+    <outline text="inject / Fiber">
+      <outline text="依赖未满足则等待">
+      </outline>
+      <outline text="effect 注册">
+      </outline>
+      <outline text="dispose 逆序撤销">
+      </outline>
+    </outline>
+    <outline text="事件">
+      <outline text="emit">
+      </outline>
+      <outline text="waterfall">
+      </outline>
+      <outline text="serial / bail">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s13 · 组合与启动">
+    <outline text="Bundle">
+      <outline text="分发插件行">
+      </outline>
+      <outline text="共享基础能力">
+      </outline>
+      <outline text="不决定机器偏好">
+      </outline>
+    </outline>
+    <outline text="Profile">
+      <outline text="产品配方">
+      </outline>
+      <outline text="Web / headless / 自定义">
+      </outline>
+      <outline text="有序装配">
+      </outline>
+    </outline>
+    <outline text="Patch">
+      <outline text="覆盖顺序">
+      </outline>
+      <outline text="整段替换不深合并">
+      </outline>
+      <outline text="!!js 逃生口">
+      </outline>
+    </outline>
+    <outline text="Seam">
+      <outline text="Definition">
+      </outline>
+      <outline text="Provider">
+      </outline>
+      <outline text="Consumer 不绕过">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s14 · 能力接缝">
+    <outline text="FS">
+      <outline text="read/write">
+      </outline>
+      <outline text="工作区边界">
+      </outline>
+      <outline text="provider 可替换">
+      </outline>
+    </outline>
+    <outline text="Shell">
+      <outline text="进程执行">
+      </outline>
+      <outline text="超时/取消">
+      </outline>
+      <outline text="approval">
+      </outline>
+    </outline>
+    <outline text="Sandbox">
+      <outline text="隔离级别">
+      </outline>
+      <outline text="fail closed">
+      </outline>
+      <outline text="策略解析">
+      </outline>
+    </outline>
+    <outline text="审批">
+      <outline text="风险动作">
+      </outline>
+      <outline text="来源/有效期">
+      </outline>
+      <outline text="可审计">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s15 · Subagents / presets">
+    <outline text="spawn">
+      <outline text="新 session">
+      </outline>
+      <outline text="任务 + 权限">
+      </outline>
+      <outline text="child id 引用">
+      </outline>
+    </outline>
+    <outline text="预算">
+      <outline text="maxDepth">
+      </outline>
+      <outline text="maxActive">
+      </outline>
+      <outline text="启动前检查">
+      </outline>
+    </outline>
+    <outline text="preset">
+      <outline text="提示词/persona">
+      </outline>
+      <outline text="工具子集">
+      </outline>
+      <outline text="按会话组装">
+      </outline>
+    </outline>
+    <outline text="结果">
+      <outline text="child 日志独立">
+      </outline>
+      <outline text="结果回父 inbox">
+      </outline>
+      <outline text="父只留摘要">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s16 · PTC">
+    <outline text="program">
+      <outline text="async 函数体">
+      </outline>
+      <outline text="顶层 await">
+      </outline>
+      <outline text="return 值">
+      </outline>
+    </outline>
+    <outline text="tools.*">
+      <outline text="Proxy 进入 callTool">
+      </outline>
+      <outline text="未知工具结构化错误">
+      </outline>
+      <outline text="调用记录">
+      </outline>
+    </outline>
+    <outline text="序列化">
+      <outline text="Date/Map/Set">
+      </outline>
+      <outline text="循环引用失败">
+      </outline>
+      <outline text="console 捕获">
+      </outline>
+    </outline>
+    <outline text="边界">
+      <outline text="fresh / persistent scope">
+      </outline>
+      <outline text="timeout">
+      </outline>
+      <outline text="失败是结果">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s17 · MCP / skills / commands">
+    <outline text="MCP">
+      <outline text="initialize">
+      </outline>
+      <outline text="tools/list">
+      </outline>
+      <outline text="tools/call">
+      </outline>
+    </outline>
+    <outline text="命名">
+      <outline text="mcp__server__tool">
+      </outline>
+      <outline text="inputSchema 来自 server">
+      </outline>
+      <outline text="错误变 isError">
+      </outline>
+    </outline>
+    <outline text="skills">
+      <outline text="SKILL.md frontmatter">
+      </outline>
+      <outline text="只注入 catalog">
+      </outline>
+      <outline text="按需 load">
+      </outline>
+    </outline>
+    <outline text="commands">
+      <outline text="slash command">
+      </outline>
+      <outline text="host 直接分派">
+      </outline>
+      <outline text="不产生模型轮次">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s18 · Skills / commands">
+    <outline text="目录">
+      <outline text="bundle">
+      </outline>
+      <outline text="flat .md">
+      </outline>
+      <outline text="frontmatter">
+      </outline>
+    </outline>
+    <outline text="加载">
+      <outline text="catalog 不含正文">
+      </outline>
+      <outline text="load_skill(name)">
+      </outline>
+      <outline text="按需注入">
+      </outline>
+    </outline>
+    <outline text="命令">
+      <outline text="registry">
+      </outline>
+      <outline text="host route">
+      </outline>
+      <outline text="0 模型轮次">
+      </outline>
+    </outline>
+    <outline text="边界">
+      <outline text="重名拒绝">
+      </outline>
+      <outline text="无效目录">
+      </outline>
+      <outline text="刷新 catalog">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s19 · Browser use">
+    <outline text="provider">
+      <outline text="单槽位注册">
+      </outline>
+      <outline text="第二个注册失败">
+      </outline>
+      <outline text="dispose 幂等">
+      </outline>
+    </outline>
+    <outline text="session">
+      <outline text="openSession">
+      </outline>
+      <outline text="会话所有权">
+      </outline>
+      <outline text="关闭页面">
+      </outline>
+    </outline>
+    <outline text="工具">
+      <outline text="navigate">
+      </outline>
+      <outline text="read / click">
+      </outline>
+      <outline text="screenshot">
+      </outline>
+    </outline>
+    <outline text="回合制">
+      <outline text="ref 表">
+      </outline>
+      <outline text="动作后新快照">
+      </outline>
+      <outline text="旧 ref 失效">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s20 · Computer use I">
+    <outline text="provider">
+      <outline text="单槽位">
+      </outline>
+      <outline text="macOS CUA">
+      </outline>
+      <outline text="app/window">
+      </outline>
+    </outline>
+    <outline text="授权">
+      <outline text="读取前检查">
+      </outline>
+      <outline text="fail closed">
+      </outline>
+      <outline text="session 级">
+      </outline>
+    </outline>
+    <outline text="快照">
+      <outline text="AX tree">
+      </outline>
+      <outline text="screenshot">
+      </outline>
+      <outline text="scale">
+      </outline>
+    </outline>
+    <outline text="工具">
+      <outline text="getApp">
+      </outline>
+      <outline text="getWindows">
+      </outline>
+      <outline text="getState">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s21 · Computer use II">
+    <outline text="坐标">
+      <outline text="截图像素">
+      </outline>
+      <outline text="relative 0–999">
+      </outline>
+      <outline text="越界拒绝">
+      </outline>
+    </outline>
+    <outline text="动作">
+      <outline text="click/type/press/scroll">
+      </outline>
+      <outline text="dispatched">
+      </outline>
+      <outline text="verified:false">
+      </outline>
+    </outline>
+    <outline text="失效">
+      <outline text="STALE_SNAPSHOT">
+      </outline>
+      <outline text="WINDOW_CHANGED">
+      </outline>
+      <outline text="重新截图">
+      </outline>
+    </outline>
+    <outline text="权限">
+      <outline text="持久/会话授权">
+      </outline>
+      <outline text="撤销">
+      </outline>
+      <outline text="输入不可逆">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s22 · Web projection">
+    <outline text="projection">
+      <outline text="事件 → 卡片">
+      </outline>
+      <outline text="纯 fold">
+      </outline>
+      <outline text="确定性">
+      </outline>
+    </outline>
+    <outline text="snapshot">
+      <outline text="首屏">
+      </outline>
+      <outline text="当前 seq">
+      </outline>
+      <outline text="多客户端">
+      </outline>
+    </outline>
+    <outline text="SSE">
+      <outline text="增量">
+      </outline>
+      <outline text="按 seq 去重">
+      </outline>
+      <outline text="断线重连">
+      </outline>
+    </outline>
+    <outline text="边界">
+      <outline text="客户端不 fold">
+      </outline>
+      <outline text="host 计算">
+      </outline>
+      <outline text="回放一致">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s23 · SDK / headless">
+    <outline text="协议">
+      <outline text="JSON-RPC">
+      </outline>
+      <outline text="stdio">
+      </outline>
+      <outline text="newline framed">
+      </outline>
+    </outline>
+    <outline text="方法">
+      <outline text="session/create">
+      </outline>
+      <outline text="prompt">
+      </outline>
+      <outline text="session/event">
+      </outline>
+    </outline>
+    <outline text="边界">
+      <outline text="进程外服务">
+      </outline>
+      <outline text="编辑器/CI 接入">
+      </outline>
+      <outline text="不复制 loop">
+      </outline>
+    </outline>
+    <outline text="错误">
+      <outline text="结构化 code">
+      </outline>
+      <outline text="取消">
+      </outline>
+      <outline text="退出码">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s24 · Client UI">
+    <outline text="卡片">
+      <outline text="text">
+      </outline>
+      <outline text="tool">
+      </outline>
+      <outline text="approval / error">
+      </outline>
+    </outline>
+    <outline text="状态">
+      <outline text="running → done/failed">
+      </outline>
+      <outline text="host 决定">
+      </outline>
+      <outline text="payload">
+      </outline>
+    </outline>
+    <outline text="同步">
+      <outline text="snapshot + delta">
+      </outline>
+      <outline text="seq 对齐">
+      </outline>
+      <outline text="不重复渲染">
+      </outline>
+    </outline>
+    <outline text="重连">
+      <outline text="lastSeq">
+      </outline>
+      <outline text="补缺失事件">
+      </outline>
+      <outline text="已结束卡不回 running">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s25 · Observability">
+    <outline text="span">
+      <outline text="turn/step/tool">
+      </outline>
+      <outline text="trace">
+      </outline>
+      <outline text="耗时">
+      </outline>
+    </outline>
+    <outline text="record">
+      <outline text="事件 + chunk">
+      </outline>
+      <outline text="replay">
+      </outline>
+      <outline text="不访问网络">
+      </outline>
+    </outline>
+    <outline text="snapshot">
+      <outline text="归一化">
+      </outline>
+      <outline text="去掉时间戳噪声">
+      </outline>
+      <outline text="diff">
+      </outline>
+    </outline>
+    <outline text="门禁">
+      <outline text="回归">
+      </outline>
+      <outline text="失败可定位">
+      </outline>
+      <outline text="不阻塞主路径">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s26 · Eval / fault injection">
+    <outline text="scenario">
+      <outline text="模型脚本">
+      </outline>
+      <outline text="工具">
+      </outline>
+      <outline text="seed">
+      </outline>
+    </outline>
+    <outline text="fault">
+      <outline text="429">
+      </outline>
+      <outline text="timeout">
+      </outline>
+      <outline text="断流 / 工具错误">
+      </outline>
+    </outline>
+    <outline text="replay">
+      <outline text="同失败">
+      </outline>
+      <outline text="同事件">
+      </outline>
+      <outline text="可重复">
+      </outline>
+    </outline>
+    <outline text="report">
+      <outline text="矩阵">
+      </outline>
+      <outline text="结论">
+      </outline>
+      <outline text="失败定位">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s27 · Security">
+    <outline text="路径">
+      <outline text="realpath + relative">
+      </outline>
+      <outline text="symlink">
+      </outline>
+      <outline text="工作区容器">
+      </outline>
+    </outline>
+    <outline text="审批">
+      <outline text="fail closed">
+      </outline>
+      <outline text="绑定参数">
+      </outline>
+      <outline text="不可复用">
+      </outline>
+    </outline>
+    <outline text="秘密">
+      <outline text="redaction">
+      </outline>
+      <outline text="key/value">
+      </outline>
+      <outline text="日志不泄露">
+      </outline>
+    </outline>
+    <outline text="CUA">
+      <outline text="allowlist">
+      </outline>
+      <outline text="拒绝先于读取">
+      </outline>
+      <outline text="审计">
+      </outline>
+    </outline>
+  </outline>
+  <outline text="s28 · Capstone">
+    <outline text="任务">
+      <outline text="真实模型">
+      </outline>
+      <outline text="多工具">
+      </outline>
+      <outline text="仓库审计">
+      </outline>
+    </outline>
+    <outline text="日志">
+      <outline text="JSONL">
+      </outline>
+      <outline text="surface 摘要">
+      </outline>
+      <outline text="可恢复">
+      </outline>
+    </outline>
+    <outline text="评测">
+      <outline text="checks">
+      </outline>
+      <outline text="报告">
+      </outline>
+      <outline text="失败不包装">
+      </outline>
+    </outline>
+    <outline text="边界">
+      <outline text="审批">
+      </outline>
+      <outline text="工具错误">
+      </outline>
+      <outline text="退出码">
+      </outline>
+    </outline>
   </outline>
 
 </body></opml>

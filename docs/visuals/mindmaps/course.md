@@ -1,131 +1,581 @@
-# Learn DeepSeek Harness · 28 课知识导图
+# DSH 运行时知识图谱
 
-## I · 内核
+> 六个知识域，不是课程目录
 
-- **s01 agent loop**
-  - 问题：minimal loop
-  - 机制：turn/step / stream / cancel
-  - 代码：core/agent-loop/src/agent.ts
-- **s02 tool round-trip**
-  - 问题：tool-call / result
-  - 机制：tool call / surface / next step
-  - 代码：core/agent-loop/src/agent.ts
-- **s03 session log**
-  - 问题：append-only + surface
-  - 机制：event sourcing / surface / replay
-  - 代码：core/session/src/{index
-- **s04 stream & attempt**
-  - 问题：chunk → attempt
-  - 机制：chunks / attempt / usage
-  - 代码：llm/llm/src/{assembler
-- **s05 tool contract**
-  - 问题：schema + output
-  - 机制：schema / inference / scope
-  - 代码：core/tools/src/{schema
-- **s06 tool runtime**
-  - 问题：policy + batch
-  - 机制：guards / approval / batch
-  - 代码：core/tools/src/{pipeline
+## 总图谱
 
-## II · 上下文
+### 控制平面
 
-- **s07 system prompt**
-  - 问题：sections + admission
-  - 机制：sections / contexts / KV cache
-  - 代码：core/system-prompt/src/index.ts
-- **s08 inbox / steering**
-  - 问题：next-turn / next-step
-  - 机制：inbox / steering / cancel
-  - 代码：core/agent-loop/src/{inbox
-- **s09 LLM seam**
-  - 问题：provider + prepareCall
-  - 机制：provider / capabilities / retry
-  - 代码：llm/llm/src/{call-config
-- **s10 persistence**
-  - 问题：JSONL + resume
-  - 机制：JSONL / recovery / fork
-  - 代码：session/session-persistence/src/index.ts
-- **s11 compaction**
-  - 问题：prune + summarize
-  - 机制：token meter / prune / summary
-  - 代码：compaction/compaction-basic/src/index.ts
+- turn / step / request
+- cancel 是协作式
+- 请求从日志派生
+- 失败与恢复分离
 
-## III · 组合
+### 事实与上下文
 
-- **s12 plugin kernel**
-  - 问题：Context / Fiber
-  - 机制：Cordis / Fiber / waterfall
-  - 代码：vendor/cordis/src/{context
-- **s13 composition / boot**
-  - 问题：profile / bundle / patch
-  - 机制：profiles / patches / boot
-  - 代码：boot/app-boot
+- append-only session log
+- surface 是视图
+- replace 不删历史
+- compaction 是工作集
 
-## IV · 执行边界
+### 工具与权限
 
-- **s14 capability seams**
-  - 问题：fs / shell / sandbox
-  - 机制：fs / shell / approval
-  - 代码：fs/tool-fs
-- **s15 subagents / presets**
-  - 问题：delegate + isolate
-  - 机制：spawn / budgets / preset
-  - 代码：subagent/subagent/src/manager.ts
-- **s16 PTC**
-  - 问题：programmatic tools
-  - 机制：run_code / PTC / tools
-  - 代码：ptc-runtime/ptc-runtime
-- **s17 MCP / skills / commands**
-  - 问题：external capability
-  - 机制：MCP / skills / commands
-  - 代码：mcp/mcp-client
-- **s18 skills / commands**
-  - 问题：catalog + slash
-  - 机制：skills / commands / host
-  - 代码：skill/skill
-- **s19 browser use**
-  - 问题：browser provider
-  - 机制：browser / provider / mock
-  - 代码：browser-use/browser-use
-- **s20 computer use I**
-  - 问题：app / window / AX
-  - 机制：CUA / macOS / AX
-  - 代码：computer-use/computer-use
-- **s21 computer use II**
-  - 问题：actions + permissions
-  - 机制：actions / coordinates / permissions
-  - 代码：experimental/cua-macos
+- 模型面 / 执行面 / 投影面
+- guard 只能收紧
+- approval fail closed
+- 并发默认独占
 
-## V · 产品面
+### 组合与生命周期
 
-- **s22 web**
-  - 问题：projection + SSE
-  - 机制：projection / SSE / reconnect
-  - 代码：session/session-projection
-- **s23 SDK / headless**
-  - 问题：JSON-RPC over stdio
-  - 机制：JSON-RPC / stdio / SDK
-  - 代码：sdk/protocol
-- **s24 client UI**
-  - 问题：action cards
-  - 机制：projection / action cards / UI
-  - 代码：client/ui-renderer
+- Context / inject
+- Fiber / effect
+- Bundle / Profile / Patch
+- Definition–Provider–Consumer
 
-## VI · 质量
+### 执行边界
 
-- **s25 observability / eval**
-  - 问题：spans + snapshots
-  - 机制：telemetry / replay / snapshot
-  - 代码：telemetry/otel
-- **s26 eval / fault injection**
-  - 问题：scenario + replay
-  - 机制：eval / fault / replay
-  - 代码：docs/testing.zh.md
-- **s27 security / permissions**
-  - 问题：fail closed
-  - 机制：security / approval / redaction
-  - 代码：sandbox
-- **s28 capstone**
-  - 问题：full harness
-  - 机制：capstone / eval / real task
-  - 代码：core/agent-loop/src/agent.ts
+- fs / shell / sandbox
+- MCP 外部工具
+- browser / CUA
+- subagent 预算
+
+### 质量与宿主
+
+- projection / SSE
+- record / replay
+- snapshot / eval
+- Web / SDK / UI
+
+## 每课知识点
+
+### s01 · 最小 agent loop
+
+- **turn / step**
+  - turn/start → turn/end
+  - step = 一次模型请求
+  - turn/end 放 finally
+- **流式组装**
+  - SSE chunk
+  - block index
+  - StreamAssembler
+- **取消**
+  - 协作式 AbortSignal
+  - 已交付前缀保留
+  - assistant/attempt
+- **日志**
+  - deriveMessages()
+  - surface = 模型视图
+  - 拒绝隐藏 messages 数组
+
+### s02 · 工具往返
+
+- **调用**
+  - assistant tool-call
+  - 参数是原始 JSON 字符串
+  - 模型不执行工具
+- **执行**
+  - ToolRegistry
+  - tool/call 事件
+  - 结果规范化
+- **结果**
+  - tool/result 回到 surface
+  - toolCallId 配对
+  - isError 也是结果
+- **下一步**
+  - deriveMessages 带结果
+  - turn/step 归属
+  - 失败不终止 turn
+
+### s03 · Session Log
+
+- **事实**
+  - append-only events
+  - seq 连续递增
+  - 事件不可原地修改
+- **surface**
+  - 当前模型视图
+  - deriveMessages()
+  - append / replace
+- **replace**
+  - 摘要遮蔽旧视图
+  - sourceEventSeqs
+  - 原始事件保留
+- **恢复**
+  - Session.restore()
+  - 重放
+  - fork 前缀
+
+### s04 · 流式与 attempt
+
+- **chunk**
+  - text/reasoning/tool delta
+  - 按 block index 归位
+  - live 帧先给 UI
+- **组装**
+  - block-start / delta / end
+  - 完整 assistant/message
+  - stream 一并持久化
+- **attempt**
+  - 失败/取消也结算
+  - 保留已交付前缀
+  - 不进模型历史
+- **usage / 重放**
+  - usage 在 finish 前
+  - 取消可解释
+  - stream 可回放
+
+### s05 · 工具契约
+
+- **作者 DSL**
+  - TypeScript 参数
+  - 编译成 JSON Schema
+  - 模型只看 schema
+- **参数校验**
+  - validateParameters
+  - 执行前拒绝
+  - isError 给模型看
+- **输出契约**
+  - 规范值
+  - output.schema
+  - render 投影
+- **作用域**
+  - scoped 工具
+  - conditions
+  - restrictions
+
+### s06 · 工具运行时
+
+- **前置闸门**
+  - pre-execute
+  - 单调 guard 只能收紧
+  - ask / deny / allow
+- **审批**
+  - approval/request
+  - 绑定参数与调用者
+  - fail closed
+- **执行**
+  - tools/execute
+  - 显式并发声明
+  - exclusive batch
+- **结果**
+  - post-execute
+  - finalizeContent
+  - tools/result 只读
+
+### s07 · 系统提示词
+
+- **sections**
+  - name / order / text
+  - 稳定前缀
+  - KV cache
+- **动态上下文**
+  - variables
+  - contexts
+  - toolOrder
+- **准入**
+  - head admission
+  - system head 替换/追加
+  - in-history
+- **泄露风险**
+  - 不要塞临时秘密
+  - renderContextMessage
+  - 可重放
+
+### s08 · Inbox / steering
+
+- **两条队列**
+  - next-turn
+  - next-step
+  - claim 是纯删除
+- **三种输入**
+  - followup 唤醒
+  - steer 改变当前路径
+  - inject 不唤醒
+- **边界**
+  - turn 边界领取全部 next-step
+  - step 边界只领 next-step
+  - step/end 之后进入历史
+- **取消**
+  - keepInbox
+  - 取消不是删除
+  - whenIdle 跨轮次
+
+### s09 · LLM seam
+
+- **统一词汇**
+  - Message / ContentBlock
+  - StreamChunk
+  - loop 不出现 provider 分支
+- **prepareCall**
+  - 绑定 config
+  - capabilities
+  - retryPolicy
+- **Messages**
+  - /v1/messages
+  - tool_use / tool_result
+  - thinking / usage
+- **失败与重试**
+  - 失败事实归一化
+  - step 内重试
+  - 不重跑 pre-step
+
+### s10 · JSONL 持久化
+
+- **写入**
+  - append 到 buffer
+  - flush + fsync
+  - 显式持久屏障
+- **文件**
+  - session.jsonl
+  - 一行一个事件
+  - 不压缩/不校验和
+- **修复**
+  - torn tail
+  - 丢弃无效后缀
+  - 未闭合 turn 补 interrupted
+- **fork**
+  - 复制前缀
+  - forked closer
+  - session/end-seed
+
+### s11 · Compaction
+
+- **触发**
+  - token estimate
+  - thresholdRatio
+  - beforeStep / overflow
+- **prune**
+  - 超长 tool/result
+  - 语义损失小
+  - 先裁剪再摘要
+- **summary**
+  - 独立模型请求
+  - 保留目标/约束
+  - 不污染主历史
+- **replace**
+  - surfaceOp: replace
+  - sourceEventSeqs
+  - 旧事件仍在
+
+### s12 · Plugin kernel
+
+- **Plugin**
+  - 函数/类/对象
+  - 贡献能力
+  - 不占主流程
+- **Context**
+  - 服务键
+  - extend / isolate
+  - 作用域
+- **inject / Fiber**
+  - 依赖未满足则等待
+  - effect 注册
+  - dispose 逆序撤销
+- **事件**
+  - emit
+  - waterfall
+  - serial / bail
+
+### s13 · 组合与启动
+
+- **Bundle**
+  - 分发插件行
+  - 共享基础能力
+  - 不决定机器偏好
+- **Profile**
+  - 产品配方
+  - Web / headless / 自定义
+  - 有序装配
+- **Patch**
+  - 覆盖顺序
+  - 整段替换不深合并
+  - !!js 逃生口
+- **Seam**
+  - Definition
+  - Provider
+  - Consumer 不绕过
+
+### s14 · 能力接缝
+
+- **FS**
+  - read/write
+  - 工作区边界
+  - provider 可替换
+- **Shell**
+  - 进程执行
+  - 超时/取消
+  - approval
+- **Sandbox**
+  - 隔离级别
+  - fail closed
+  - 策略解析
+- **审批**
+  - 风险动作
+  - 来源/有效期
+  - 可审计
+
+### s15 · Subagents / presets
+
+- **spawn**
+  - 新 session
+  - 任务 + 权限
+  - child id 引用
+- **预算**
+  - maxDepth
+  - maxActive
+  - 启动前检查
+- **preset**
+  - 提示词/persona
+  - 工具子集
+  - 按会话组装
+- **结果**
+  - child 日志独立
+  - 结果回父 inbox
+  - 父只留摘要
+
+### s16 · PTC
+
+- **program**
+  - async 函数体
+  - 顶层 await
+  - return 值
+- **tools.***
+  - Proxy 进入 callTool
+  - 未知工具结构化错误
+  - 调用记录
+- **序列化**
+  - Date/Map/Set
+  - 循环引用失败
+  - console 捕获
+- **边界**
+  - fresh / persistent scope
+  - timeout
+  - 失败是结果
+
+### s17 · MCP / skills / commands
+
+- **MCP**
+  - initialize
+  - tools/list
+  - tools/call
+- **命名**
+  - mcp__server__tool
+  - inputSchema 来自 server
+  - 错误变 isError
+- **skills**
+  - SKILL.md frontmatter
+  - 只注入 catalog
+  - 按需 load
+- **commands**
+  - slash command
+  - host 直接分派
+  - 不产生模型轮次
+
+### s18 · Skills / commands
+
+- **目录**
+  - bundle
+  - flat .md
+  - frontmatter
+- **加载**
+  - catalog 不含正文
+  - load_skill(name)
+  - 按需注入
+- **命令**
+  - registry
+  - host route
+  - 0 模型轮次
+- **边界**
+  - 重名拒绝
+  - 无效目录
+  - 刷新 catalog
+
+### s19 · Browser use
+
+- **provider**
+  - 单槽位注册
+  - 第二个注册失败
+  - dispose 幂等
+- **session**
+  - openSession
+  - 会话所有权
+  - 关闭页面
+- **工具**
+  - navigate
+  - read / click
+  - screenshot
+- **回合制**
+  - ref 表
+  - 动作后新快照
+  - 旧 ref 失效
+
+### s20 · Computer use I
+
+- **provider**
+  - 单槽位
+  - macOS CUA
+  - app/window
+- **授权**
+  - 读取前检查
+  - fail closed
+  - session 级
+- **快照**
+  - AX tree
+  - screenshot
+  - scale
+- **工具**
+  - getApp
+  - getWindows
+  - getState
+
+### s21 · Computer use II
+
+- **坐标**
+  - 截图像素
+  - relative 0–999
+  - 越界拒绝
+- **动作**
+  - click/type/press/scroll
+  - dispatched
+  - verified:false
+- **失效**
+  - STALE_SNAPSHOT
+  - WINDOW_CHANGED
+  - 重新截图
+- **权限**
+  - 持久/会话授权
+  - 撤销
+  - 输入不可逆
+
+### s22 · Web projection
+
+- **projection**
+  - 事件 → 卡片
+  - 纯 fold
+  - 确定性
+- **snapshot**
+  - 首屏
+  - 当前 seq
+  - 多客户端
+- **SSE**
+  - 增量
+  - 按 seq 去重
+  - 断线重连
+- **边界**
+  - 客户端不 fold
+  - host 计算
+  - 回放一致
+
+### s23 · SDK / headless
+
+- **协议**
+  - JSON-RPC
+  - stdio
+  - newline framed
+- **方法**
+  - session/create
+  - prompt
+  - session/event
+- **边界**
+  - 进程外服务
+  - 编辑器/CI 接入
+  - 不复制 loop
+- **错误**
+  - 结构化 code
+  - 取消
+  - 退出码
+
+### s24 · Client UI
+
+- **卡片**
+  - text
+  - tool
+  - approval / error
+- **状态**
+  - running → done/failed
+  - host 决定
+  - payload
+- **同步**
+  - snapshot + delta
+  - seq 对齐
+  - 不重复渲染
+- **重连**
+  - lastSeq
+  - 补缺失事件
+  - 已结束卡不回 running
+
+### s25 · Observability
+
+- **span**
+  - turn/step/tool
+  - trace
+  - 耗时
+- **record**
+  - 事件 + chunk
+  - replay
+  - 不访问网络
+- **snapshot**
+  - 归一化
+  - 去掉时间戳噪声
+  - diff
+- **门禁**
+  - 回归
+  - 失败可定位
+  - 不阻塞主路径
+
+### s26 · Eval / fault injection
+
+- **scenario**
+  - 模型脚本
+  - 工具
+  - seed
+- **fault**
+  - 429
+  - timeout
+  - 断流 / 工具错误
+- **replay**
+  - 同失败
+  - 同事件
+  - 可重复
+- **report**
+  - 矩阵
+  - 结论
+  - 失败定位
+
+### s27 · Security
+
+- **路径**
+  - realpath + relative
+  - symlink
+  - 工作区容器
+- **审批**
+  - fail closed
+  - 绑定参数
+  - 不可复用
+- **秘密**
+  - redaction
+  - key/value
+  - 日志不泄露
+- **CUA**
+  - allowlist
+  - 拒绝先于读取
+  - 审计
+
+### s28 · Capstone
+
+- **任务**
+  - 真实模型
+  - 多工具
+  - 仓库审计
+- **日志**
+  - JSONL
+  - surface 摘要
+  - 可恢复
+- **评测**
+  - checks
+  - 报告
+  - 失败不包装
+- **边界**
+  - 审批
+  - 工具错误
+  - 退出码

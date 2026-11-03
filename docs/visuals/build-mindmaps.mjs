@@ -1,112 +1,86 @@
 #!/usr/bin/env node
-/** 生成 28 张本课知识导图 + 一张总知识导图（SVG）。 */
+/** 生成 28 张“知识点”思维导图 + 一张 DSH 知识图谱（SVG）。 */
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { lessons, course } from './mindmap-data.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const outDir = resolve(here, 'mindmaps')
 const source = await readFile(resolve(here, '../../site/data.js'), 'utf8')
-globalThis.window = {}
-eval(source)
+globalThis.window = {}; eval(source)
 const C = globalThis.window.COURSE
 const esc = s => String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;')
 const palette = { core:'#5b5bd6', context:'#0c93ad', composition:'#8b5cf6', execution:'#b87412', product:'#158a63', quality:'#b33a3a' }
-const soft = { core:'#ecebff', context:'#e5f8fb', composition:'#f1eafe', execution:'#fff3dd', product:'#e8f8f1', quality:'#fbeaea' }
+const partOf = slug => C.lessons[slug]?.part || 'core'
+const partTitle = slug => C.parts.find(p => p.id === partOf(slug))?.title || ''
 
-function wrap(text, width = 20) {
-  const words = String(text)
-  if (/[\u4e00-\u9fff]/.test(words)) {
-    const chars = [...words]; const lines = []
-    for (let i = 0; i < chars.length; i += width) lines.push(chars.slice(i, i + width).join(''))
-    return lines.slice(0, 3)
-  }
-  const out = []; let line = ''
-  for (const word of words.split(/\s+/)) {
-    if ((line + ' ' + word).trim().length > width) { if (line) out.push(line); line = word }
-    else line = (line + ' ' + word).trim()
-  }
-  if (line) out.push(line)
-  return out.slice(0, 3)
+function wrap(text, width = 22) {
+  const chars = [...String(text)]
+  const lines = []
+  for (let i = 0; i < chars.length; i += width) lines.push(chars.slice(i, i + width).join(''))
+  return lines.slice(0, 3)
 }
-
 function textLines(lines, x, y, size, color, weight = 400, anchor = 'start') {
   return lines.map((line, i) => `<text x="${x}" y="${y + i * (size + 3)}" font-size="${size}" font-weight="${weight}" fill="${color}" text-anchor="${anchor}" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(line)}</text>`).join('')
 }
-
-function partOf(slug) { return C.lessons[slug].part }
-function lessonMindmap(slug) {
-  const l = C.lessons[slug]; const p = palette[l.part]; const s = soft[l.part]
-  const part = C.parts.find(x => x.id === l.part)
-  const branches = [
-    { title: '本课问题', color: p, leaves: [l.short, l.desc] },
-    { title: '机制', color: p, leaves: l.tags.slice(0, 3) },
-    { title: '代码', color: p, leaves: [l.source.split(',')[0].split('/').pop() || l.source, 'src/'] },
-    { title: '验收', color: p, leaves: [l.tests, `难度 ${'●'.repeat(l.difficulty)}`] },
-    { title: '连接', color: p, leaves: [part?.title || l.part, `第 ${l.n} / 28 课`] },
-  ]
-  const W = 1080, H = 620, cx = 126, cy = H / 2, bx = 330, by = 74
-  const branchSvg = branches.map((b, i) => {
-    const y = by + i * 108
-    const leaves = b.leaves.flatMap(x => wrap(x, 22)).slice(0, 4)
-    return `<path d="M${cx + 54} ${cy} C${cx + 160} ${cy} ${bx - 60} ${y + 20} ${bx} ${y + 20}" fill="none" stroke="${b.color}" stroke-opacity=".4" stroke-width="1.4"/>
-      <rect x="${bx}" y="${y}" width="190" height="40" rx="9" fill="${b.color}"/>
-      <text x="${bx + 16}" y="${y + 25}" font-size="13" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(b.title)}</text>
-      ${textLines(leaves, bx + 210, y + 22, 11, '#3c3c43')}`
+function lessonMap([slug, title, branches]) {
+  const p = palette[partOf(slug)]; const W = 1120, H = 640, cx = 132, cy = H / 2
+  const nodeX = 342; const top = 70; const gap = (H - 140) / branches.length
+  const branchSvg = branches.map(([label, leaves], i) => {
+    const y = top + i * gap
+    return `<path d="M${cx + 58} ${cy} C${cx + 170} ${cy} ${nodeX - 70} ${y + 20} ${nodeX} ${y + 20}" fill="none" stroke="${p}" stroke-opacity=".4" stroke-width="1.4"/>
+      <rect x="${nodeX}" y="${y}" width="205" height="42" rx="9" fill="${p}"/>
+      <text x="${nodeX + 16}" y="${y + 26}" font-size="13.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(label)}</text>
+      ${textLines(leaves.flatMap(x => wrap(x, 26)).slice(0, 4), nodeX + 228, y + 23, 11, '#3c3c43')}`
   }).join('')
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="title">
-  <title id="title">s${String(l.n).padStart(2,'0')} ${esc(l.title)} 知识导图</title>
+  <title id="title">${esc(title)} 知识点导图</title>
   <defs><pattern id="g" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#303a63" stroke-opacity=".035"/></pattern></defs>
   <rect width="${W}" height="${H}" fill="#fbfcff"/><rect width="${W}" height="${H}" fill="url(#g)"/>
-  <text x="48" y="44" font-size="9" letter-spacing=".12em" fill="${p}" font-family="SFMono-Regular,Consolas,monospace">S${String(l.n).padStart(2,'0')} · ${(part?.title || l.part).toUpperCase()} · KNOWLEDGE MAP</text>
-  <text x="48" y="72" font-size="22" font-weight="750" fill="#222733" letter-spacing="-.02em" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(l.title)}</text>
-  <circle cx="${cx}" cy="${cy}" r="54" fill="${p}"/>
-  <text x="${cx}" y="${cy - 18}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.72)" font-family="SFMono-Regular,Consolas,monospace">S${String(l.n).padStart(2,'0')}</text>
-  ${textLines(wrap(l.title, 12), cx, cy + 4, 11, '#fff', 700, 'middle')}
+  <text x="48" y="40" font-size="9" letter-spacing=".12em" fill="${p}" font-family="SFMono-Regular,Consolas,monospace">${esc(title.split(' · ')[0].toUpperCase())} · ${esc(partTitle(slug).toUpperCase())} · KNOWLEDGE POINTS</text>
+  <text x="48" y="68" font-size="21" font-weight="750" fill="#222733" letter-spacing="-.02em" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(title.split(' · ').slice(1).join(' · '))}</text>
+  <circle cx="${cx}" cy="${cy}" r="58" fill="${p}"/>
+  <text x="${cx}" y="${cy - 18}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.7)" font-family="SFMono-Regular,Consolas,monospace">${esc(title.split(' · ')[0].toUpperCase())}</text>
+  ${textLines(wrap(title.split(' · ').slice(1).join(' · '), 12), cx, cy + 4, 11, '#fff', 700, 'middle')}
   ${branchSvg}
-  <line x1="48" y1="${H - 50}" x2="${W - 48}" y2="${H - 50}" stroke="#e3e6ef"/>
-  <text x="48" y="${H - 26}" font-size="9" fill="#a0a6b6" font-family="SFMono-Regular,Consolas,monospace">Learn DeepSeek Harness · 28 lessons v3</text>
-  <text x="${W - 48}" y="${H - 26}" text-anchor="end" font-size="9" fill="#a0a6b6" font-family="SFMono-Regular,Consolas,monospace">${esc(l.source.split(',')[0])}</text>
+  <line x1="48" y1="${H - 46}" x2="${W - 48}" y2="${H - 46}" stroke="#e3e6ef"/>
+  <text x="48" y="${H - 24}" font-size="9" fill="#a0a6b6" font-family="SFMono-Regular,Consolas,monospace">${esc(C.lessons[slug]?.source.split(',')[0] || '')}</text>
+  <text x="${W - 48}" y="${H - 24}" text-anchor="end" font-size="9" fill="#a0a6b6" font-family="SFMono-Regular,Consolas,monospace">Learn DeepSeek Harness · knowledge map</text>
 </svg>`
 }
 
-function courseMindmap() {
-  const W = 1600, H = 1020, cx = 800, cy = 92
-  const parts = C.parts
-  const colW = 245
-  const branchSvg = parts.map((part, i) => {
-    const x = 90 + i * 250
-    const color = palette[part.id] || '#5b5bd6'
-    const lessons = part.lessons
-    const rows = lessons.map((slug, j) => {
-      const l = C.lessons[slug]; const y = 248 + j * 82
-      return `<path d="M${x + 106} 206 C${x + 106} ${y} ${x + 110} ${y} ${x + 126} ${y}" fill="none" stroke="${color}" stroke-opacity=".35" stroke-width="1.1"/>
-        <circle cx="${x + 126}" cy="${y}" r="3" fill="${color}" opacity=".8"/>
-        <text x="${x + 138}" y="${y + 4}" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${String(l.n).padStart(2,'0')} ${esc(l.short)}</text>
-        <text x="${x + 138}" y="${y + 18}" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">${esc(l.tags[0] || '')}</text>`
+function courseMap() {
+  const W = 1600, H = 960, cx = W / 2, cy = 90
+  const cols = course.branches.length; const colW = W / cols
+  const branches = course.branches.map(([label, leaves], i) => {
+    const x = i * colW + 38; const color = ['#5b5bd6','#0c93ad','#8b5cf6','#b87412','#158a63','#b33a3a'][i]
+    const rows = leaves.map((leaf, j) => {
+      const y = 260 + j * 92
+      return `<path d="M${x + 100} 208 C${x + 100} ${y} ${x + 105} ${y} ${x + 120} ${y}" fill="none" stroke="${color}" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="${x + 120}" cy="${y}" r="3.5" fill="${color}"/>
+        <text x="${x + 134}" y="${y + 4}" font-size="11" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(leaf)}</text>`
     }).join('')
-    return `<path d="M${cx} ${cy + 54} C${cx} 160 ${x + 106} 140 ${x + 106} 190" fill="none" stroke="${color}" stroke-opacity=".38" stroke-width="1.4"/>
-      <rect x="${x}" y="160" width="212" height="46" rx="10" fill="${color}"/>
-      <text x="${x + 14}" y="188" font-size="12.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(part.title)}</text>
+    return `<path d="M${cx} ${cy + 54} C${cx} 160 ${x + 100} 150 ${x + 100} 205" fill="none" stroke="${color}" stroke-opacity=".38" stroke-width="1.4"/>
+      <rect x="${x}" y="165" width="200" height="44" rx="10" fill="${color}"/>
+      <text x="${x + 14}" y="192" font-size="12.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(label)}</text>
       ${rows}`
   }).join('')
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="title">
-  <title id="title">Learn DeepSeek Harness 28 课知识导图</title>
+  <title id="title">DeepSeek Harness 知识图谱</title>
   <rect width="${W}" height="${H}" fill="#fbfcff"/>
-  <g stroke="#303a63" stroke-opacity=".03"><path d="M0 0H1600M0 120H1600M0 240H1600M0 360H1600M0 480H1600M0 600H1600M0 720H1600M0 840H1600M0 960H1600"/></g>
-  <text x="48" y="40" font-size="9" letter-spacing=".12em" fill="#5b5bd6" font-family="SFMono-Regular,Consolas,monospace">LEARN DEEPSEEK HARNESS · KNOWLEDGE MAP V3</text>
-  <text x="48" y="70" font-size="24" font-weight="760" fill="#222733" letter-spacing="-.02em" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">从 loop 到 computer use：28 课的知识树</text>
-  <rect x="${cx - 150}" y="${cy - 40}" width="300" height="80" rx="18" fill="#222733"/>
-  <text x="${cx}" y="${cy - 18}" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.65)" font-family="SFMono-Regular,Consolas,monospace">28 LESSONS · 6 PARTS</text>
-  <text x="${cx}" y="${cy + 20}" text-anchor="middle" font-size="17" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">DSH 运行时</text>
-  ${branchSvg}
-  <text x="48" y="${H - 28}" font-size="9" fill="#a0a6b6" font-family="SFMono-Regular,Consolas,monospace">内核 → 上下文 → 组合 → 执行 → 产品 → 质量</text>
+  <g stroke="#303a63" stroke-opacity=".03"><path d="M0 0H1600M0 120H1600M0 240H1600M0 360H1600M0 480H1600M0 600H1600M0 720H1600M0 840H1600"/></g>
+  <text x="48" y="38" font-size="9" letter-spacing=".12em" fill="#5b5bd6" font-family="SFMono-Regular,Consolas,monospace">DEEPSEEK HARNESS · KNOWLEDGE GRAPH</text>
+  <text x="48" y="68" font-size="24" font-weight="760" fill="#222733" letter-spacing="-.02em" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(course.title)}</text>
+  <rect x="${cx - 160}" y="48" width="320" height="72" rx="16" fill="#222733"/>
+  <text x="${cx}" y="76" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.65)" font-family="SFMono-Regular,Consolas,monospace">SIX DOMAINS · NOT A LESSON LIST</text>
+  <text x="${cx}" y="102" text-anchor="middle" font-size="16" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(course.subtitle)}</text>
+  ${branches}
+  <text x="48" y="${H - 28}" font-size="9" fill="#a0a6b6" font-family="SFMono-Regular,Consolas,monospace">控制面 → 事实 → 工具 → 组合 → 执行 → 质量</text>
 </svg>`
 }
 
 await mkdir(outDir, { recursive: true })
-for (const slug of Object.keys(C.lessons)) {
-  await writeFile(resolve(outDir, `${slug.slice(0,3)}.svg`), lessonMindmap(slug))
-}
-await writeFile(resolve(outDir, 'course.svg'), courseMindmap())
-console.log(`wrote ${Object.keys(C.lessons).length} lesson mindmaps + course.svg`)
+for (const item of lessons) await writeFile(resolve(outDir, `${item[0].slice(0,3)}.svg`), lessonMap(item))
+await writeFile(resolve(outDir, 'course.svg'), courseMap())
+console.log(`wrote ${lessons.length} knowledge maps + course.svg`)

@@ -13,9 +13,9 @@
 
 ## 知识导图
 
-![28 课知识导图](../docs/visuals/mindmaps/course.svg)
+![DSH 知识图谱](../docs/visuals/mindmaps/course.svg)
 
-一张总图：六个 Part、28 课、每课的问题/机制/代码/验收。网页直接显示 SVG；需要编辑时下载 XMind。
+一张总图：六个知识域，不是课程目录；XMind 内含总图谱 + 28 张每课知识点。网页直接显示 SVG；需要编辑时下载 XMind。
 
 - [XMind 源文件](../docs/visuals/mindmaps/course.xmind)
 - [OPML（通用大纲）](../docs/visuals/mindmaps/course.opml)
