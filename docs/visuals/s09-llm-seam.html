@@ -193,8 +193,8 @@
   .config-row span { color:var(--muted); }
   .endpoint { margin-top:9px; border:1px solid color-mix(in srgb, var(--brand) 28%, var(--line)); border-radius:7px; background:var(--brand-soft); padding:7px 8px; font:8.5px/1.5 var(--mono); color:var(--brand); opacity:.2; }
   .endpoint.on { opacity:1; }
-  .jsonl-note { border-top:1px dashed var(--line); margin-top:8px; padding-top:7px; color:var(--muted); font:8.5px/1.5 var(--mono); opacity:.3; }
-  .jsonl-note.on { opacity:1; }
+  .seam-note { border-top:1px dashed var(--line); margin-top:8px; padding-top:7px; color:var(--muted); font:8.5px/1.5 var(--mono); opacity:.3; }
+  .seam-note.on { opacity:1; }
   .legend { display:flex; gap:8px; flex-wrap:wrap; font:8px var(--mono); color:var(--muted); margin-top:7px; opacity:.3; }
   .legend.on { opacity:1; }
   .legend i { width:6px; height:6px; border-radius:50%; display:inline-block; background:var(--green); margin-right:3px; }
@@ -207,7 +207,7 @@
       <div>
         <div class="eyebrow"><i></i> s09 · LLM seam · source-guided</div>
         <h1>一次模型调用，<em>在 seam 上发生了什么</em></h1>
-        <p class="subtitle">ChatRequest → prepareCall → POST /v1/messages → SSE JSONL → StreamChunk → assistant/message</p>
+        <p class="subtitle">ChatRequest → prepareCall → POST /v1/messages → SSE events → StreamChunk → assistant/message</p>
       </div>
       <div class="badge-live"><b></b> MESSAGES TRACE</div>
     </div>
@@ -223,7 +223,7 @@
       <div class="connector" data-conn="3"></div>
       <div class="node" data-node="chunk"><div class="node-icon">05</div><div><b>StreamChunk</b><small>block / usage / finish</small></div></div>
       <div class="connector" data-conn="4"></div>
-      <div class="node" data-node="event"><div class="node-icon">06</div><div><b>assistant/message</b><small>session JSONL</small></div></div>
+      <div class="node" data-node="event"><div class="node-icon">06</div><div><b>assistant/message</b><small>stream result</small></div></div>
       <div class="packet" id="packet"></div>
     </div>
 
@@ -257,12 +257,12 @@
           <div class="config-row" data-cfg="2"><b>maxRetries</b><span>2</span></div>
           <div class="config-row" data-cfg="2"><b>retryOn</b><span>429 / 5xx / NETWORK</span></div>
           <div class="endpoint" id="endpoint">POST <b>api.deepseek.com/anthropic/v1/messages</b><br>x-api-key · anthropic-version: 2023-06-01</div>
-          <div class="jsonl-note" id="jsonl-note">返回的每个 block 都变成一条 StreamChunk；最后才写 assistant/message。</div>
+          <div class="seam-note" id="seam-note">SSE block 在 seam 里变成 StreamChunk；Session 的持久化写入属于 s10。</div>
         </div>
       </section>
 
       <section class="panel">
-        <div class="panel-head"><b>3 · SSE / Session JSONL</b><span>actual lines</span></div>
+        <div class="panel-head"><b>3 · SSE events → StreamChunk</b><span>actual lines</span></div>
         <div class="panel-body">
           <div class="codebox" id="sse-box">
             <div class="ln" data-sse="3"><span class="no">01</span><span><span class="tag">data:</span> {"type":"message_start",</span></div>
@@ -275,8 +275,9 @@
             <div class="ln" data-sse="6"><span class="no">08</span><span><span class="tag">data:</span> {"type":"message_delta",</span></div>
             <div class="ln" data-sse="6"><span class="no">09</span><span>  "delta":{"stop_reason":"end_turn"},</span></div>
             <div class="ln" data-sse="6"><span class="no">10</span><span>  "usage":{"output_tokens":1}}</span></div>
-            <div class="ln" data-sse="7"><span class="no">11</span><span><span class="tag">jsonl:</span> {"seq":7,"type":"assistant/message",</span></div>
-            <div class="ln" data-sse="7"><span class="no">12</span><span>  "data":{"message":{"content":[...]}}}</span></div>
+            <div class="ln" data-sse="7"><span class="no">11</span><span><span class="tag">chunk:</span> {"type":"block-end","index":0,</span></div>
+            <div class="ln" data-sse="7"><span class="no">12</span><span>  "block":{"type":"text","text":"42"}}</span></div>
+            <div class="ln" data-sse="7"><span class="no">13</span><span><span class="tag">chunk:</span> {"type":"usage","usage":{...}}</span></div>
           </div>
         </div>
       </section>
@@ -317,7 +318,7 @@
   let raf = 0
   let last = 0
   if (capture) document.body.classList.add('capture')
-  const STAGE_NAMES = ['请求', 'prepare', 'POST', 'start', 'delta', 'finish', 'JSONL']
+  const STAGE_NAMES = ['请求', 'prepare', 'POST', 'start', 'delta', 'finish', 'chunk']
   const stages = [
     { at: 0.00, title: '从 surface 派生请求', desc: 'ChatRequest 不是隐藏的 messages 数组，而是从会话日志派生。', code: '<b>deriveMessages</b>()', code2: 'request/header', active: 'req' },
     { at: 0.13, title: 'prepareCall 绑定配置', desc: 'provider、model、contextWindow、retryPolicy 在这里绑定成一次 PreparedCall。', code: '<b>prepareCall</b>({ provider, model })', code2: 'config + capabilities', active: 'prep' },
@@ -325,7 +326,7 @@
     { at: 0.43, title: 'message_start + block_start', desc: '服务端先声明 message 和第一个 content block。', code: '<b>message_start</b>', code2: 'content_block_start · text', active: 'sse' },
     { at: 0.58, title: 'content_block_delta', desc: '文本和工具参数都以 block delta 到达；这里开始产生 StreamChunk。', code: '<b>text_delta</b>', code2: 'block-start → text-delta', active: 'chunk' },
     { at: 0.73, title: 'message_delta / stop', desc: 'stop_reason 和 usage 结算，最后推 finish。', code: '<b>message_delta</b>', code2: 'stop_reason = end_turn', active: 'chunk' },
-    { at: 0.88, title: '写入 Session JSONL', desc: 'loop 只把完整 assistant/message 写进日志；SSE 原始行不是事实。', code: "<b>append</b>('assistant/message')", code2: 'seq = 7', active: 'event' },
+    { at: 0.88, title: '返回 StreamChunk', desc: 'block-end / usage / finish 交给 assembler；Session 的持久化写入属于 s10.', code: '<b>finish</b>', code2: 'reason = stop', active: 'event' },
   ]
   const els = {
     nodes: [...document.querySelectorAll('[data-node]')],
@@ -336,7 +337,7 @@
     segs: [...document.querySelectorAll('[data-seg]')],
     packet: document.getElementById('packet'),
     endpoint: document.getElementById('endpoint'),
-    note: document.getElementById('jsonl-note'),
+    note: document.getElementById('seam-note'),
     legend: document.getElementById('legend'),
     kicker: document.getElementById('stage-kicker'),
     title: document.getElementById('stage-title'),

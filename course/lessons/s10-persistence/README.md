@@ -30,11 +30,11 @@ JSONL 会话日志、flush 屏障、resume、截断修复、未闭合 turn、for
 
 ### 先看机制动画
 
-![s10 机制动画](../../../docs/visuals/s10-flow.gif)
+![s10 JSONL 持久化动画](../../../docs/visuals/s10-persistence.gif)
 
-*会话如何活过进程重启：每一步的边界、输入和产出。*
+*实际 JSONL 行：append、flush、torn tail、修复与 fork。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s10) · [MP4](../../../docs/visuals/s10-flow.mp4)
+[交互版](../../../docs/visuals/s10-persistence.html) · [MP4](../../../docs/visuals/s10-persistence.mp4)
 
 ## 0. 先跑起来
 

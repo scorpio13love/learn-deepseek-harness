@@ -167,6 +167,10 @@ browser use 则是另一套 provider registry：
 
 ![s09 LLM seam](visuals/s09-llm-seam.gif)
 
+**s10 · persistence**
+
+![s10 JSONL](visuals/s10-persistence.gif)
+
 **s08 · inbox / steering**
 
 ![s08 inbox](visuals/s08-inbox.gif)

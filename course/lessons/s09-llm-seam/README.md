@@ -32,7 +32,7 @@ Provider 注册、prepareCall、能力元数据、in-history 与 step 内重试�
 
 ![s09 LLM seam 动画](../../../docs/visuals/s09-llm-seam.gif)
 
-*真实 Messages 请求、SSE JSONL 行，以及写入 Session 的 assistant/message。*
+*真实 Messages 请求、SSE 事件，以及 seam 产出的 StreamChunk；持久化留给 s10。*
 
 [交互版](../../../docs/visuals/s09-llm-seam.html) · [MP4](../../../docs/visuals/s09-llm-seam.mp4)
 
@@ -349,9 +349,9 @@ s08 的 `prepare` 返回 config；真实 loop 还有 `requestProposal` 清除 ad
 
 ---
 
-## 9. 下一课：s09 · persistence
+## 9. 下一课：s10 · persistence
 
-s08 让模型调用可替换、可重试。s09 会让会话活过进程重启：
+s09 让模型调用可替换、可重试。s10 会让会话活过进程重启：
 
 - JSONL 日志如何 append/flush？
 - 重启时如何恢复到最后一次 flush？
