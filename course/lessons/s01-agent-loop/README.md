@@ -1,6 +1,6 @@
 # s01 · 最小 agent loop：一次真实文本 turn 如何发生
 
-> 本课代码：`src/`（`types.ts`、`session.ts`、`deepseek.ts`、`env.ts`、`tools.ts`、`agent.ts`、`demo.ts`）
+> 本课代码：`src/`（`types.ts`、`session.ts`、`messages.ts`、`env.ts`、`tools.ts`、`agent.ts`、`demo.ts`）
 >
 > 测试：`tests/s01.test.ts`（7 个离线用例）+ `tests/live.test.ts`（1 个真实模型用例）
 >
@@ -8,53 +8,43 @@
 
 ---
 
-## 开篇 · 本课定位
+## 一个普通的周三下午
 
-### 这一课学什么
+你把一个 failing test 丢给 agent。它回了三行字，说“我来看看”，然后你按了 Ctrl-C。
 
-把「调一次 DeepSeek」写成 coding agent 的最小闭环，并且让每一步都可以被观察：
+第二天你重新打开会话，想接着问它昨天改了哪里。它没有昨天的上下文；日志里也说不清，用户是在哪一步取消的，模型当时到底看到了什么。
 
-- 一次 **turn** 如何打开、如何以 `turn/end` 收口；
-- turn 里的 **step** 是什么，为什么不是简单的 `while (true)`;
-- 模型返回的 SSE chunk 如何被 **StreamAssembler** 组装成一条 assistant message；
-- 用户取消时，已经流式交付的文本前缀如何保留；
-- 为什么请求历史必须每次从 **会话日志派生**，而不是维护一个隐藏的 `messages` 数组。
+这不是模型不够聪明，是运行时把“发生过什么”只放在了一个内存里的 `messages` 数组。**数组只能告诉你现在是什么，不能告诉你为什么变成这样。**
 
-这一课**不要求工具往返**。`tools.ts` 和 loop 里的工具分发代码保留为内部能力，方便后续课程增量改造；但 demo、README 和主测试只聚焦文本 loop。
+## 这一课只回答一个问题
 
-### DeepSeek 为什么这么做
+一次纯文本 turn，怎样才能写成**可观察、可取消、可恢复**的状态机？
 
-因为 agent 不是一次问答，而是**会持续产生可观察事实的长事务**：
+先把两个词分开：
 
-- 模型输出是流式的，用户在中途就能看到文本；取消不能把已经看到的内容抹掉；
-- 一次用户请求可能包含多个模型步骤，每一步都需要独立的失败、取消和用量边界；
-- 进程可能崩溃，恢复后必须能从事件日志重建“模型当时看到了什么”；
-- 失败（网络错误、内容过滤、超限）本身也是事实，不能用一个没人记录的异常吞掉。
+- **turn**：一次任务唤醒。用户说“修这个测试”，到 `turn/end` 为止。
+- **step**：turn 里的一次模型请求。模型可能一步答完，也可能因为工具结果继续第二步。
 
-所以 DSH 把循环写成显式的 `turn()` / `step()` 状态机，把每个可观察事实追加到 Session 日志；取消是协作式的，已交付前缀进入历史。参考：
+本课只跑文本，不跑工具往返；工具留到 s02。你要亲手看到：
 
-- [`agent-loop` 的中文说明](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/core/agent-loop/README.zh.md)
-- [`session` 子系统](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/session.zh.md)
-- [`assistant-stream`](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/core/agent-loop/src/assistant-stream.ts)
+- `turn/start` 和 `turn/end` 为什么必须成对，`turn/end` 为什么放在 `finally`；
+- 流式返回的 chunk 怎样按 block index 进入 assembler，最后变成一条完整的 assistant message；
+- 用户取消时，已经流给用户看的前缀为什么不能丢；
+- 下一次请求为什么从 `deriveMessages()` 重建，而不是 loop 自己维护数组。
 
-### 服务的场景
-
-这节对应的是所有后续能力的地基：
-
-```text
-用户提出任务 → 模型流式回答 → 文本进入历史 → 用户看到结果
-                              ↘ 取消 / 失败 / 超时也留下可回放的事实
-```
-
-没有这层状态机，后面的工具往返、持久化、压缩、subagent、SDK 都只是孤立模块。
-
-### 先看一张图
+### 先看一遍它怎么跑
 
 ![s01 agent loop：chunk → message → event](../../../docs/visuals/s01-loop.gif)
 
-*一次 turn 的完整轨迹：SSE chunk 进入 assembler，组装成 message，再作为事件进入 surface。*
+*一条真实 turn：SSE chunk 进入 assembler，组装成 message，再作为事件进入 surface。*
 
-[交互版（下载后用浏览器打开）](../../../docs/visuals/s01-loop.html) · [MP4](../../../docs/visuals/s01-loop.mp4)
+[交互版](../../../docs/visuals/s01-loop.html) · [MP4](../../../docs/visuals/s01-loop.mp4)
+
+### 读完之后，拿这三个问题审自己
+
+1. 如果 `turn/end` 不在 `finally`，进程崩溃时日志会缺什么？
+2. 如果请求不是从日志派生，而是 loop 自己维护 `messages`，恢复后模型看到的历史会差在哪？
+3. 如果取消时把半个 assistant message 丢掉，用户已经看到的内容为什么算“没发生过”？
 
 ---
 
@@ -65,7 +55,7 @@
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons-v3/s01-agent-loop
+cd course/lessons/s01-agent-loop
 
 cp env.example .env
 # 编辑 .env，至少填入 DEEPSEEK_API_KEY

@@ -118,6 +118,14 @@ window.COURSE = {
       "file": "../course/README.md",
       "desc": "课程目录、运行方式、环境约定与代码组织。",
       "badge": "运行指南"
+    },
+    {
+      "id": "course-writing",
+      "title": "课程写作规范",
+      "short": "写作规范",
+      "file": "../docs/03-course-writing.zh.md",
+      "desc": "从具体失败场景、真实 trace、代价与设计检查出发；含 zero2Agent 13 篇的叙事地图与官方文档入口。",
+      "badge": "写作"
     }
   ],
   "lessons": {

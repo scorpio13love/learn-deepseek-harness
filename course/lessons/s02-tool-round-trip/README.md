@@ -1,6 +1,6 @@
 # s02 · tool round-trip：工具调用如何回到下一轮请求
 
-> 本课代码：`src/`（`types.ts`、`session.ts`、`deepseek.ts`、`env.ts`、`tools.ts`、`agent.ts`、`demo.ts`）
+> 本课代码：`src/`（`types.ts`、`session.ts`、`messages.ts`、`env.ts`、`tools.ts`、`agent.ts`、`demo.ts`）
 >
 > 测试：`tests/s02.test.ts`（16 个离线用例）+ `tests/live.test.ts`（2 个真实模型用例）
 >
@@ -8,48 +8,39 @@
 
 ---
 
-## 开篇 · 本课定位
+## 一个很常见的错觉
 
-### 这一课学什么
+模型说：“我已经读了这个文件，问题出在第 42 行。”你打开文件，发现根本没有这行。
 
-模型如何产出 `tool-call`，运行时如何执行并规范化结果，`tool/result` 如何回到下一轮请求：
+继续追问，它又编了一个更合理的解释。不是模型在撒谎，而是它只看到了一次工具调用，却没有看到工具结果回到历史；下一步请求里没有 `tool/result`，它只能继续猜。
 
-- `assistant/message` 里的 `tool-call` block
-- `tool/call` 与 `tool/result` 的配对
-- `deriveMessages()` 在第二步如何带上工具结果
-- 工具失败/未知工具为什么也是可回放的结果
+另一条路更糟：工具抛了异常，loop 直接结束。用户看到“运行失败”，模型却没机会知道“文件不存在”或“测试超时”，下一轮还是重复同样的动作。
 
-### DeepSeek 为什么这么做
+## 这一课要守住的线
 
-模型不能直接操作世界；它只能请求工具。DSH 把“调用”和“结果”都写成事件：
+工具调用不是一次函数调用，而是**两条必须配对的事实**：
 
-- 调用和结果必须成对，否则下一步请求是非法历史
-- 工具失败不能中断轮次，必须变成模型可见的 `isError` 结果
-- 多步工具往返要保留每一步的 turn/step 归属
-- 结果进入 surface 后，下一步请求才能看到它
+- 模型在 `assistant/message` 里发出 `tool-call`；
+- 运行时执行后，把 `tool/result` 写回会话；
+- 下一次请求由 `deriveMessages()` 派生，必须能同时看到调用和结果。
 
-参考：
+失败也一样。未知工具、参数非法、工具抛错，都不能让轮次消失；它们要变成模型可见的 `isError` 结果。模型看到“这次调用失败了”，才可能换一种做法。
 
-- [`agent-loop` 的工具分发](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/core/agent-loop/README.zh.md)
-- [`tools` 子系统](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/tools.zh.md)
-
-### 服务的场景
-
-真实 coding agent 的日常：
-
-```text
-读文件 → 改代码 → 跑测试 → 看失败 → 再改
-```
-
-每一步都是模型发起工具调用、运行时执行、结果回到历史，然后进入下一步。
-
-### 先看一张动图
+### 先看一次真实往返
 
 ![s02 tool round-trip](../../../docs/visuals/s02-tools.gif)
 
 *工具调用不是“函数调用完就结束”，而是写回日志、进入 surface、驱动下一步。*
 
 [交互版](../../../docs/visuals/s02-tools.html) · [MP4](../../../docs/visuals/s02-tools.mp4)
+
+### 设计检查
+
+1. 如果 `tool/call` 写了、`tool/result` 没写，下一轮请求会发生什么？
+2. 工具抛错时，你的 loop 是记录一个 `isError` 结果，还是直接终止 turn？
+3. 同一次 assistant message 里有多个工具调用，结果能按调用 id 对应回去吗？
+4. 工具结果的原始参数和模型参数，是否在投影时被重新序列化坏了？
+5. 取消发生在工具执行中，未分发的调用有没有一个明确的“未执行”结果？
 
 ---
 
