@@ -145,6 +145,9 @@
   .stage-jump { display: flex; gap: 3px; padding: 0 4px; border-left: 1px solid rgba(255,255,255,.18); border-right: 1px solid rgba(255,255,255,.18); }
   .stage-jump button { border-color: transparent; color: #aab2d0; padding: 3px 5px; font-size: 9px; white-space: nowrap; }
   .stage-jump button.active { background: rgba(139,139,245,.3); color: #fff; border-color: rgba(139,139,245,.55); }
+  .stage-jump button:hover { border-color:color-mix(in srgb, var(--brand) 45%, var(--line)); color:var(--brand); background:var(--brand-soft); }
+  .stage-jump button:focus-visible { outline:2px solid var(--brand); outline-offset:1px; }
+  .stage-jump button.active:hover { border-color:var(--brand); color:var(--brand); background:var(--brand-soft); }
   .controls input { width: 100px; accent-color: #8b8bf5; }
   .controls span { min-width: 54px; color: #c8cdea; font-family: var(--mono); font-size: 9px; }
   body:not(.capture) .stage { margin-bottom: 64px; }
@@ -369,7 +372,7 @@
     els.requestResult.classList.toggle('on', t >= 0.56);
     els.answer.classList.toggle('on', t >= 0.88);
     els.segs.forEach((seg, i) => { seg.classList.toggle('done', i < stage); seg.classList.toggle('on', i === stage); });
-    jumpButtons.forEach((button, index) => button.classList.toggle('active', index === stage));
+    jumpButtons.forEach((button, index) => { button.classList.toggle('active', index === stage); button.setAttribute('aria-pressed', String(index === stage)); });
   }
 
   function setFrame(next) {
@@ -379,7 +382,7 @@
     document.getElementById('counter').textContent = `${frame} / ${TOTAL - 1}`;
   }
   function pause() { playing = false; document.getElementById('play').textContent = '播放'; cancelAnimationFrame(raf); }
-  function goStage(index) { pause(); const bounded = (index + stages.length) % stages.length; setFrame(Math.round(stages[bounded].at * (TOTAL - 1))); }
+  function goStage(index) { pause(); const bounded = (index + stages.length) % stages.length; setFrame(Math.min(TOTAL - 1, Math.ceil(stages[bounded].at * (TOTAL - 1)))); }
   function tick(time) {
     if (!playing) return;
     if (!last) last = time;

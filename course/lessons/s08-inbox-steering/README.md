@@ -385,6 +385,6 @@ s07 解决了输入路由。s08 会转向模型适配器 seam：
 - `systemPromptUpdate` / `toolUpdate` 能力如何影响提示词与工具增量？
 - 重试应该发生在哪一层？
 - 如何在不改 loop 的情况下换 provider？
-- DeepSeek 的 Messages 与 Chat Completions 有什么差异？
+- DeepSeek Messages 的 content block 与字符串消息有什么差异？
 
 先读：[`llm/llm/src/call-config.ts`](../../../deepseek-harness/packages/llm/llm/src/call-config.ts) 与 [`llm-deepseek`](../../../deepseek-harness/packages/llm/llm-deepseek/)。

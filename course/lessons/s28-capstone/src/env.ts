@@ -50,7 +50,7 @@ function positiveInt(value: string | undefined, fallback: number): number {
 export function readConfig(env: NodeJS.ProcessEnv = process.env): CapstoneConfig {
   return {
     ...env.DEEPSEEK_API_KEY === undefined ? {} : { apiKey: env.DEEPSEEK_API_KEY },
-    baseUrl: env.DEEPSEEK_BASE_URL ?? 'https://api.deepseek.com/v1',
+    baseUrl: env.DEEPSEEK_BASE_URL ?? 'https://api.deepseek.com/anthropic',
     model: env.DEEPSEEK_MODEL ?? 'deepseek-flash',
     maxTokens: positiveInt(env.DEEPSEEK_MAX_TOKENS, 4_096),
     timeoutMs: positiveInt(env.DEEPSEEK_TIMEOUT_MS, 120_000),

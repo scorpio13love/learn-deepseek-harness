@@ -68,7 +68,6 @@ retry policy: { maxRetries: 2, retryableCodes: [ 'NETWORK', 'HTTP_429', ... ] }
 4. `in-history` 与「替换 head」对 KV cache 有什么不同？
 5. 重试应该发生在哪一层？为什么重试不重跑 pre-step / 用户消息准入？
 6. 哪些错误可重试？哪些必须终止？
-7. 真实 DSH 的 DeepSeek adapter 为什么用 Messages 而不是 Chat Completions？
 
 ---
 
@@ -77,13 +76,13 @@ retry policy: { maxRetries: 2, retryableCodes: [ 'NETWORK', 'HTTP_429', ... ] }
 | 顺序 | 文件 / 函数 | 读的时候问自己 | 思考题 |
 |---|---|---|---|
 | 1 | [`llm/llm/src/call-config.ts`](../../../deepseek-harness/packages/llm/llm/src/call-config.ts) | `prepareCall` 解析/绑定什么？ | Q1 / Q2 |
-| 2 | [`llm-deepseek/src/adapter.ts`](../../../deepseek-harness/packages/llm/llm-deepseek/src/adapter.ts#L22) | 适配器如何持有一次调用的配置？ | Q2 / Q9 |
+| 2 | [`llm-deepseek/src/adapter.ts`](../../../deepseek-harness/packages/llm/llm-deepseek/src/adapter.ts#L22) | 适配器如何持有一次调用的配置？ | Q2 |
 | 3 | [`llm-deepseek/src/model-info.ts`](../../../deepseek-harness/packages/llm/llm-deepseek/src/model-info.ts) | 能力元数据从哪里来？ | Q3 |
 | 4 | [`llm/types.ts` → `ResolvedModelInfo`](../../../deepseek-harness/packages/llm/llm/src/types.ts) | `systemPromptUpdate` / `toolUpdate` 的语义？ | Q3 / Q4 / Q5 |
 | 5 | [`llm-retry`](../../../deepseek-harness/packages/llm/llm-retry/src/index.ts) | 重试在哪一层？什么错误可重试？ | Q6 / Q7 |
 | 6 | [`agent-loop` prepareRequest](../../../deepseek-harness/packages/core/agent-loop/src/agent.ts#L613) | loop 如何校验路由未被改写？ | Q2 |
 | 7 | [`agent-loop` prompt admission](../../../deepseek-harness/packages/core/agent-loop/README.md#understand-the-implementation) | in-history 如何写入 system？ | Q4 |
-| 8 | [`deepseek-llm-api-wire-extensions`](../../../deepseek-harness/docs/deepseek-llm-api-wire-extensions.zh.md) | 真实 wire 扩展有哪些？ | Q9 |
+| 8 | [`deepseek-llm-api-wire-extensions`](../../../deepseek-harness/docs/deepseek-llm-api-wire-extensions.zh.md) | 真实 wire 扩展有哪些？ | 扩展阅读 |
 
 读完后，你应该能画出：
 
@@ -130,7 +129,7 @@ s08 实现 `contextWindow` 和 `systemPromptUpdate` 的 loop 行为；`toolUpdat
 - **替换 head**：把第一个 system 节点换成新文本。请求前缀从第一个 token 开始变化，KV cache 全失效。
 - **in-history**：把新 system 消息追加在历史之后。provider 读取「最新的 system 消息」作为有效提示词；之前的前缀缓存仍然可用。
 
-s08 的 DeepSeek Chat Completions 适配器**不声明** `in-history`（因为它没有实现该 wire 语义）；测试里的 provider 会声明，用来验证 loop 行为。
+本课共享的 DeepSeek Messages 适配器暂不声明 `in-history`，因为这里只实现了基础 Messages 子集；真实 DSH 的 `deepseek-flash` 会声明该能力。测试里的 provider 会声明，用来验证 loop 行为。
 
 ### 3.4 重试
 
@@ -161,7 +160,7 @@ s08 的 DeepSeek Chat Completions 适配器**不声明** `in-history`（因为�
 | 文件 | 作用 | 真实对应 |
 |---|---|---|
 | [`src/llm.ts`](src/llm.ts) | Provider、LlmRuntime、PreparedCall 类型、重试辅助 | `llm/llm/src/{index,call-config}.ts` |
-| [`src/deepseek.ts`](src/deepseek.ts) | `DeepSeekModel.prepare()`、`DeepSeekProvider` | `llm-deepseek/src/adapter.ts` |
+| [`src/messages.ts`](src/messages.ts) | `DeepSeekModel.prepare()`、`DeepSeekProvider` | `llm-deepseek/src/adapter.ts` |
 | [`src/agent.ts`](src/agent.ts) | prepared call、request/context、in-history、重试 | `agent-loop/src/agent.ts` |
 | [`src/demo.ts`](src/demo.ts) | runtime 注册 + prepare 输出 | — |
 
@@ -230,7 +229,7 @@ for (let attempt = 0; ; attempt++) {
 
 | 真实 DSH | s08 | 影响 |
 |---|---|---|
-| Messages 协议 + x-api-key | Chat Completions + Bearer | 教学适配器 |
+| 完整 Messages 能力（图像/文件、tool changes、replay） | 基础 Messages 子集 + 离线测试 | 图像/文件/tool changes 留在后续 |
 | model catalog / listing / pricing | 单个 provider | 后续 |
 | toolUpdate 增量 | 只用类型描述 | 后续 |
 | replayState / ReplayEnvelope | 无 | 后续 |
@@ -244,9 +243,9 @@ for (let attempt = 0; ; attempt++) {
 
 ### 1. 第二个 provider
 
-实现一个 OpenAI-compatible provider：
+实现第二个 Messages-compatible provider：
 
-- 复用 `DeepSeekModel` 的 SSE 解析；
+- 复用共享 `DeepSeekModel` 的 Messages SSE 解析；
 - 改 base URL、model id、能力元数据；
 - 在 runtime 里注册两个 provider；
 - 写测试：同一 Agent 换 provider，不改 loop。
@@ -342,13 +341,7 @@ for (let attempt = 0; ; attempt++) {
 
 s08 的 `prepare` 返回 config；真实 loop 还有 `requestProposal` 清除 adapterDefaults。
 
-### Q9. 为什么真实 DSH 的 DeepSeek adapter 用 Messages 而不是 Chat Completions？
-
-真实适配器需要 `thinking`、`tool_use`、`cache_read_input_tokens`、文件/图片、mid-conversation tool changes 等 Messages 语义；Chat Completions 表达不了这些。s08 的 Chat Completions 适配器是为了教学简单，能力元数据也相应保守。
-
-见 [`llm-deepseek/src/adapter.ts`](../../../deepseek-harness/packages/llm/llm-deepseek/src/adapter.ts#L22) 与 [`translate.ts`](../../../deepseek-harness/packages/llm/llm-deepseek/src/translate.ts)。
-
-### Q10. 换 provider 为什么不用改 loop？
+### Q9. 换 provider 为什么不用改 loop？
 
 因为 loop 只依赖 `PreparedCall` 的 config/capabilities/retryPolicy/stream。新 provider 只要实现 `Provider` 并返回同样的结构，就能被 runtime 注册、被 Agent 使用。
 

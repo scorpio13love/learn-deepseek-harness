@@ -28,14 +28,6 @@ fs、shell、sandbox、approval：agent 如何安全地碰真实世界。
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
-### 先看机制动画
-
-![s14 机制动画](../../../docs/visuals/s14-flow.gif)
-
-*agent 如何安全地碰真实世界：每一步的边界、输入和产出。*
-
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s14) · [MP4](../../../docs/visuals/s14-flow.mp4)
-
 ## 0. 先跑起来
 
 ```sh

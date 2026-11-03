@@ -28,14 +28,6 @@ VS Code 插件或 CI 脚本调用 agent。
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
-### 先看机制动画
-
-![s23 机制动画](../../../docs/visuals/s23-flow.gif)
-
-*把 harness 变成进程外服务：每一步的边界、输入和产出。*
-
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s23) · [MP4](../../../docs/visuals/s23-flow.mp4)
-
 ## 0. 先跑起来
 
 ```sh

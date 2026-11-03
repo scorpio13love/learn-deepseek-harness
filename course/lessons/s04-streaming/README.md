@@ -201,7 +201,7 @@ session.append('assistant/attempt', {
 | [`src/types.ts`](src/types.ts) | `TimedStreamChunk`、`AssistantStreamFrame`、事件 map 扩展 | `dsh-llm` + `dsh-session` |
 | [`src/session.ts`](src/session.ts) | 校验 assistant 事件必须带 stream；重放 | `core/session` |
 | [`src/agent.ts`](src/agent.ts) | 成功/失败/取消的结算分支 | `core/agent-loop/src/agent.ts` |
-| [`src/deepseek.ts`](src/deepseek.ts) | 真实 SSE → chunk | `llm-deepseek` |
+| [`src/messages.ts`](src/messages.ts) | 真实 SSE → chunk | `llm-deepseek` |
 | [`src/demo.ts`](src/demo.ts) | 观察 stream/live 帧/重放 | — |
 
 ### 4.2 attempt 的生命周期

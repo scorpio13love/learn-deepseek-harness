@@ -37,7 +37,7 @@ export function readDeepSeekConfig(): DeepSeekEnvConfig {
       'DEEPSEEK_API_KEY is not set. Run `cp env.example .env` in this lesson and fill in your key.',
     )
   }
-  const baseUrl = process.env.DEEPSEEK_BASE_URL?.trim() || 'https://api.deepseek.com'
+  const baseUrl = process.env.DEEPSEEK_BASE_URL?.trim() || 'https://api.deepseek.com/anthropic'
   const model = process.env.DEEPSEEK_MODEL?.trim() || 'deepseek-flash'
   const maxTokens = positiveInteger('DEEPSEEK_MAX_TOKENS', process.env.DEEPSEEK_MAX_TOKENS)
   const timeoutMs = positiveInteger('DEEPSEEK_TIMEOUT_MS', process.env.DEEPSEEK_TIMEOUT_MS)

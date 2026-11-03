@@ -256,7 +256,7 @@ replace 的规则：
 | [`src/types.ts`](src/types.ts) | 事件信封、surface 类型、JSON 校验 | `dsh-session` 的类型 |
 | [`src/session.ts`](src/session.ts) | append、surface fold、derive、restore | `core/session/src/{index,surface}.ts` |
 | [`src/agent.ts`](src/agent.ts) | 写入 surface intent、header/context | `core/agent-loop/src/agent.ts` |
-| [`src/deepseek.ts`](src/deepseek.ts) | 真实 DeepSeek 适配器 | `llm/llm-deepseek` |
+| [`src/messages.ts`](src/messages.ts) | 真实 DeepSeek 适配器 | `llm/llm-deepseek` |
 | [`src/demo.ts`](src/demo.ts) | 日志 / 重放 / 压缩演示 | — |
 
 ### 4.2 append 的提交顺序

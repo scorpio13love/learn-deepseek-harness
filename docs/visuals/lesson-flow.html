@@ -66,6 +66,9 @@
   .stage-jump { display:flex; gap:3px; flex-wrap:wrap; }
   .stage-jump button { padding:4px 6px; font:8px var(--mono); color:var(--muted); }
   .stage-jump button.active { border-color:var(--brand); color:var(--brand); background:var(--brand-soft); }
+  .stage-jump button:hover { border-color:color-mix(in srgb, var(--brand) 45%, var(--line)); color:var(--brand); background:var(--brand-soft); }
+  .stage-jump button:focus-visible { outline:2px solid var(--brand); outline-offset:1px; }
+  .stage-jump button.active:hover { border-color:var(--brand); color:var(--brand); background:var(--brand-soft); }
   #scrub { flex:1; min-width:110px; accent-color:var(--brand); }
   #counter { font:9px var(--mono); color:var(--muted); }
   body.capture .controls { display:none; }
@@ -196,12 +199,12 @@
     els.packet.classList.toggle('on', packetOn);
     if (packetOn) { const p = Math.max(0, Math.min(1, (t-.05)/.92)); const first=nodes[0].offsetLeft, lastN=nodes[nodes.length-1]; els.packet.style.left = `${first + p*(lastN.offsetLeft + lastN.offsetWidth - first)}px`; }
     els.segs.forEach((seg,i)=>{ seg.classList.toggle('done',i<stage); seg.classList.toggle('on',i===stage); });
-    jumps.forEach((b,i)=>b.classList.toggle('active',i===stage));
+    jumps.forEach((b,i)=>{ b.classList.toggle('active',i===stage); b.setAttribute('aria-pressed',String(i===stage)); });
   }
   function setFrame(next) { frame = (next + TOTAL) % TOTAL; render(frame/(TOTAL-1)); document.getElementById('scrub').value=String(Math.round(frame/(TOTAL-1)*1000)); document.getElementById('counter').textContent=`${frame} / ${TOTAL-1}`; }
   window.setFrame = setFrame;
   function pause(){ playing=false; document.getElementById('play').textContent='播放'; cancelAnimationFrame(raf); }
-  function goStage(i){ pause(); setFrame(Math.round(stages[(i+stages.length)%stages.length].at*(TOTAL-1))); }
+  function goStage(i){ pause(); setFrame(Math.min(TOTAL-1, Math.ceil(stages[(i+stages.length)%stages.length].at*(TOTAL-1)))); }
   function tick(time){ if(!playing) return; if(!last) last=time; if(time-last>1000/10){ last=time; setFrame(frame+1); } raf=requestAnimationFrame(tick); }
   function fit(){ if(capture) return; const scale=Math.min(window.innerWidth/1280,(window.innerHeight-48)/720); document.getElementById('stage').style.transform=`scale(${scale})`; document.body.style.height=`${720*scale+40}px`; }
   document.getElementById('play').addEventListener('click', (e)=>{ playing=!playing; e.currentTarget.textContent=playing?'暂停':'播放'; if(playing){last=0;raf=requestAnimationFrame(tick);} else cancelAnimationFrame(raf); });

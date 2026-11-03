@@ -28,14 +28,6 @@
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
-### 先看机制动画
-
-![s05 机制动画](../../../docs/visuals/s05-flow.gif)
-
-*作者写 TS，模型看 JSON Schema：每一步的边界、输入和产出。*
-
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s05) · [MP4](../../../docs/visuals/s05-flow.mp4)
-
 ## 0. 先跑起来
 
 ```sh
@@ -59,7 +51,7 @@ Demo 会先静态解析工具集，再让真实模型调用 `calc`：
 ```text
 resolved tools: [ 'calc', 'admin_stats' ]
 schemas: [ 'calc', 'admin_stats' ]
-model: deepseek/deepseek-flash (https://api.deepseek.com)
+model: deepseek/deepseek-flash (https://api.deepseek.com/anthropic)
 
 #07 tool/result        84 meta={"expression":"(12 + 30) * 2","result":"84"}
 ```

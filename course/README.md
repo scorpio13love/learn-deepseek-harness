@@ -50,7 +50,7 @@ course/lessons/
   s27-security/
   s28-capstone/
 ```
-每课都有 `README.md`、`env.example`、`package.json`、`tsconfig.json`、`src/`、`tests/`；后一课复制前一课并增量修改。
+每课都有 `README.md`、`env.example`、`package.json`、`tsconfig.json`、`src/`、`tests/`；DeepSeek Messages wire 实现在各课 `src/messages.ts`，`src/deepseek.ts` 只做本地导出。
 
 ## 运行
 

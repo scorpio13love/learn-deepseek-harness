@@ -1,6 +1,6 @@
 # s16 · PTC：让模型写程序调用工具
 
-> 本课代码：`src/ptc.ts`、`src/tools.ts`、`src/deepseek.ts`、`src/env.ts`、`src/demo.ts`
+> 本课代码：`src/ptc.ts`、`src/tools.ts`、`src/messages.ts`、`src/env.ts`、`src/demo.ts`
 >
 > 测试：`tests/s16.test.ts`（14 个离线用例，不访问网络）
 >
@@ -129,7 +129,7 @@ value   : 84
 | 变量 | 必填 | 默认 | 说明 |
 |---|---|---|---|
 | `DEEPSEEK_API_KEY` | 仅真实 demo | — | 没有 key 时 demo 走离线程序 |
-| `DEEPSEEK_BASE_URL` | 否 | `https://api.deepseek.com` | OpenAI-compatible 端点 |
+| `DEEPSEEK_BASE_URL` | 否 | `https://api.deepseek.com/anthropic` | DeepSeek Messages 根地址 |
 | `DEEPSEEK_MODEL` | 否 | `deepseek-flash` | 默认模型 |
 | `DEEPSEEK_MAX_TOKENS` | 否 | 不发送 | 单次输出上限 |
 | `DEEPSEEK_TIMEOUT_MS` | 否 | 不超时 | HTTP 请求超时 |
@@ -276,7 +276,7 @@ scope 是显式对象：只有写在 `scope.*` 上的值跨 run 保留；`const`
 |---|---|
 | [`src/ptc.ts`](src/ptc.ts) | `PtcRuntime`、编译、tools Proxy、序列化、超时/取消、失败分类 |
 | [`src/tools.ts`](src/tools.ts) | 最小 `ToolRegistry`、`defineTool`、安全 `calc` |
-| [`src/deepseek.ts`](src/deepseek.ts) | 非流式 DeepSeek 客户端（只给 demo 用） |
+| [`src/messages.ts`](src/messages.ts) | 非流式 DeepSeek 客户端（只给 demo 用） |
 | [`src/env.ts`](src/env.ts) | 配置读取；无 key 时返回 undefined |
 | [`src/demo.ts`](src/demo.ts) | 真实模型生成程序；无 key 时跑离线程序 |
 

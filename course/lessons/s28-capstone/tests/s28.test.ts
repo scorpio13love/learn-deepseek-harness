@@ -78,19 +78,24 @@ test('deepseek: wire messages carry tool calls and tool_call_id', () => {
 
   assert.deepEqual(wire[0], {
     role: 'assistant',
-    content: '',
-    tool_calls: [{
+    content: [{
+      type: 'tool_use',
       id: 'call-1',
-      type: 'function',
-      function: { name: 'read_file', arguments: '{"path":"README.md"}' },
+      name: 'read_file',
+      input: { path: 'README.md' },
     }],
   })
   assert.deepEqual(wire[1], {
-    role: 'tool',
-    tool_call_id: 'call-1',
-    content: '{"content":"hi"}',
+    role: 'user',
+    content: [
+      {
+        type: 'tool_result',
+        tool_use_id: 'call-1',
+        content: [{ type: 'text', text: '{"content":"hi"}' }],
+      },
+      { type: 'text', text: 'continue' },
+    ],
   })
-  assert.deepEqual(wire[2], { role: 'user', content: 'continue' })
 })
 
 test('offline smoke: multi-tool capstone passes all checks and writes artifacts', async t => {
@@ -187,12 +192,16 @@ test('events: append-only JSONL rejects malformed lines', async t => {
 test('deepseek: streaming response parses text, split tool calls and usage', async () => {
   const original = globalThis.fetch
   const frames = [
-    'data: {"choices":[{"delta":{"content":"I will read "}}]}\n\n',
-    'data: {"choices":[{"delta":{"content":"the file."}}]}\n\n',
-    'data: {"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call-1","function":{"name":"read_file","arguments":"{\\"path\\":"}}]}}]}\n\n',
-    'data: {"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"arguments":"\\"README.md\\"}"}}]}}]}\n\n',
-    'data: {"choices":[{"delta":{},"finish_reason":"tool_calls"}],"usage":{"prompt_tokens":12,"completion_tokens":7}}\n\n',
-    'data: [DONE]\n\n',
+    'data: {"type":"message_start","message":{"usage":{"input_tokens":12,"output_tokens":0}}}\n\n',
+    'data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}}\n\n',
+    'data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"I will read "}}\n\n',
+    'data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"the file."}}\n\n',
+    'data: {"type":"content_block_stop","index":0}\n\n',
+    'data: {"type":"content_block_start","index":1,"content_block":{"type":"tool_use","id":"call-1","name":"read_file","input":{}}}\n\n',
+    'data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"{\\"path\\":\\"README.md\\"}"}}\n\n',
+    'data: {"type":"content_block_stop","index":1}\n\n',
+    'data: {"type":"message_delta","delta":{"stop_reason":"tool_use"},"usage":{"output_tokens":7}}\n\n',
+    'data: {"type":"message_stop"}\n\n',
   ]
   globalThis.fetch = (async () => new Response(frames.join(''), {
     status: 200,

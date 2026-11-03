@@ -235,7 +235,7 @@ course/lessons/s01-agent-loop/
 **mini 产出**：
 
 - `Provider` 接口：`resolveModel`、`prepareCall`、`stream`。
-- 两个真实 provider 变体（DeepSeek chat / reasoner，或 DeepSeek + 一个 OpenAI-compatible 端点）。
+- 两个真实 provider 变体（DeepSeek Messages + 一个 Messages-compatible 端点）。
 - 能力协商：contextWindow、in-history、toolUpdate、reasoning。
 - 重试策略与终止错误分类。
 - 适配器默认值物化与清除。

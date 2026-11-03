@@ -15,21 +15,13 @@
 - `eval-report.json`：验收检查与指标（通过/失败、步骤、token、文件数）；
 - `audit.md`：agent 真正写出的报告。
 
-有 key 时用真实 DeepSeek（流式 Chat Completions + tool calls）；没有 key 时用 `OfflineModel` 跑同一套 agent、工具、日志和评测，只是在模型边界替换成确定性脚本。测试全部离线。
+有 key 时用真实 DeepSeek（流式 Messages + tool_use）；没有 key 时用 `OfflineModel` 跑同一套 agent、工具、日志和评测，只是在模型边界替换成确定性脚本。测试全部离线。
 
 ---
 
 ![s28 本课地图](../../../docs/visuals/maps/s28.svg)
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
-
-### 先看机制动画
-
-![s28 机制动画](../../../docs/visuals/s28-flow.gif)
-
-*用完整 harness 跑真实任务：每一步的边界、输入和产出。*
-
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s28) · [MP4](../../../docs/visuals/s28-flow.mp4)
 
 ## 0. 先跑起来（无需 key）
 
@@ -63,8 +55,8 @@ node src/main.ts --workspace /absolute/path/to/repo --out /tmp/capstone-run
 `main.ts` 会：
 
 1. 读取 `.env`（不覆盖已有环境变量），没有 key 时直接退出并提示；
-2. 用 `DeepSeekModel` 请求 `${DEEPSEEK_BASE_URL}/chat/completions`，`stream: true`；
-3. 解析 SSE 的 `delta.content` 和 `delta.tool_calls`，把工具参数 JSON 还原；
+2. 用 `DeepSeekModel` 请求 `${DEEPSEEK_BASE_URL}/v1/messages`，`stream: true`；
+3. 解析 Messages SSE 的 `text_delta`、`thinking_delta` 和 `input_json_delta`，把工具参数 JSON 还原；
 4. 执行工具，写事件日志，最后生成 surface 与 eval；
 5. 按 eval 是否通过设置退出码。
 
@@ -141,7 +133,7 @@ node src/main.ts --workspace /absolute/path/to/repo --out /tmp/capstone-run
 | [`src/workspace.ts`](src/workspace.ts) | 工作区路径容器 |
 | [`src/events.ts`](src/events.ts) | JSONL 事件日志、surface 摘要 |
 | [`src/tools.ts`](src/tools.ts) | 四个工具 + 审批 |
-| [`src/deepseek.ts`](src/deepseek.ts) | 真实 DeepSeek 流式客户端 |
+| [`src/messages.ts`](src/messages.ts) | 真实 DeepSeek 流式客户端 |
 | [`src/sse.ts`](src/sse.ts) | SSE 解码器 |
 | [`src/offline.ts`](src/offline.ts) | 无 key 的确定性模型 |
 | [`src/agent.ts`](src/agent.ts) | 多步工具循环 |

@@ -334,22 +334,27 @@ test('wire: messages map system/user/assistant/tool and preserve raw tool argume
   ]
 
   assert.deepEqual(toWireMessages(messages), [
-    { role: 'system', content: 'You are a calculator.' },
-    { role: 'user', content: '2 + 3?' },
+    { role: 'system', content: [{ type: 'text', text: 'You are a calculator.' }] },
+    { role: 'user', content: [{ type: 'text', text: '2 + 3?' }] },
     {
       role: 'assistant',
-      content: 'let me add',
-      tool_calls: [{
-        id: 'call_1',
-        type: 'function',
-        function: { name: 'add', arguments: '{"a":2,"b":3}' },
+      content: [
+        { type: 'text', text: 'let me add' },
+        { type: 'tool_use', id: 'call_1', name: 'add', input: { a: 2, b: 3 } },
+      ],
+    },
+    {
+      role: 'user',
+      content: [{
+        type: 'tool_result',
+        tool_use_id: 'call_1',
+        content: [{ type: 'text', text: '5' }],
       }],
     },
-    { role: 'tool', tool_call_id: 'call_1', content: '5' },
   ])
 })
 
-test('wire: tools map to OpenAI function declarations', () => {
+test('wire: tools map to Messages input_schema', () => {
   assert.deepEqual(toWireTools([{
     name: 'calc',
     description: 'Calculate.',
@@ -359,15 +364,12 @@ test('wire: tools map to OpenAI function declarations', () => {
       required: ['expression'],
     },
   }]), [{
-    type: 'function',
-    function: {
-      name: 'calc',
-      description: 'Calculate.',
-      parameters: {
-        type: 'object',
-        properties: { expression: { type: 'string' } },
-        required: ['expression'],
-      },
+    name: 'calc',
+    description: 'Calculate.',
+    input_schema: {
+      type: 'object',
+      properties: { expression: { type: 'string' } },
+      required: ['expression'],
     },
   }])
 })
@@ -384,18 +386,15 @@ test('wire: SSE decoder handles split frames, CRLF and multiple events', () => {
 
 test('wire: usage separates cache hits from uncached input', () => {
   assert.deepEqual(mapUsage({
-    prompt_tokens: 100,
-    prompt_cache_hit_tokens: 80,
-    prompt_cache_miss_tokens: 20,
-    completion_tokens: 10,
-    total_tokens: 110,
-    completion_tokens_details: { reasoning_tokens: 3 },
+    input_tokens: 100,
+    output_tokens: 10,
+    cache_read_input_tokens: 80,
+    cache_creation_input_tokens: 20,
   }), {
-    inputTokens: 20,
+    inputTokens: 100,
     outputTokens: 10,
-    totalTokens: 110,
     cacheReadTokens: 80,
-    reasoningTokens: 3,
+    cacheWriteTokens: 20,
   })
 })
 

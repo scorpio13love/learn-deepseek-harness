@@ -18,14 +18,6 @@
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
-### 先看机制动画
-
-![s27 机制动画](../../../docs/visuals/s27-flow.gif)
-
-*路径、审批、redaction 与授权：每一步的边界、输入和产出。*
-
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s27) · [MP4](../../../docs/visuals/s27-flow.mp4)
-
 ## 0. 先跑起来
 
 ```sh

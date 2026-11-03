@@ -368,7 +368,8 @@
       ['s03-session-log', { gif: 's03-surface.gif', html: 's03-surface.html', sub: 'event log → surface → derive' }],
       ['s08-inbox-steering', { gif: 's08-inbox.gif', html: 's08-inbox.html', sub: 'followup · steer · inject → claim' }],
     ]);
-    const slugs = C.parts.flatMap(part => part.lessons);
+    const animatedGeneric = new Set(['s04-streaming','s06-tool-runtime','s09-llm-seam','s10-persistence','s11-compaction','s12-plugin-kernel','s15-subagents-presets','s16-ptc','s17-mcp-skills-commands','s19-browser-use','s20-computer-use-i','s21-computer-use-ii','s22-web','s24-client-ui','s25-observability-eval','s26-eval']);
+    const slugs = C.parts.flatMap(part => part.lessons).filter(slug => custom.has(slug) || animatedGeneric.has(slug));
     const cards = slugs.map(slug => {
       const lesson = lessons[slug];
       const c = custom.get(slug) || { gif: `${slug.slice(0,3)}-flow.gif`, html: `lesson-flow.html?lesson=${slug.slice(0,3)}`, sub: lesson.short };
@@ -379,13 +380,13 @@
     }).join('');
     $('#content').innerHTML = `<div class="home">
       <section class="hero">
-        <span class="eyebrow">28 animations · carousel</span>
-        <h1>每一课，<br><em>都可以单步看</em></h1>
-        <p>28 张机制动画：s01–s03、s08 是专属分镜；其余 24 课由本课地图、开篇问题和源码锚点驱动。点开任意一张，按阶段前后播放。</p>
+        <span class="eyebrow">${slugs.length} animations · carousel</span>
+        <h1>机制课，<br><em>都可以单步看</em></h1>
+        <p>保留 20 个真正需要看时序的机制动画：s01–s03、s08 是专属分镜；其余课程用本课地图，不强行做动画。点开任意一张，按阶段前后播放。</p>
         <div class="hero-actions"><a class="primary-button" href="#/">回到课程地图 <span>→</span></a></div>
       </section>
       <section class="section">
-        <div class="section-head"><div><h2>全部 28 课</h2><p>GIF 预览；点开为可单步 HTML</p></div></div>
+        <div class="section-head"><div><h2>全部 ${slugs.length} 课</h2><p>GIF 预览；点开为可单步 HTML</p></div></div>
         <div class="visual-grid">${cards}</div>
       </section>
     </div>`;
@@ -447,7 +448,7 @@
       </section>
 
       <section class="section">
-        <div class="section-head"><div><h2>机制动画</h2><p>点开可单步：chunk → message → event / tool round-trip / surface</p></div><a class="section-link" href="#/animations">全部 28 个 →</a></div>
+        <div class="section-head"><div><h2>机制动画</h2><p>点开可单步：chunk → message → event / tool round-trip / surface</p></div><a class="section-link" href="#/animations">全部动画 →</a></div>
         <div class="visual-grid">
           <a class="visual-card" href="../docs/visuals/s01-loop.html" target="_blank" rel="noreferrer">
             <img src="../docs/visuals/s01-loop.gif" alt="s01 agent loop 动画" loading="lazy">

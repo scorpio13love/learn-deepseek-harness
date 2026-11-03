@@ -65,14 +65,6 @@ skill 是「可复用指令包」：一段 Markdown 正文，加上 `name` / `de
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
-### 先看机制动画
-
-![s18 机制动画](../../../docs/visuals/s18-flow.gif)
-
-*技能目录与斜杠命令：每一步的边界、输入和产出。*
-
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s18) · [MP4](../../../docs/visuals/s18-flow.mp4)
-
 ## 0. 先跑起来
 
 ```sh

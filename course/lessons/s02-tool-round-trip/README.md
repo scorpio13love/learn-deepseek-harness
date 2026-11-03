@@ -79,7 +79,7 @@ npm run typecheck
 | 变量 | 必填 | 默认 | 说明 |
 |---|---|---|---|
 | `DEEPSEEK_API_KEY` | 是 | — | DeepSeek API key |
-| `DEEPSEEK_BASE_URL` | 否 | `https://api.deepseek.com` | OpenAI-compatible 端点，可带 `/v1` |
+| `DEEPSEEK_BASE_URL` | 否 | `https://api.deepseek.com/anthropic` | DeepSeek Messages 根地址，可带 `/v1` |
 | `DEEPSEEK_MODEL` | 否 | `deepseek-flash` | DeepSeek-V4.1-Flash；也可用 `deepseek-v4-pro` |
 | `DEEPSEEK_MAX_TOKENS` | 否 | 不发送 | 单次输出上限 |
 | `DEEPSEEK_TIMEOUT_MS` | 否 | 不超时 | 请求超时 |
@@ -87,7 +87,7 @@ npm run typecheck
 Demo 会打印一次真实 turn 的事件序列。因为模型输出不固定，事件的具体条数取决于它调用了几次工具；正常情况下长这样：
 
 ```text
-model: deepseek/deepseek-flash (https://api.deepseek.com)
+model: deepseek/deepseek-flash (https://api.deepseek.com/anthropic)
 
 === 事件日志 ===
 #00 turn/start
@@ -142,7 +142,7 @@ answer: (12 + 30) * 2 = 84
 | 7 | [`session/src/types.ts` → `SessionEventMap`](../../../deepseek-harness/packages/core/session/src/types.ts#L287) | 哪些事件进入模型历史？哪些只是日志事实？ | Q7 |
 | 8 | [`session/src/index.ts` → `deriveMessages()`](../../../deepseek-harness/packages/core/session/src/index.ts#L999) | 派生规则是什么？空 assistant 消息为什么被排除？ | Q8 |
 | 9 | [`tools/src/contracts.ts` → `ToolDefinition`](../../../deepseek-harness/packages/core/tools/src/contracts.ts#L26) | 工具为什么返回「规范值」而不是文本？ | Q9 |
-| 10 | [`llm-deepseek`](../../../deepseek-harness/packages/llm/llm-deepseek/) | 真实适配器如何处理 reasoning、tool_calls、cache usage？ | Q10 |
+| 10 | [`llm-deepseek`](../../../deepseek-harness/packages/llm/llm-deepseek/) | 真实适配器如何处理 thinking、tool_use、cache usage？ | Q10 |
 
 读完后先回答这 10 个问题，再对照第 9 节的答案；答不上来的，回到对应函数再读一遍。
 
@@ -260,37 +260,40 @@ s01 实现了第二条（流中途取消保留前缀），第一条/第三条留
 
 ## 4. 真实 DeepSeek 适配器
 
-这一课不再使用假模型。`src/deepseek.ts` 直接调用 `POST /chat/completions`，并把 SSE 转成内部 `StreamChunk`。这是整课最长、也最值得逐行读的文件。
+这一课不再使用假模型。`src/messages.ts` 直接调用 `POST /v1/messages`，并把 SSE 转成内部 `StreamChunk`。这是整课最长、也最值得逐行读的文件。
 
 ### 4.1 请求映射
 
 ```ts
-// src/deepseek.ts
+// src/messages.ts
 const body = {
   model: this.model,
+  max_tokens: config.maxTokens ?? 4096,
+  system,                         // 从 system 消息提取，放在顶层
   messages: toWireMessages(request.messages),
+  tools: toWireTools(request.tools), // { name, description, input_schema }
+  thinking: { type: 'enabled' },
   stream: true,
-  stream_options: { include_usage: true },
-  tools: toWireTools(request.tools),
-  max_tokens: config.maxTokens,
 }
 ```
 
-- 内部 `Message` 有 `system` / `user` / `assistant` / `tool` 四种角色，和 OpenAI wire 一一对应。
-- assistant 的文本和 `tool_calls` 要拆开：文本进 `content`，工具调用进 `tool_calls`。
-- tool 结果必须带 `tool_call_id`，否则 provider 无法配对。
-- 工具的原始参数是字符串，**不做重新序列化**，避免破坏模型给的 JSON 字节。
+- 内部 `Message` 有 `system` / `developer` / `user` / `assistant` / `tool` 角色；system 进入顶层 `system`。
+- assistant 的 `tool-call` 投影成 `tool_use` block；`tool` 消息投影成 user `tool_result` block。
+- 工具结果通过 `tool_use_id` 配对，不再有 OpenAI 的 `tool_call_id` 字段。
+- 工具声明使用 `input_schema`，不是 `function.parameters`。
+- 工具的原始参数是字符串；投影时解析成 `input` 对象。
 
 ### 4.2 SSE 解析
 
 ```text
-data: {"choices":[{"delta":{"content":"你"}}]}
-data: {"choices":[{"delta":{"content":"好"}}]}
-data: {"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call_1","function":{"name":"calc","arguments":"{\"expr"}}]}}]}
-data: {"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"arguments":"ession\":\"1+1\"}"}}]}}]}
-data: {"choices":[{"finish_reason":"tool_calls"}]}
-data: {"usage":{...}}
-data: [DONE]
+data: {"type":"message_start","message":{"usage":{"input_tokens":12}}}
+data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}}
+data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"你"}}
+data: {"type":"content_block_start","index":1,"content_block":{"type":"tool_use","id":"call_1","name":"calc","input":{}}}
+data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"{\"expression\":\"1+1\"}"}}
+data: {"type":"content_block_stop","index":1}
+data: {"type":"message_delta","delta":{"stop_reason":"tool_use"},"usage":{"output_tokens":7}}
+data: {"type":"message_stop"}
 ```
 
 `SseDecoder` 处理三件容易出错的事：
@@ -301,18 +304,20 @@ data: [DONE]
 
 ### 4.3 工具调用分片
 
-DeepSeek 的 tool call 是**按 index 合并**的：
+Messages 的工具参数不是按 `tool_calls[].index` 合并，而是按 content block index：
 
-- 第一片通常带 `id` 和 `function.name`；
-- 后续片只带 `function.arguments` 的增量；
-- 同一 index 的所有 arguments 拼接后才是完整 JSON。
+- `content_block_start` 带 `tool_use.id` / `name`；
+- 后续 `input_json_delta.partial_json` 是参数 JSON 的增量；
+- 同一个 block index 拼接后才是完整 `input`；
+- `content_block_stop` 时生成完整的 `tool-call` block。
 
-代码里用 `Map<number, {id, name, arguments}>` 累积，流结束时补一个 `block-end`，把完整块交给 assembler。真实 DSH 的 [`assembler.ts`](../../../deepseek-harness/packages/llm/llm/src/assembler.ts) 做的是同一件事，只是更严格。
+代码里用 `Map<number, block>` 累积，流结束时补 `block-end`，把完整块交给 assembler。
 
 ### 4.4 reasoning 与 cache usage
 
-- 在默认端点上，`deepseek-flash` 默认开启 thinking，会返回 `reasoning_content`；我们把 `reasoning-delta` 映射成 `reasoning` 块。
-- `usage.prompt_tokens = prompt_cache_hit_tokens + prompt_cache_miss_tokens`；我们的 `inputTokens` 只算未命中部分，命中单独记 `cacheReadTokens`。这与真实 DSH 的 `TokenUsage` 语义一致（输入/输出/cache 字段不相交）。
+- Messages 的 thinking 是 `thinking` block，用 `thinking_delta` 增量到达；我们映射成 `reasoning` 块。
+- usage 字段是 `input_tokens` / `output_tokens` / `cache_read_input_tokens` / `cache_creation_input_tokens`；不再有 `prompt_cache_hit_tokens`。
+- `input_tokens` 是本次输入总量，cache 读/写单独记。
 
 ### 4.5 错误与超时
 
@@ -330,7 +335,7 @@ DeepSeek 的 tool call 是**按 index 合并**的：
 |---|---|---|
 | [`src/types.ts`](src/types.ts) | 消息、内容块、流、工具、会话事件 | `dsh-llm` + `dsh-session` + `dsh-tools` 的核心类型 |
 | [`src/session.ts`](src/session.ts) | 事件日志、`append`、`deriveMessages` | `core/session` |
-| [`src/deepseek.ts`](src/deepseek.ts) | 真实 DeepSeek HTTP + SSE 适配器 | `llm/llm-deepseek` + `llm/llm` 的 assembler |
+| [`src/messages.ts`](src/messages.ts) | 真实 DeepSeek HTTP + SSE 适配器 | `llm/llm-deepseek` + `llm/llm` 的 assembler |
 | [`src/env.ts`](src/env.ts) | `.env` 读取与校验 | 真实 DSH 的 credentials/settings |
 | [`src/tools.ts`](src/tools.ts) | 注册表、参数校验、结果规范化 | `core/tools` 的一小部分 |
 | [`src/agent.ts`](src/agent.ts) | turn/step 状态机、流组装、取消 | `core/agent-loop/src/agent.ts` |
@@ -604,7 +609,7 @@ loop 构造的请求 = **`header.config` + `deriveMessages()` + `header.tools`**
 
 见 [`ToolOutputDefinition`](../../../deepseek-harness/packages/core/tools/src/contracts.ts#L16) 与 [`ToolDefinition`](../../../deepseek-harness/packages/core/tools/src/contracts.ts#L26)。
 
-### Q10. 真实适配器如何处理 reasoning、tool_calls、cache usage？
+### Q10. 真实适配器如何处理 thinking、tool_use、cache usage？
 
 真实 `llm-deepseek` 走 DeepSeek 的 Messages 风格 wire：
 
@@ -612,9 +617,9 @@ loop 构造的请求 = **`header.config` + `deriveMessages()` + `header.tools`**
 - `tool_use` 块 → `tool-call`；finish reason `tool_use` → `tool-calls`；
 - usage 的 `input_tokens` / `output_tokens` / `cache_read_input_tokens` / `cache_creation_input_tokens` 分别映射到 `inputTokens` / `outputTokens` / `cacheReadTokens` / `cacheWriteTokens`，并在最终 finish 前算出 total。
 
-s01 默认模型是 `deepseek-flash`，用的是 OpenAI-compatible Chat Completions，字段名不同但概念相同：`reasoning_content`、`tool_calls`（按 index 合并分片）、`prompt_cache_hit_tokens` / `prompt_cache_miss_tokens`。
+s01 默认模型是 `deepseek-flash`，用的是 DeepSeek Messages：`thinking` block、`tool_use` / `tool_result` content block、`input_tokens` / `cache_read_input_tokens`。
 
-见真实 [`translate.ts` 的 usage 映射](../../../deepseek-harness/packages/llm/llm-deepseek/src/translate.ts#L34)、[`thinking` 映射](../../../deepseek-harness/packages/llm/llm-deepseek/src/translate.ts#L51)、[`tool_use` 映射](../../../deepseek-harness/packages/llm/llm-deepseek/src/translate.ts#L55)；s01 实现见 [`deepseek.ts`](src/deepseek.ts#L265)。
+见真实 [`translate.ts` 的 usage 映射](../../../deepseek-harness/packages/llm/llm-deepseek/src/translate.ts#L34)、[`thinking` 映射](../../../deepseek-harness/packages/llm/llm-deepseek/src/translate.ts#L51)、[`tool_use` 映射](../../../deepseek-harness/packages/llm/llm-deepseek/src/translate.ts#L55)；s01 实现见 [`deepseek.ts`](src/messages.ts)。
 
 ### Q11. 为什么工具结果要按模型顺序提交，而不是完成顺序？
 

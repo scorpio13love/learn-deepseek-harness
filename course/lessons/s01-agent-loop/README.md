@@ -84,7 +84,7 @@ npm run typecheck
 | 变量 | 必填 | 默认 | 说明 |
 |---|---|---|---|
 | `DEEPSEEK_API_KEY` | 是 | — | DeepSeek API key |
-| `DEEPSEEK_BASE_URL` | 否 | `https://api.deepseek.com` | OpenAI-compatible 端点，可带 `/v1` |
+| `DEEPSEEK_BASE_URL` | 否 | `https://api.deepseek.com/anthropic` | DeepSeek Messages 根地址，可带 `/v1` |
 | `DEEPSEEK_MODEL` | 否 | `deepseek-flash` | DeepSeek-V4.1-Flash；也可用 `deepseek-v4-pro` |
 | `DEEPSEEK_MAX_TOKENS` | 否 | 不发送 | 单次输出上限 |
 | `DEEPSEEK_TIMEOUT_MS` | 否 | 不超时 | 请求超时 |
@@ -92,7 +92,7 @@ npm run typecheck
 Demo 只发一次纯文本请求，正常情况下事件序列长这样：
 
 ```text
-model: deepseek/deepseek-flash (https://api.deepseek.com)
+model: deepseek/deepseek-flash (https://api.deepseek.com/anthropic)
 
 === 事件日志 ===
 #00 turn/start
@@ -227,13 +227,13 @@ reasoning-delta(index=0)
 
 ## 4. 真实 DeepSeek 适配器
 
-`src/deepseek.ts` 做三件事：
+`src/messages.ts` 做三件事：
 
-1. 把内部 `Message[]` 投影成 OpenAI-compatible wire messages；
+1. 把内部 `Message[]` 投影成 Messages content-block wire messages；
 2. 用 `fetch` 发 `stream: true` 请求，`SseDecoder` 处理跨 chunk 切割与 CRLF；
-3. 把 `delta.content` / `delta.reasoning_content` / `finish_reason` / usage 映射成内部 `StreamChunk`。
+3. 把 `text_delta` / `thinking_delta` / `stop_reason` / usage 映射成内部 `StreamChunk`。
 
-本课只需要文本路径；`tool_calls` 的分片合并代码保留，但 demo 不触发它。真实适配器还会处理重试、错误分类和能力协商，这些留给后续课程。
+本课只需要文本路径；`tool_use` 的 `input_json_delta` 合并代码保留，但 demo 不触发它。真实适配器还会处理重试、错误分类和能力协商，这些留给后续课程。
 
 ---
 
@@ -246,7 +246,7 @@ reasoning-delta(index=0)
 | [`src/types.ts`](src/types.ts) | 消息、内容块、流 chunk、会话事件 |
 | [`src/session.ts`](src/session.ts) | 仅追加日志、稳定 id、`deriveMessages()`、restore |
 | [`src/agent.ts`](src/agent.ts) | `Agent.run()`、`StreamAssembler`、turn/step 状态机 |
-| [`src/deepseek.ts`](src/deepseek.ts) | 真实 DeepSeek SSE 适配器 |
+| [`src/messages.ts`](src/messages.ts) | 真实 DeepSeek SSE 适配器 |
 | [`src/env.ts`](src/env.ts) | 读取 `.env` 并校验配置 |
 | [`src/tools.ts`](src/tools.ts) | 工具注册表（本课内部能力，demo 不使用） |
 | [`src/demo.ts`](src/demo.ts) | 纯文本 loop 演示 |
