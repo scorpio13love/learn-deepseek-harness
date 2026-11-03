@@ -206,13 +206,3 @@ session log + surface
 1. 用 mini harness 跑一个真实任务（读写文件、跑测试、修复 bug）；
 2. 对照 `dsh --profile headless` 的事件日志；
 3. 选一个真实 DSH 子系统，按本课格式继续深挖。
-
----
-
-## 知识导图
-
-![s25 知识导图](../../../docs/visuals/mindmaps/s25.svg)
-
-*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
-
-[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

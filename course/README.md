@@ -11,17 +11,19 @@
 - 当前进度：**s01-s28 全部完成**
 - 课程网站：[`../site/`](../site/README.md)（`node site/serve.mjs`）
 
-## 知识导图
+## 知识图谱
 
 ![DSH 知识图谱](../docs/visuals/mindmaps/course.svg)
 
-总图是六个知识域；每课导图围绕主体元素展开：**是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接**。XMind 内含总图谱 + 28 张每课知识点。网页直接显示 SVG；需要编辑时下载 XMind。
+六个知识域，30 道面试题；图上有短答案，完整答案在网页/Markdown/XMind 里。
 
-- [XMind 源文件](../docs/visuals/mindmaps/course.xmind)
+- [带答案的网页](../docs/visuals/knowledge-map.html)
+- [Markdown 面试题与答案](../docs/04-knowledge-map.zh.md)
+- [XMind 源文件](../docs/visuals/mindmaps/course.xmind)（1 张 sheet，30 题 + 答案）
 - [OPML（通用大纲）](../docs/visuals/mindmaps/course.opml)
 - [Markdown 大纲](../docs/visuals/mindmaps/course.md)
 
-> XMind 内含 29 张 sheet（1 张总图谱 + 28 张每课知识点）。如果本机 Xmind 版本提示格式不兼容，直接导入 `.opml`。
+> XMind 里是一张总图：六个域 → 30 道题 → 答案。若本机 Xmind 版本提示格式不兼容，直接导入 `.opml`。
 
 ## 课程目录
 

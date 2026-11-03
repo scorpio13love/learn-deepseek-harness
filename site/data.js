@@ -126,6 +126,14 @@ window.COURSE = {
       "file": "../docs/03-course-writing.zh.md",
       "desc": "从具体失败场景、真实 trace、代价与设计检查出发；含 zero2Agent 13 篇的叙事地图与官方文档入口。",
       "badge": "写作"
+    },
+    {
+      "id": "knowledge-map",
+      "title": "知识图谱 · 30 道面试题",
+      "short": "知识图谱",
+      "file": "../docs/04-knowledge-map.zh.md",
+      "desc": "六个知识域、30 道面试题与答案；配可展开网页、SVG 与 XMind。",
+      "badge": "30 Q"
     }
   ],
   "lessons": {

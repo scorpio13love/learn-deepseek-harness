@@ -192,13 +192,3 @@ s13 有了执行世界。s14 会加入委派：
 - preset 如何给不同 agent 不同工具/提示词？
 
 先读：[`subagent`](../../../deepseek-harness/packages/subagent/subagent/README.md) 与 [`preset`](../../../deepseek-harness/packages/preset/agent-preset-registry/README.md)。
-
----
-
-## 知识导图
-
-![s14 知识导图](../../../docs/visuals/mindmaps/s14.svg)
-
-*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
-
-[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

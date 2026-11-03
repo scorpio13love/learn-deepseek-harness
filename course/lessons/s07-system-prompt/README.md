@@ -379,13 +379,3 @@ s06 解决了「模型看到什么提示词」。s07 会解决「运行中的 ag
 - 注入的上下文为什么不能唤醒 idle agent？
 
 先读：[`agent-loop/src/{inbox,agent}.ts`](../../../deepseek-harness/packages/core/agent-loop/src/inbox.ts) 与 [`core.zh.md` 的 inbox 段](../../../deepseek-harness/docs/subsystems/core.zh.md)。
-
----
-
-## 知识导图
-
-![s07 知识导图](../../../docs/visuals/mindmaps/s07.svg)
-
-*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
-
-[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

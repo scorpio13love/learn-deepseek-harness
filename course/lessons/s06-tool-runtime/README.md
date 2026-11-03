@@ -382,13 +382,3 @@ s05 解决了工具执行。s06 会解决「模型看到的提示词如何组装
 - 为什么这会影响 KV cache？
 
 先读：[`core/system-prompt/src/index.ts`](../../../deepseek-harness/packages/core/system-prompt/src/index.ts) 与 [`docs/subsystems/system-prompt.zh.md`](../../../deepseek-harness/docs/subsystems/system-prompt.zh.md)。
-
----
-
-## 知识导图
-
-![s06 知识导图](../../../docs/visuals/mindmaps/s06.svg)
-
-*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
-
-[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

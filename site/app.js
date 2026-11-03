@@ -528,7 +528,7 @@
       </section>
 
       <section class="section">
-        <div class="section-head"><div><h2>知识导图</h2><p>六个知识域，不是课程目录；XMind 内含每课知识点</p></div><a class="section-link" href="../docs/visuals/mindmaps/course.xmind">下载 XMind →</a></div>
+        <div class="section-head"><div><h2>知识导图</h2><p>六个知识域、30 道面试题；图上有短答案</p></div><a class="section-link" href="../docs/visuals/knowledge-map.html">带答案版 →</a></div>
         <a class="course-map-link" href="../docs/visuals/mindmaps/course.svg" target="_blank" rel="noreferrer">
           <img class="course-map" src="../docs/visuals/mindmaps/course.svg" alt="Learn DeepSeek Harness 28 课知识导图">
         </a>

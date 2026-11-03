@@ -29,10 +29,11 @@ README 里放静态首帧或 GIF；网站里放可交互版本。
 | `s04-agent-run.gif` … `s26-agent-run.gif` | s04–s26 实际运行动画（GIF/MP4） |
 | `capture-agent-run.mjs` | 抓帧 + 编码 |
 | `maps/s01.svg` … `maps/s28.svg` | 28 张本课机制地图 |
-| `mindmaps/s01.svg` … `s28.svg` | 28 张本课知识导图 |
-| `mindmaps/course.svg` | 总知识导图 |
+| `mindmaps/course.svg` | 总知识图谱（六个域 + 30 题 + 短答案） |
 | `mindmaps/course.xmind` / `.opml` / `.md` | 可编辑大纲（XMind / OPML / Markdown） |
-| `build-mindmaps.mjs` / `build-xmind.mjs` | 生成知识导图与 XMind |
+| `knowledge-map.html` | 可展开答案的总知识图谱 |
+| `knowledge-data.mjs` | 六个知识域、30 道面试题与答案 |
+| `build-knowledge.mjs` | 生成知识图谱 HTML/Markdown/SVG/XMind |
 | `build-maps.mjs` | 生成 28 张地图的脚本 |
 | `build-s01.sh` … `build-s10.sh` | 从 HTML 重新生成 GIF/MP4 的脚本 |
 
@@ -51,8 +52,7 @@ ffmpeg -version
 
 ```sh
 node docs/visuals/build-maps.mjs
-node docs/visuals/build-mindmaps.mjs
-node docs/visuals/build-xmind.mjs
+node docs/visuals/build-knowledge.mjs
 node docs/visuals/capture-agent-run.mjs
 ./docs/visuals/build-s01.sh
 ./docs/visuals/build-s02.sh

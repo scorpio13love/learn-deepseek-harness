@@ -413,13 +413,3 @@ s04 解决了「工具是什么、能看见什么」。s05 会解决「一次调
 - 失败步骤如何补齐缺失的工具结果。
 
 先读：[`tool-execution-pipeline.zh.md`](../../../deepseek-harness/docs/tool-execution-pipeline.zh.md) 与 [`core/tools/src/{pipeline,batch}.ts`](../../../deepseek-harness/packages/core/tools/src/pipeline.ts)。
-
----
-
-## 知识导图
-
-![s05 知识导图](../../../docs/visuals/mindmaps/s05.svg)
-
-*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
-
-[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

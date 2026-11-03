@@ -226,13 +226,3 @@ register(provider) {
 2. **AX 裁剪**：给 `getState` 加 `maxElements` / `maxDepth`，超出时返回 `truncated: true`。
 3. **多显示器**：给窗口加 `displayId` 与 `scale`，思考 point 与 pixel 的关系（s21 会用到）。
 4. **替换 provider**：写一个 `RecordingProvider`，把真实 MCP 的响应录成 fixture，再让 `cua` 工具跑在 fixture 上。
-
----
-
-## 知识导图
-
-![s20 知识导图](../../../docs/visuals/mindmaps/s20.svg)
-
-*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
-
-[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

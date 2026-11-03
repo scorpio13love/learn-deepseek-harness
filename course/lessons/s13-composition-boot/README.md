@@ -185,13 +185,3 @@ s12 组装了插件树。s13 会加入真实执行世界：
 - 如何把本地后端换成远程后端？
 
 先读：[`fs`](../../../deepseek-harness/packages/fs/README.md)、[`shell`](../../../deepseek-harness/packages/shell/README.md)、[`sandbox`](../../../deepseek-harness/packages/sandbox/README.md)。
-
----
-
-## 知识导图
-
-![s13 知识导图](../../../docs/visuals/mindmaps/s13.svg)
-
-*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
-
-[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

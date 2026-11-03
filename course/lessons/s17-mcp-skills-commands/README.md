@@ -195,13 +195,3 @@ s15 接入了外部能力。s16 会把状态送到浏览器：
 - 多客户端如何保持一致？
 
 先读：[`session-projection`](../../../deepseek-harness/packages/session/session-projection/src/index.ts) 与 [`host/webserver`](../../../deepseek-harness/packages/host/webserver/src/index.ts)。
-
----
-
-## 知识导图
-
-![s17 知识导图](../../../docs/visuals/mindmaps/s17.svg)
-
-*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
-
-[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

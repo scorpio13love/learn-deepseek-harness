@@ -415,13 +415,3 @@ turn/start → step/start → user/message → request/header
 - 为什么工具结果必须在 `step/end` 之前提交？
 
 先把本课的 `agent.ts` 读透，再进入 s02。
-
----
-
-## 知识导图
-
-![s01 知识导图](../../../docs/visuals/mindmaps/s01.svg)
-
-*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
-
-[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

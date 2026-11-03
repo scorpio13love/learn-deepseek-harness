@@ -146,7 +146,7 @@ node site/serve.mjs
 
 ![DSH 知识图谱](docs/visuals/mindmaps/course.svg)
 
-[课程知识导图 XMind](docs/visuals/mindmaps/course.xmind) · [OPML](docs/visuals/mindmaps/course.opml)
+[知识图谱带答案版](docs/visuals/knowledge-map.html) · [30 道面试题答案](docs/04-knowledge-map.zh.md) · [XMind](docs/visuals/mindmaps/course.xmind)
 
 ## 课程进度
 
