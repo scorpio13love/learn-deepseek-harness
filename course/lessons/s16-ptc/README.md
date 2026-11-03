@@ -382,3 +382,13 @@ PTC 把“工具调用”变成“程序”。下一步可以看：
 - **s17**：MCP / skills / commands，如何把外部能力接进同一个工具面；
 - **s19 / s20**：browser-use 与 computer-use，PTC 最适合的细粒度动作场景；
 - **s27**：安全与沙箱，回答“这段模型代码到底能碰什么”。
+
+---
+
+## 知识导图
+
+![s16 知识导图](../../../docs/visuals/mindmaps/s16.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

@@ -30,11 +30,11 @@ SSE chunk 如何变成可回放的 attempt：block 组装、usage、live 帧、�
 
 ### 先看机制动画
 
-![s04 机制动画](../../../docs/visuals/s04-flow.gif)
+![s04 agent 运行动画](../../../docs/visuals/s04-agent-run.gif)
 
-*chunk 如何变成可回放的 attempt：每一步的边界、输入和产出。*
+*实际 agent run：chunk 先到，block 后组装，取消时 attempt 保留前缀。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s04) · [MP4](../../../docs/visuals/s04-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s04) · [MP4](../../../docs/visuals/s04-agent-run.mp4)
 
 ## 0. 先跑起来
 
@@ -432,3 +432,13 @@ s03 解决了「模型输出怎么结算」。s04 会转向模型能调用的能
 - 工具 schema 如何进入系统提示词？
 
 先读：[`core/tools/src/{contracts,schema}.ts`](../../../deepseek-harness/packages/core/tools/src/contracts.ts) 与 [`docs/cookbook/adding-a-tool.zh.md`](../../../deepseek-harness/docs/cookbook/adding-a-tool.zh.md)。
+
+---
+
+## 知识导图
+
+![s04 知识导图](../../../docs/visuals/mindmaps/s04.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

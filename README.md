@@ -123,7 +123,7 @@ deepseek-harness/   上游源码 clone（不提交，仅本地阅读）
 | [`course/lessons/`](course/lessons) | 28 课自包含讲义：每课 README 含源码阅读路径、实现说明、验收、练习与带答案的思考题 |
 | [`docs/02-course-v3.zh.md`](docs/02-course-v3.zh.md) | v3 课程设计：28 课、computer use、每课开篇模板与可视化规范 |
 | [`docs/03-course-writing.zh.md`](docs/03-course-writing.zh.md) | 课程写作规范：从具体失败场景、真实 trace、代价与设计检查出发 |
-| [`docs/visuals/README.md`](docs/visuals/README.md) | 20 个机制动画、28 张本课地图与生成脚本 |
+| [`docs/visuals/README.md`](docs/visuals/README.md) | 21 个实际运行动画、28 张本课地图与生成脚本 |
 
 ## 课程网站
 
@@ -143,6 +143,10 @@ node site/serve.mjs
 28 课的六条主线：内核 → 上下文 → 组合 → 执行 → 产品 → 质量；详细拆解见 [`docs/02-course-v3.zh.md`](docs/02-course-v3.zh.md)。
 
 ![28 课课程地图](docs/visuals/course-map.svg)
+
+![28 课知识导图](docs/visuals/mindmaps/course.svg)
+
+[课程知识导图 XMind](docs/visuals/mindmaps/course.xmind) · [OPML](docs/visuals/mindmaps/course.opml)
 
 ## 课程进度
 

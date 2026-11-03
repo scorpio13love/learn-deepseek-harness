@@ -28,6 +28,14 @@
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看一次真实工具调用
+
+![s05 agent 运行动画](../../../docs/visuals/s05-agent-run.gif)
+
+*实际 agent run：模型给错参数 → schema 在副作用前拒绝 → 修正 → 输出契约通过。*
+
+[交互版](../../../docs/visuals/agent-run.html?lesson=s05) · [MP4](../../../docs/visuals/s05-agent-run.mp4)
+
 ## 0. 先跑起来
 
 ```sh
@@ -405,3 +413,13 @@ s04 解决了「工具是什么、能看见什么」。s05 会解决「一次调
 - 失败步骤如何补齐缺失的工具结果。
 
 先读：[`tool-execution-pipeline.zh.md`](../../../deepseek-harness/docs/tool-execution-pipeline.zh.md) 与 [`core/tools/src/{pipeline,batch}.ts`](../../../deepseek-harness/packages/core/tools/src/pipeline.ts)。
+
+---
+
+## 知识导图
+
+![s05 知识导图](../../../docs/visuals/mindmaps/s05.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

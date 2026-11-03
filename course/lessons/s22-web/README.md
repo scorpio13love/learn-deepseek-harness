@@ -179,3 +179,13 @@ s16 把状态送到浏览器。s17 会把 harness 变成进程外服务：
 - SDK 和 ACP 的差异？
 
 先读：[`sdk/protocol`](../../../deepseek-harness/packages/sdk/protocol/src/index.ts)。
+
+---
+
+## 知识导图
+
+![s22 知识导图](../../../docs/visuals/mindmaps/s22.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

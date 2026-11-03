@@ -55,7 +55,7 @@
   <div class="top"><div><div class="eyebrow"><i></i><span id="eyebrow">S11 · CORE · AGENT RUN</span></div><h1 id="title"></h1><p class="subtitle" id="subtitle"></p></div><div class="badge-live"><b></b> LIVE RUN</div></div>
   <div class="statusbar"><span><i class="dot"></i><b id="run-state">running</b></span><span class="spacer"></span><span>turn <b id="turn">1</b></span><span>step <b id="step">1</b></span><span>seq <b id="seq">6</b></span><span id="status-note"></span></div>
   <div class="main">
-    <section class="panel"><div class="panel-head"><b>Session event log</b><span>seq / type / data</span></div><div class="panel-body"><div class="events" id="events"></div></div></section>
+    <section class="panel"><div class="panel-head"><b id="events-title">Session event log</b><span>seq / type / data</span></div><div class="panel-body"><div class="events" id="events"></div></div></section>
     <section class="panel"><div class="panel-head"><b id="center-title">机制</b><span>actual state</span></div><div class="panel-body center" id="center"></div></section>
     <section class="panel"><div class="panel-head"><b id="right-title">payload</b><span>actual data</span></div><div class="panel-body"><div class="codebox" id="right"></div></div></section>
   </div>
@@ -70,7 +70,7 @@
   const TOTAL=120;let frame=Number(params.get('frame')??0);if(!Number.isFinite(frame))frame=0;let playing=!capture,raf=0,last=0;if(capture)document.body.classList.add('capture');
   const stageAt=t=>{let i=0;for(let j=0;j<run.stages.length;j++)if(t>=run.stages[j].at)i=j;return i};
   const els={eyebrow:document.getElementById('eyebrow'),title:document.getElementById('title'),subtitle:document.getElementById('subtitle'),events:document.getElementById('events'),center:document.getElementById('center'),right:document.getElementById('right'),centerTitle:document.getElementById('center-title'),rightTitle:document.getElementById('right-title'),kicker:document.getElementById('kicker'),captionTitle:document.getElementById('caption-title'),captionDesc:document.getElementById('caption-desc'),code:document.getElementById('code-line'),code2:document.getElementById('code-line2'),progress:document.getElementById('progress-label'),segs:[...document.querySelectorAll('[data-seg]')],state:document.getElementById('run-state'),turn:document.getElementById('turn'),step:document.getElementById('step'),seq:document.getElementById('seq'),note:document.getElementById('status-note')};
-  els.eyebrow.textContent=`${id.toUpperCase()} · ${run.part.toUpperCase()} · AGENT RUN`;els.title.innerHTML=run.title;els.subtitle.textContent=run.subtitle;els.centerTitle.textContent=run.centerTitle;els.rightTitle.textContent=run.rightTitle;
+  els.eyebrow.textContent=`${id.toUpperCase()} · ${run.part.toUpperCase()} · AGENT RUN`;document.getElementById('events-title').textContent=run.eventsTitle||'Session event log';els.title.innerHTML=run.title;els.subtitle.textContent=run.subtitle;els.centerTitle.textContent=run.centerTitle;els.rightTitle.textContent=run.rightTitle;
   els.events.innerHTML=run.events.map((e,i)=>`<div class="ev" data-ev="${i}"><span class="seq">#${String(e.seq).padStart(2,'0')}</span><span class="type">${e.type}</span><span class="data">${e.data}</span></div>`).join('');
   const evEls=[...els.events.querySelectorAll('[data-ev]')];
   const jump=document.getElementById('stage-jump');jump.innerHTML=run.stages.map((s,i)=>`<button data-stage="${i}" aria-label="跳到第 ${i+1} 幕">${i+1} ${s.short}</button>`).join('');const jumps=[...jump.querySelectorAll('[data-stage]')];

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 用 Chrome DevTools Protocol 一次性抓取 24 课通用 lesson-flow 动画帧。
+ * 用 Chrome DevTools Protocol 一次性抓取 s04–s26 的 agent-run 动画帧。
  * 前置：Chrome、gifski、ffmpeg。
  *
  * 用法：
@@ -17,7 +17,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../..')
 const chrome = process.env.CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const port = Number(process.env.CDP_PORT || 9333)
-const all = ['s11','s12','s15','s16','s17','s19','s20','s21','s22','s24','s25','s26']
+const all = ['s04','s05','s06','s11','s12','s15','s16','s17','s19','s20','s21','s22','s24','s25','s26']
 const wanted = process.argv.slice(2).filter(Boolean)
 const lessons = wanted.length ? all.filter(x => wanted.includes(x)) : all
 const TOTAL = 120

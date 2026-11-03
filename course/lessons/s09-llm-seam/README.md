@@ -360,3 +360,13 @@ s09 让模型调用可替换、可重试。s10 会让会话活过进程重启：
 - fork 如何复制前缀并标记继承边界？
 
 先读：[`session-persistence`](../../../deepseek-harness/packages/session/session-persistence/src/index.ts) 与 [`session-persistence-jsonl`](../../../deepseek-harness/packages/session/session-persistence-jsonl/src/index.ts)。
+
+---
+
+## 知识导图
+
+![s09 知识导图](../../../docs/visuals/mindmaps/s09.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

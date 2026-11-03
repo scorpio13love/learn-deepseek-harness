@@ -691,3 +691,13 @@ s01 的 `deriveMessages()` 只是「按顺序挑消息」。s02 会回答：
 - 重放（replay）与恢复（resume）的区别是什么？
 
 先读：[`core/session/src/surface.ts`](../../../deepseek-harness/packages/core/session/src/surface.ts) 与 [`docs/subsystems/session.zh.md`](../../../deepseek-harness/docs/subsystems/session.zh.md)。
+
+---
+
+## 知识导图
+
+![s02 知识导图](../../../docs/visuals/mindmaps/s02.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

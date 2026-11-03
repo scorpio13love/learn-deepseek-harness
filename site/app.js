@@ -405,6 +405,9 @@
       ['s01-agent-loop', { gif: 's01-loop.gif', html: 's01-loop.html', sub: 'chunk → assembler → message → event' }],
       ['s02-tool-round-trip', { gif: 's02-tools.gif', html: 's02-tools.html', sub: 'tool-call → execute → tool/result' }],
       ['s03-session-log', { gif: 's03-surface.gif', html: 's03-surface.html', sub: 'event log → surface → derive' }],
+      ['s04-streaming', { gif: 's04-agent-run.gif', html: 'agent-run.html?lesson=s04', sub: 'chunks → attempt → cancel' }],
+      ['s05-tool-contract', { gif: 's05-agent-run.gif', html: 'agent-run.html?lesson=s05', sub: 'schema → invalid args → retry' }],
+      ['s06-tool-runtime', { gif: 's06-agent-run.gif', html: 'agent-run.html?lesson=s06', sub: 'guard → approval → execute' }],
       ['s08-inbox-steering', { gif: 's08-inbox.gif', html: 's08-inbox.html', sub: 'followup · steer · inject → claim' }],
       ['s09-llm-seam', { gif: 's09-llm-seam.gif', html: 's09-llm-seam.html', sub: 'request → Messages → SSE → StreamChunk' }],
       ['s10-persistence', { gif: 's10-persistence.gif', html: 's10-persistence.html', sub: 'JSONL · flush · torn tail · fork' }],
@@ -422,11 +425,12 @@
       ['s26-eval', { gif: 's26-agent-run.gif', html: 'agent-run.html?lesson=s26', sub: 'scenario → faults → report' }],
 
     ]);
-    const animatedGeneric = new Set(['s04-streaming','s06-tool-runtime']);
+    const animatedGeneric = new Set([]);
     const slugs = C.parts.flatMap(part => part.lessons).filter(slug => custom.has(slug) || animatedGeneric.has(slug));
     const cards = slugs.map(slug => {
       const lesson = lessons[slug];
-      const c = custom.get(slug) || { gif: `${slug.slice(0,3)}-flow.gif`, html: `lesson-flow.html?lesson=${slug.slice(0,3)}`, sub: lesson.short };
+      const c = custom.get(slug);
+      if (!c) return '';
       return `<a class="visual-card" href="../docs/visuals/${c.html}" target="_blank" rel="noreferrer">
         <img src="../docs/visuals/${c.gif}" alt="s${String(lesson.n).padStart(2, '0')} ${escapeHtml(lesson.title)} 动画" loading="lazy">
         <span><b>s${String(lesson.n).padStart(2, '0')} · ${escapeHtml(lesson.title)}</b><small>${escapeHtml(c.sub)}</small></span>
@@ -436,7 +440,7 @@
       <section class="hero">
         <span class="eyebrow">${slugs.length} animations · carousel</span>
         <h1>机制课，<br><em>都可以单步看</em></h1>
-        <p>保留 20 个真正需要看时序的机制动画：s01–s03、s08 是专属分镜；其余课程用本课地图，不强行做动画。点开任意一张，按阶段前后播放。</p>
+        <p>21 个实际 agent run 动画：s01–s03、s08–s10 是专属协议/状态分镜；s04–s26 用真实 SessionEvent、工具调用和该课机制驱动。点开任意一张，按阶段前后播放。</p>
         <div class="hero-actions"><a class="primary-button" href="#/">回到课程地图 <span>→</span></a></div>
       </section>
       <section class="section">
@@ -521,6 +525,13 @@
             <span><b>s08 · inbox / steering</b><small>followup · steer · inject → claim</small></span>
           </a>
         </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div><h2>知识导图</h2><p>六条主线、28 课、每课的问题 / 机制 / 代码 / 验收</p></div><a class="section-link" href="../docs/visuals/mindmaps/course.xmind">下载 XMind →</a></div>
+        <a class="course-map-link" href="../docs/visuals/mindmaps/course.svg" target="_blank" rel="noreferrer">
+          <img class="course-map" src="../docs/visuals/mindmaps/course.svg" alt="Learn DeepSeek Harness 28 课知识导图">
+        </a>
       </section>
 
       <section class="section">

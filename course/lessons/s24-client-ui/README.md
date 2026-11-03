@@ -162,3 +162,13 @@ node --test tests/*.test.ts
 - [DSH action cards](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/experimental/action-cards/README.zh.md)
 - [DSH client UI action cards](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/experimental/client-ui-action-cards/README.zh.md)
 - [DSH conversation 与 presentation](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/conversation.zh.md)
+
+---
+
+## 知识导图
+
+![s24 知识导图](../../../docs/visuals/mindmaps/s24.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

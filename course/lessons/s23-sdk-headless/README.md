@@ -168,3 +168,13 @@ s17 把 harness 变成服务。s18 会让它可诊断、可回归：
 - 故障注入覆盖哪些路径？
 
 先读：[`telemetry`](../../../deepseek-harness/packages/telemetry/README.md) 与 [`testing.zh.md`](../../../deepseek-harness/docs/testing.zh.md)。
+
+---
+
+## 知识导图
+
+![s23 知识导图](../../../docs/visuals/mindmaps/s23.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

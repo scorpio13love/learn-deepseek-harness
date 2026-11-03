@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1020" viewBox="0 0 1600 1020" role="img" aria-labelledby="title">
+  <title id="title">Learn DeepSeek Harness 28 课知识导图</title>
+  <rect width="1600" height="1020" fill="#fbfcff"/>
+  <g stroke="#303a63" stroke-opacity=".03"><path d="M0 0H1600M0 120H1600M0 240H1600M0 360H1600M0 480H1600M0 600H1600M0 720H1600M0 840H1600M0 960H1600"/></g>
+  <text x="48" y="40" font-size="9" letter-spacing=".12em" fill="#5b5bd6" font-family="SFMono-Regular,Consolas,monospace">LEARN DEEPSEEK HARNESS · KNOWLEDGE MAP V3</text>
+  <text x="48" y="70" font-size="24" font-weight="760" fill="#222733" letter-spacing="-.02em" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">从 loop 到 computer use：28 课的知识树</text>
+  <rect x="650" y="52" width="300" height="80" rx="18" fill="#222733"/>
+  <text x="800" y="74" text-anchor="middle" font-size="10" fill="rgba(255,255,255,.65)" font-family="SFMono-Regular,Consolas,monospace">28 LESSONS · 6 PARTS</text>
+  <text x="800" y="112" text-anchor="middle" font-size="17" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">DSH 运行时</text>
+  <path d="M800 146 C800 160 196 140 196 190" fill="none" stroke="#5b5bd6" stroke-opacity=".38" stroke-width="1.4"/>
+      <rect x="90" y="160" width="212" height="46" rx="10" fill="#5b5bd6"/>
+      <text x="104" y="188" font-size="12.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">I · 内核</text>
+      <path d="M196 206 C196 248 200 248 216 248" fill="none" stroke="#5b5bd6" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="216" cy="248" r="3" fill="#5b5bd6" opacity=".8"/>
+        <text x="228" y="252" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">01 minimal loop</text>
+        <text x="228" y="266" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">turn/step</text><path d="M196 206 C196 330 200 330 216 330" fill="none" stroke="#5b5bd6" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="216" cy="330" r="3" fill="#5b5bd6" opacity=".8"/>
+        <text x="228" y="334" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">02 tool-call / result</text>
+        <text x="228" y="348" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">tool call</text><path d="M196 206 C196 412 200 412 216 412" fill="none" stroke="#5b5bd6" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="216" cy="412" r="3" fill="#5b5bd6" opacity=".8"/>
+        <text x="228" y="416" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">03 append-only + surface</text>
+        <text x="228" y="430" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">event sourcing</text><path d="M196 206 C196 494 200 494 216 494" fill="none" stroke="#5b5bd6" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="216" cy="494" r="3" fill="#5b5bd6" opacity=".8"/>
+        <text x="228" y="498" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">04 chunk → attempt</text>
+        <text x="228" y="512" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">chunks</text><path d="M196 206 C196 576 200 576 216 576" fill="none" stroke="#5b5bd6" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="216" cy="576" r="3" fill="#5b5bd6" opacity=".8"/>
+        <text x="228" y="580" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">05 schema + output</text>
+        <text x="228" y="594" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">schema</text><path d="M196 206 C196 658 200 658 216 658" fill="none" stroke="#5b5bd6" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="216" cy="658" r="3" fill="#5b5bd6" opacity=".8"/>
+        <text x="228" y="662" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">06 policy + batch</text>
+        <text x="228" y="676" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">guards</text><path d="M800 146 C800 160 446 140 446 190" fill="none" stroke="#0c93ad" stroke-opacity=".38" stroke-width="1.4"/>
+      <rect x="340" y="160" width="212" height="46" rx="10" fill="#0c93ad"/>
+      <text x="354" y="188" font-size="12.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">II · 上下文</text>
+      <path d="M446 206 C446 248 450 248 466 248" fill="none" stroke="#0c93ad" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="466" cy="248" r="3" fill="#0c93ad" opacity=".8"/>
+        <text x="478" y="252" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">07 sections + admission</text>
+        <text x="478" y="266" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">sections</text><path d="M446 206 C446 330 450 330 466 330" fill="none" stroke="#0c93ad" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="466" cy="330" r="3" fill="#0c93ad" opacity=".8"/>
+        <text x="478" y="334" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">08 next-turn / next-step</text>
+        <text x="478" y="348" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">inbox</text><path d="M446 206 C446 412 450 412 466 412" fill="none" stroke="#0c93ad" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="466" cy="412" r="3" fill="#0c93ad" opacity=".8"/>
+        <text x="478" y="416" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">09 provider + prepareCall</text>
+        <text x="478" y="430" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">provider</text><path d="M446 206 C446 494 450 494 466 494" fill="none" stroke="#0c93ad" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="466" cy="494" r="3" fill="#0c93ad" opacity=".8"/>
+        <text x="478" y="498" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">10 JSONL + resume</text>
+        <text x="478" y="512" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">JSONL</text><path d="M446 206 C446 576 450 576 466 576" fill="none" stroke="#0c93ad" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="466" cy="576" r="3" fill="#0c93ad" opacity=".8"/>
+        <text x="478" y="580" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">11 prune + summarize</text>
+        <text x="478" y="594" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">token meter</text><path d="M800 146 C800 160 696 140 696 190" fill="none" stroke="#8b5cf6" stroke-opacity=".38" stroke-width="1.4"/>
+      <rect x="590" y="160" width="212" height="46" rx="10" fill="#8b5cf6"/>
+      <text x="604" y="188" font-size="12.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">III · 组合</text>
+      <path d="M696 206 C696 248 700 248 716 248" fill="none" stroke="#8b5cf6" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="716" cy="248" r="3" fill="#8b5cf6" opacity=".8"/>
+        <text x="728" y="252" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">12 Context / Fiber</text>
+        <text x="728" y="266" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">Cordis</text><path d="M696 206 C696 330 700 330 716 330" fill="none" stroke="#8b5cf6" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="716" cy="330" r="3" fill="#8b5cf6" opacity=".8"/>
+        <text x="728" y="334" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">13 profile / bundle / patch</text>
+        <text x="728" y="348" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">profiles</text><path d="M800 146 C800 160 946 140 946 190" fill="none" stroke="#b87412" stroke-opacity=".38" stroke-width="1.4"/>
+      <rect x="840" y="160" width="212" height="46" rx="10" fill="#b87412"/>
+      <text x="854" y="188" font-size="12.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">IV · 执行边界</text>
+      <path d="M946 206 C946 248 950 248 966 248" fill="none" stroke="#b87412" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="966" cy="248" r="3" fill="#b87412" opacity=".8"/>
+        <text x="978" y="252" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">14 fs / shell / sandbox</text>
+        <text x="978" y="266" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">fs</text><path d="M946 206 C946 330 950 330 966 330" fill="none" stroke="#b87412" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="966" cy="330" r="3" fill="#b87412" opacity=".8"/>
+        <text x="978" y="334" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">15 delegate + isolate</text>
+        <text x="978" y="348" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">spawn</text><path d="M946 206 C946 412 950 412 966 412" fill="none" stroke="#b87412" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="966" cy="412" r="3" fill="#b87412" opacity=".8"/>
+        <text x="978" y="416" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">16 programmatic tools</text>
+        <text x="978" y="430" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">run_code</text><path d="M946 206 C946 494 950 494 966 494" fill="none" stroke="#b87412" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="966" cy="494" r="3" fill="#b87412" opacity=".8"/>
+        <text x="978" y="498" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">17 external capability</text>
+        <text x="978" y="512" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">MCP</text><path d="M946 206 C946 576 950 576 966 576" fill="none" stroke="#b87412" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="966" cy="576" r="3" fill="#b87412" opacity=".8"/>
+        <text x="978" y="580" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">18 catalog + slash</text>
+        <text x="978" y="594" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">skills</text><path d="M946 206 C946 658 950 658 966 658" fill="none" stroke="#b87412" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="966" cy="658" r="3" fill="#b87412" opacity=".8"/>
+        <text x="978" y="662" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">19 browser provider</text>
+        <text x="978" y="676" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">browser</text><path d="M946 206 C946 740 950 740 966 740" fill="none" stroke="#b87412" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="966" cy="740" r="3" fill="#b87412" opacity=".8"/>
+        <text x="978" y="744" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">20 app / window / AX</text>
+        <text x="978" y="758" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">CUA</text><path d="M946 206 C946 822 950 822 966 822" fill="none" stroke="#b87412" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="966" cy="822" r="3" fill="#b87412" opacity=".8"/>
+        <text x="978" y="826" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">21 actions + permissions</text>
+        <text x="978" y="840" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">actions</text><path d="M800 146 C800 160 1196 140 1196 190" fill="none" stroke="#158a63" stroke-opacity=".38" stroke-width="1.4"/>
+      <rect x="1090" y="160" width="212" height="46" rx="10" fill="#158a63"/>
+      <text x="1104" y="188" font-size="12.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">V · 产品面</text>
+      <path d="M1196 206 C1196 248 1200 248 1216 248" fill="none" stroke="#158a63" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="1216" cy="248" r="3" fill="#158a63" opacity=".8"/>
+        <text x="1228" y="252" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">22 projection + SSE</text>
+        <text x="1228" y="266" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">projection</text><path d="M1196 206 C1196 330 1200 330 1216 330" fill="none" stroke="#158a63" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="1216" cy="330" r="3" fill="#158a63" opacity=".8"/>
+        <text x="1228" y="334" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">23 JSON-RPC over stdio</text>
+        <text x="1228" y="348" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">JSON-RPC</text><path d="M1196 206 C1196 412 1200 412 1216 412" fill="none" stroke="#158a63" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="1216" cy="412" r="3" fill="#158a63" opacity=".8"/>
+        <text x="1228" y="416" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">24 action cards</text>
+        <text x="1228" y="430" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">projection</text><path d="M800 146 C800 160 1446 140 1446 190" fill="none" stroke="#b33a3a" stroke-opacity=".38" stroke-width="1.4"/>
+      <rect x="1340" y="160" width="212" height="46" rx="10" fill="#b33a3a"/>
+      <text x="1354" y="188" font-size="12.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">VI · 质量</text>
+      <path d="M1446 206 C1446 248 1450 248 1466 248" fill="none" stroke="#b33a3a" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="1466" cy="248" r="3" fill="#b33a3a" opacity=".8"/>
+        <text x="1478" y="252" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">25 spans + snapshots</text>
+        <text x="1478" y="266" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">telemetry</text><path d="M1446 206 C1446 330 1450 330 1466 330" fill="none" stroke="#b33a3a" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="1466" cy="330" r="3" fill="#b33a3a" opacity=".8"/>
+        <text x="1478" y="334" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">26 scenario + replay</text>
+        <text x="1478" y="348" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">eval</text><path d="M1446 206 C1446 412 1450 412 1466 412" fill="none" stroke="#b33a3a" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="1466" cy="412" r="3" fill="#b33a3a" opacity=".8"/>
+        <text x="1478" y="416" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">27 fail closed</text>
+        <text x="1478" y="430" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">security</text><path d="M1446 206 C1446 494 1450 494 1466 494" fill="none" stroke="#b33a3a" stroke-opacity=".35" stroke-width="1.1"/>
+        <circle cx="1466" cy="494" r="3" fill="#b33a3a" opacity=".8"/>
+        <text x="1478" y="498" font-size="11" font-weight="600" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">28 full harness</text>
+        <text x="1478" y="512" font-size="8.5" fill="#8a8f9c" font-family="SFMono-Regular,Consolas,monospace">capstone</text>
+  <text x="48" y="992" font-size="9" fill="#a0a6b6" font-family="SFMono-Regular,Consolas,monospace">内核 → 上下文 → 组合 → 执行 → 产品 → 质量</text>
+</svg>

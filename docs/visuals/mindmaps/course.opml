@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0"><head><title>Learn DeepSeek Harness 28 课</title></head><body>
+  <outline text="DSH 运行时 · 28 课">
+  <outline text="I · 内核">
+<outline text="s01 agent loop">
+<outline text="问题：minimal loop">
+</outline>
+<outline text="机制：turn/step / stream / cancel">
+</outline>
+<outline text="代码：core/agent-loop/src/agent.ts">
+</outline>
+</outline>
+<outline text="s02 tool round-trip">
+<outline text="问题：tool-call / result">
+</outline>
+<outline text="机制：tool call / surface / next step">
+</outline>
+<outline text="代码：core/agent-loop/src/agent.ts">
+</outline>
+</outline>
+<outline text="s03 session log">
+<outline text="问题：append-only + surface">
+</outline>
+<outline text="机制：event sourcing / surface / replay">
+</outline>
+<outline text="代码：core/session/src/{index">
+</outline>
+</outline>
+<outline text="s04 stream &amp; attempt">
+<outline text="问题：chunk → attempt">
+</outline>
+<outline text="机制：chunks / attempt / usage">
+</outline>
+<outline text="代码：llm/llm/src/{assembler">
+</outline>
+</outline>
+<outline text="s05 tool contract">
+<outline text="问题：schema + output">
+</outline>
+<outline text="机制：schema / inference / scope">
+</outline>
+<outline text="代码：core/tools/src/{schema">
+</outline>
+</outline>
+<outline text="s06 tool runtime">
+<outline text="问题：policy + batch">
+</outline>
+<outline text="机制：guards / approval / batch">
+</outline>
+<outline text="代码：core/tools/src/{pipeline">
+</outline>
+</outline>
+  </outline>
+  <outline text="II · 上下文">
+<outline text="s07 system prompt">
+<outline text="问题：sections + admission">
+</outline>
+<outline text="机制：sections / contexts / KV cache">
+</outline>
+<outline text="代码：core/system-prompt/src/index.ts">
+</outline>
+</outline>
+<outline text="s08 inbox / steering">
+<outline text="问题：next-turn / next-step">
+</outline>
+<outline text="机制：inbox / steering / cancel">
+</outline>
+<outline text="代码：core/agent-loop/src/{inbox">
+</outline>
+</outline>
+<outline text="s09 LLM seam">
+<outline text="问题：provider + prepareCall">
+</outline>
+<outline text="机制：provider / capabilities / retry">
+</outline>
+<outline text="代码：llm/llm/src/{call-config">
+</outline>
+</outline>
+<outline text="s10 persistence">
+<outline text="问题：JSONL + resume">
+</outline>
+<outline text="机制：JSONL / recovery / fork">
+</outline>
+<outline text="代码：session/session-persistence/src/index.ts">
+</outline>
+</outline>
+<outline text="s11 compaction">
+<outline text="问题：prune + summarize">
+</outline>
+<outline text="机制：token meter / prune / summary">
+</outline>
+<outline text="代码：compaction/compaction-basic/src/index.ts">
+</outline>
+</outline>
+  </outline>
+  <outline text="III · 组合">
+<outline text="s12 plugin kernel">
+<outline text="问题：Context / Fiber">
+</outline>
+<outline text="机制：Cordis / Fiber / waterfall">
+</outline>
+<outline text="代码：vendor/cordis/src/{context">
+</outline>
+</outline>
+<outline text="s13 composition / boot">
+<outline text="问题：profile / bundle / patch">
+</outline>
+<outline text="机制：profiles / patches / boot">
+</outline>
+<outline text="代码：boot/app-boot">
+</outline>
+</outline>
+  </outline>
+  <outline text="IV · 执行边界">
+<outline text="s14 capability seams">
+<outline text="问题：fs / shell / sandbox">
+</outline>
+<outline text="机制：fs / shell / approval">
+</outline>
+<outline text="代码：fs/tool-fs">
+</outline>
+</outline>
+<outline text="s15 subagents / presets">
+<outline text="问题：delegate + isolate">
+</outline>
+<outline text="机制：spawn / budgets / preset">
+</outline>
+<outline text="代码：subagent/subagent/src/manager.ts">
+</outline>
+</outline>
+<outline text="s16 PTC">
+<outline text="问题：programmatic tools">
+</outline>
+<outline text="机制：run_code / PTC / tools">
+</outline>
+<outline text="代码：ptc-runtime/ptc-runtime">
+</outline>
+</outline>
+<outline text="s17 MCP / skills / commands">
+<outline text="问题：external capability">
+</outline>
+<outline text="机制：MCP / skills / commands">
+</outline>
+<outline text="代码：mcp/mcp-client">
+</outline>
+</outline>
+<outline text="s18 skills / commands">
+<outline text="问题：catalog + slash">
+</outline>
+<outline text="机制：skills / commands / host">
+</outline>
+<outline text="代码：skill/skill">
+</outline>
+</outline>
+<outline text="s19 browser use">
+<outline text="问题：browser provider">
+</outline>
+<outline text="机制：browser / provider / mock">
+</outline>
+<outline text="代码：browser-use/browser-use">
+</outline>
+</outline>
+<outline text="s20 computer use I">
+<outline text="问题：app / window / AX">
+</outline>
+<outline text="机制：CUA / macOS / AX">
+</outline>
+<outline text="代码：computer-use/computer-use">
+</outline>
+</outline>
+<outline text="s21 computer use II">
+<outline text="问题：actions + permissions">
+</outline>
+<outline text="机制：actions / coordinates / permissions">
+</outline>
+<outline text="代码：experimental/cua-macos">
+</outline>
+</outline>
+  </outline>
+  <outline text="V · 产品面">
+<outline text="s22 web">
+<outline text="问题：projection + SSE">
+</outline>
+<outline text="机制：projection / SSE / reconnect">
+</outline>
+<outline text="代码：session/session-projection">
+</outline>
+</outline>
+<outline text="s23 SDK / headless">
+<outline text="问题：JSON-RPC over stdio">
+</outline>
+<outline text="机制：JSON-RPC / stdio / SDK">
+</outline>
+<outline text="代码：sdk/protocol">
+</outline>
+</outline>
+<outline text="s24 client UI">
+<outline text="问题：action cards">
+</outline>
+<outline text="机制：projection / action cards / UI">
+</outline>
+<outline text="代码：client/ui-renderer">
+</outline>
+</outline>
+  </outline>
+  <outline text="VI · 质量">
+<outline text="s25 observability / eval">
+<outline text="问题：spans + snapshots">
+</outline>
+<outline text="机制：telemetry / replay / snapshot">
+</outline>
+<outline text="代码：telemetry/otel">
+</outline>
+</outline>
+<outline text="s26 eval / fault injection">
+<outline text="问题：scenario + replay">
+</outline>
+<outline text="机制：eval / fault / replay">
+</outline>
+<outline text="代码：docs/testing.zh.md">
+</outline>
+</outline>
+<outline text="s27 security / permissions">
+<outline text="问题：fail closed">
+</outline>
+<outline text="机制：security / approval / redaction">
+</outline>
+<outline text="代码：sandbox">
+</outline>
+</outline>
+<outline text="s28 capstone">
+<outline text="问题：full harness">
+</outline>
+<outline text="机制：capstone / eval / real task">
+</outline>
+<outline text="代码：core/agent-loop/src/agent.ts">
+</outline>
+</outline>
+  </outline>
+  </outline>
+
+</body></opml>

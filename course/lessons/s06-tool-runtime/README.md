@@ -30,11 +30,11 @@
 
 ### 先看机制动画
 
-![s06 机制动画](../../../docs/visuals/s06-flow.gif)
+![s06 agent 运行动画](../../../docs/visuals/s06-agent-run.gif)
 
-*一次工具调用的运行时流水线：每一步的边界、输入和产出。*
+*实际 agent run：tool/call → guard → approval → execute → result。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s06) · [MP4](../../../docs/visuals/s06-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s06) · [MP4](../../../docs/visuals/s06-agent-run.mp4)
 
 ## 0. 先跑起来
 
@@ -382,3 +382,13 @@ s05 解决了工具执行。s06 会解决「模型看到的提示词如何组装
 - 为什么这会影响 KV cache？
 
 先读：[`core/system-prompt/src/index.ts`](../../../deepseek-harness/packages/core/system-prompt/src/index.ts) 与 [`docs/subsystems/system-prompt.zh.md`](../../../deepseek-harness/docs/subsystems/system-prompt.zh.md)。
+
+---
+
+## 知识导图
+
+![s06 知识导图](../../../docs/visuals/mindmaps/s06.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

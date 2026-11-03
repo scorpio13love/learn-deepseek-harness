@@ -302,3 +302,13 @@ s10 完成了上下文管理。s11 会把前面 10 课重构成插件树：
 - 为什么没有特权内核？
 
 先读：[`vendor/cordis/src/{context,fiber,events}.ts`](../../../deepseek-harness/vendor/cordis/src/context.ts)。
+
+---
+
+## 知识导图
+
+![s11 知识导图](../../../docs/visuals/mindmaps/s11.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

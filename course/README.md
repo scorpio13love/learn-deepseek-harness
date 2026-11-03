@@ -11,6 +11,16 @@
 - 当前进度：**s01-s28 全部完成**
 - 课程网站：[`../site/`](../site/README.md)（`node site/serve.mjs`）
 
+## 知识导图
+
+![28 课知识导图](../docs/visuals/mindmaps/course.svg)
+
+一张总图：六个 Part、28 课、每课的问题/机制/代码/验收。网页直接显示 SVG；需要编辑时下载 XMind。
+
+- [XMind 源文件](../docs/visuals/mindmaps/course.xmind)
+- [OPML（通用大纲）](../docs/visuals/mindmaps/course.opml)
+- [Markdown 大纲](../docs/visuals/mindmaps/course.md)
+
 ## 课程目录
 
 ```text

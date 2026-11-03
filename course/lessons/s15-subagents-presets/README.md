@@ -191,3 +191,13 @@ s14 解决了委派。s15 会接入外部能力：
 - 外部工具的错误如何映射成模型可见结果？
 
 先读：[`mcp`](../../../deepseek-harness/packages/mcp/README.md)、[`skill`](../../../deepseek-harness/packages/skill/README.md)。
+
+---
+
+## 知识导图
+
+![s15 知识导图](../../../docs/visuals/mindmaps/s15.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

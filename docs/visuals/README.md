@@ -26,12 +26,13 @@ README 里放静态首帧或 GIF；网站里放可交互版本。
 | `s09-llm-seam.html` / `.gif` / `.mp4` | s09 Messages 请求/SSE/StreamChunk 原型 |
 | `s10-persistence.html` / `.gif` / `.mp4` | s10 JSONL / flush / torn tail / fork 原型 |
 | `agent-run.html` + `run-data.js` | 12 课实际 agent run 播放器 |
-| `s11-agent-run.gif` … `s26-agent-run.gif` | s11–s26 实际运行动画（GIF/MP4） |
+| `s04-agent-run.gif` … `s26-agent-run.gif` | s04–s26 实际运行动画（GIF/MP4） |
 | `capture-agent-run.mjs` | 抓帧 + 编码 |
-| `lesson-flow.html` + `flow-data.js` | 通用机制动画播放器（只给需要看时序的课） |
-| `sNN-flow.gif` | s04/s06 两张通用 flow 动画 |
-| `build-flow-data.mjs` / `capture-flow.mjs` | 生成 flow 数据、抓帧与编码 |
 | `maps/s01.svg` … `maps/s28.svg` | 28 张本课机制地图 |
+| `mindmaps/s01.svg` … `s28.svg` | 28 张本课知识导图 |
+| `mindmaps/course.svg` | 总知识导图 |
+| `mindmaps/course.xmind` / `.opml` / `.md` | 可编辑大纲（XMind / OPML / Markdown） |
+| `build-mindmaps.mjs` / `build-xmind.mjs` | 生成知识导图与 XMind |
 | `build-maps.mjs` | 生成 28 张地图的脚本 |
 | `build-s01.sh` … `build-s10.sh` | 从 HTML 重新生成 GIF/MP4 的脚本 |
 
@@ -50,8 +51,8 @@ ffmpeg -version
 
 ```sh
 node docs/visuals/build-maps.mjs
-node docs/visuals/build-flow-data.mjs
-node docs/visuals/capture-flow.mjs
+node docs/visuals/build-mindmaps.mjs
+node docs/visuals/build-xmind.mjs
 node docs/visuals/capture-agent-run.mjs
 ./docs/visuals/build-s01.sh
 ./docs/visuals/build-s02.sh
@@ -98,8 +99,7 @@ node docs/visuals/capture-agent-run.mjs
 | s08 inbox | followup / steer / inject → claim | `s08-inbox.*` |
 | s09 LLM seam | 请求 JSON → SSE 事件 → StreamChunk | `s09-llm-seam.*` |
 | s10 persistence | JSONL → flush → torn tail → fork | `s10-persistence.*` |
-| s11–s26 agent run | 真实 SessionEvent + 本课机制 | `agent-run.html?lesson=sNN` |
-| s04/s06 flow | 本课问题 / 节点 / 源码锚点 | `lesson-flow.html?lesson=sNN` |
+| s04–s26 agent run | 真实 SessionEvent + 本课机制 | `agent-run.html?lesson=sNN` |
 
 ## 后续课程视觉
 

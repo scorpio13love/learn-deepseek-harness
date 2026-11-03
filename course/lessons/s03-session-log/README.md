@@ -514,3 +514,13 @@ s02 把「消息」写进日志，但 assistant 消息目前只保存最终结�
 - usage 的 input/output/cache 字段为什么要「不相交」？
 
 先读：[`llm/llm/src/assembler.ts`](../../../deepseek-harness/packages/llm/llm/src/assembler.ts) 与 [`docs/subsystems/llm-streaming.zh.md`](../../../deepseek-harness/docs/subsystems/llm-streaming.zh.md)。
+
+---
+
+## 知识导图
+
+![s03 知识导图](../../../docs/visuals/mindmaps/s03.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

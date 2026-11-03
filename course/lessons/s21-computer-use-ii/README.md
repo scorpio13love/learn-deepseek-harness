@@ -230,3 +230,13 @@ if (elementIndex 越界) throw INVALID_ARGUMENT
 3. **部分效果**：让 `press('Return')` 在 mock 里触发一次导航，`cancel()` 后仍能看到部分效果，思考如何向模型报告。
 4. **授权卡片**：把 `grant()` 换成异步 `ask` 回调，模拟「仅本次会话 / 拒绝 / 始终允许」，并测试拒绝后不重放。
 5. **把 s21 接回 s20**：抽出共享 core 包，让两课只保留差异，比较「复制 vs 共享」的维护成本。
+
+---
+
+## 知识导图
+
+![s21 知识导图](../../../docs/visuals/mindmaps/s21.svg)
+
+*用一张图记住：本课问题、机制、代码位置、验收与相邻课程。*
+
+[总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)
