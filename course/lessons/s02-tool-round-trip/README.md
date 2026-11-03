@@ -28,11 +28,52 @@
 
 ### 先看一次真实往返
 
+**90 秒**：先看动画。**3 分钟**：读下面的代码卡。**30 分钟**：跑完整 demo，再对照源码。
+
 ![s02 tool round-trip](../../../docs/visuals/s02-tools.gif)
 
 *工具调用不是“函数调用完就结束”，而是写回日志、进入 surface、驱动下一步。*
 
 [交互版](../../../docs/visuals/s02-tools.html) · [MP4](../../../docs/visuals/s02-tools.mp4)
+
+### 动画的 7 幕，在代码里是哪几行
+
+| 动画 | 你看到的 | 课程代码 | 真实对照 |
+|---|---|---|---|
+| 1 请求 | 只有 user 消息 | [`agent.ts:197`](src/agent.ts#L197) | `turn/start` + 首次输入 |
+| 2 选工具 | 模型产出 `tool-call` | [`agent.ts:202`](src/agent.ts#L202) | `step()` 里的模型请求 |
+| 3 `tool/call` | 调用写进日志 | [`agent.ts:213`](src/agent.ts#L213) | `tool/call` 事件 |
+| 4 执行 | 参数校验、执行 | [`agent.ts:221`](src/agent.ts#L221) | `tools/execute` pipeline |
+| 5 `tool/result` | 结果写进 surface | [`agent.ts:234`](src/agent.ts#L234) | `tool/result` 事件 |
+| 6 第二步 | 下一次请求看到结果 | [`agent.ts:202`](src/agent.ts#L202) | `deriveMessages()` |
+| 7 收口 | 模型给最终回答 | [`agent.ts:255`](src/agent.ts#L255) | `turn/end` |
+
+最关键的是这段 25 行。注意顺序：先写 `tool/call`，执行，再写 `tool/result`；结果不是函数的返回值，而是一条日志事实。
+
+```ts
+for (const call of calls) {
+  this.session.append('tool/call', { turn, step, callId: call.id, name: call.name, arguments: call.arguments })
+  const result = await this.#tools.execute(call, { signal, callId: call.id, sessionId: this.session.id })
+  const message = createMessage({
+    role: 'tool',
+    toolCallId: call.id,
+    isError: result.isError,
+    content: result.content,
+  })
+  this.session.append('tool/result', { turn, step, message })
+}
+```
+
+*为什么读这里：模型下一轮能不能看到“84”，只取决于最后这行 `append('tool/result')` 有没有发生。*
+
+完整实现：[`src/agent.ts`](src/agent.ts) · 真实对照：[`agent.ts` 的 tool 分发](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/core/agent-loop/src/agent.ts)
+
+### 最容易误解的两件事
+
+| 误解 | 实际 |
+|---|---|
+| 工具调用就是一次函数调用 | 调用和结果是两条必须配对的日志事实；下一步请求从日志派生 |
+| 工具报错就应该让 turn 失败 | 错误要变成模型可见的 `isError` 结果，模型才有机会换做法 |
 
 ### 设计检查
 

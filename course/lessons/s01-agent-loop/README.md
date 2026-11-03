@@ -38,7 +38,42 @@
 
 *一条真实 turn：SSE chunk 进入 assembler，组装成 message，再作为事件进入 surface。*
 
+> 动画后两幕（工具结果、下一步）是 s02 的预告；s01 的 demo 只跑纯文本，不调用工具。
+
 [交互版](../../../docs/visuals/s01-loop.html) · [MP4](../../../docs/visuals/s01-loop.mp4)
+
+### 三种读法
+
+**90 秒**：先看上面的动画。**3 分钟**：读下面这段 12 行代码。**30 分钟**：跑完整 demo，再回来看源码。
+
+### 这段在代码里
+
+`src/agent.ts:178–259` 省略了中间的重试与流组装，只保留最关键的提交边界：
+
+```ts
+async run(prompt: string): Promise<RunResult> {
+  this.session.append('turn/start', { turn })
+  try {
+    // ...
+    this.session.append('step/start', { turn, step })
+    const outcome = await this.#runStep(turn, step, signal)
+    // ...
+  } finally {
+    this.session.append('turn/end', { turn, reason })
+  }
+}
+```
+
+*为什么读这里：`turn/end` 不是“成功分支的结尾”，而是 `finally` 里的收口。读它的时候问自己：如果 `#runStep` 抛错，哪条事件保证这次 turn 仍然可回放？*
+
+完整实现：[`src/agent.ts`](src/agent.ts) · 真实对照：[`agent.ts:327–422`](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/core/agent-loop/src/agent.ts#L327-L422)
+
+### 最容易误解的两件事
+
+| 误解 | 实际 |
+|---|---|
+| `turn/end` 表示成功 | 它只表示“这次 turn 收口了”；reason 可能是 completed / aborted / error |
+| 一个 step 就是一次工具调用 | step 是一次模型请求；它可能没有工具，也可能请求多个工具，工具留到 s02 |
 
 ### 读完之后，拿这三个问题审自己
 

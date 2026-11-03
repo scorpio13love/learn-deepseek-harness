@@ -27,11 +27,47 @@
 
 ### 先看一次真实压缩
 
+**90 秒**：先看动画。**3 分钟**：读下面的代码卡。**30 分钟**：跑完整 demo，再对照源码。
+
 ![s11 agent 运行动画](../../../docs/visuals/s11-agent-run.gif)
 
 *同一次 run：48 KB tool/result → token 92% → prune → summary → surface replace → step 2。*
 
 [交互版](../../../docs/visuals/agent-run.html?lesson=s11) · [MP4](../../../docs/visuals/s11-agent-run.mp4)
+
+### 动画的 5 幕，在代码里是哪几行
+
+| 动画 | 你看到的 | 课程代码 | 真实对照 |
+|---|---|---|---|
+| 1 92% | `estimate(surface)` 超过阈值 | [`compaction.ts:132`](src/compaction.ts#L132) | `token-meter` |
+| 2 prune | 超长 `tool/result` 被替换 | [`compaction.ts:161`](src/compaction.ts#L161) | `pruneToolResults` |
+| 3 summary | 旧段落走独立模型请求 | [`compaction.ts:209`](src/compaction.ts#L209) | `summarizeWithModel` |
+| 4 replace | 摘要遮蔽旧 surface | [`compaction.ts:215`](src/compaction.ts#L215) | `surfaceOp: replace` |
+| 5 continue | 新请求只看到摘要 | [`agent.ts`](src/agent.ts) | overflow 重试 |
+
+真正改变模型看到的，不是 `delete`，而是这个 `append` 上的 `surfaceOp`：
+
+```ts
+session.append('user/message', { message: summaryMessage }, {
+  surfaceOp: {
+    op: 'replace',
+    startSeq: old[0]!.seq,
+    endSeq: old[old.length - 1]!.seq,
+  },
+  sourceEventSeqs: old.map(node => node.seq),
+})
+```
+
+*为什么读这里：`sourceEventSeqs` 把“这段摘要是从哪些旧事件来的”钉在日志里。没有它，回放时就说不清摘要凭什么替换了旧 surface。*
+
+完整实现：[`src/compaction.ts`](src/compaction.ts) · 真实对照：[`compaction-basic`](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/compaction/compaction-basic/src/index.ts)
+
+### 最容易误解的两件事
+
+| 误解 | 实际 |
+|---|---|
+| 压缩就是把聊天记录删短 | 旧事件仍在日志里；`surface replace` 只改变模型当前看到的视图 |
+| 摘要越短越好 | 摘要必须保留目标、约束、未完成动作和证据来源，否则下一步会做错决定 |
 
 ### 设计检查
 
