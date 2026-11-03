@@ -30,11 +30,11 @@ agent 行为不确定，必须能录制、回放、对比和注入失败。
 
 ### 先看机制动画
 
-![s25 机制动画](../../../docs/visuals/s25-flow.gif)
+![s25 agent 运行动画](../../../docs/visuals/s25-agent-run.gif)
 
-*span、回放与快照：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s25) · [MP4](../../../docs/visuals/s25-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s25) · [MP4](../../../docs/visuals/s25-agent-run.mp4)
 
 ## 0. 先跑起来
 

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>agent run</title>
+<style>
+  :root { --bg:#f4f6fb; --panel:#fff; --ink:#161a2c; --ink-soft:#343b54; --muted:#6f778d; --faint:#a0a6b6; --line:#dfe3ef; --brand:#5b5bd6; --brand-soft:#ecebff; --green:#158a63; --green-soft:#e8f8f1; --amber:#b87412; --amber-soft:#fff3dd; --red:#b33a3a; --red-soft:#fbeaea; --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace; --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif; --accent:#5b5bd6; }
+  *{box-sizing:border-box} html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+  body.capture{overflow:hidden}
+  .stage{width:1280px;height:720px;transform-origin:top left}
+  .frame{position:relative;width:100%;height:100%;padding:26px 32px 20px;overflow:hidden;background:radial-gradient(circle at 18% 6%,rgba(91,91,214,.07),transparent 30%),linear-gradient(135deg,#f8f9fc,#eef2fa)}
+  .frame:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(48,58,99,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(48,58,99,.035) 1px,transparent 1px);background-size:30px 30px;pointer-events:none}
+  .top{position:relative;display:flex;justify-content:space-between;gap:18px}
+  .eyebrow{font:9px var(--mono);letter-spacing:.11em;color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:6px}.eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1{margin:9px 0 4px;font-size:29px;line-height:1.12;letter-spacing:-.035em;font-weight:750}h1 em{font-style:normal;color:var(--accent)}
+  .subtitle{margin:0;color:var(--muted);font-size:11px}
+  .badge-live{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.75);padding:6px 10px;font:9px var(--mono);color:var(--ink-soft);display:flex;gap:6px;align-items:center}.badge-live b{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(21,138,99,.1)}
+  .statusbar{position:relative;display:flex;gap:8px;align-items:center;margin:14px 0 12px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.8);font:9px var(--mono);color:var(--muted)}
+  .statusbar b{color:var(--ink-soft);font-weight:500}.statusbar .dot{width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px}.statusbar .spacer{flex:1}
+  .main{display:grid;grid-template-columns:1.05fr 1.1fr .95fr;gap:12px;height:382px}
+  .panel{min-width:0;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.9);display:flex;flex-direction:column;overflow:hidden}
+  .panel-head{display:flex;justify-content:space-between;padding:8px 11px;border-bottom:1px solid var(--line);font:9px var(--mono);color:var(--muted)}.panel-head b{color:var(--ink-soft);font-weight:600}
+  .panel-body{padding:10px;overflow:hidden;flex:1}
+  .events{display:flex;flex-direction:column;gap:3px}
+  .ev{display:grid;grid-template-columns:30px 76px 1fr;gap:5px;align-items:center;padding:4px 5px;border-radius:5px;opacity:.18;transition:opacity .2s,background .2s;font:8px var(--mono)}
+  .ev.on{opacity:1}.ev.hot{background:var(--brand-soft)}.ev .seq{color:var(--faint)}.ev .type{color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ev .data{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .center{min-height:0}.center .widget{height:100%}
+  .codebox{background:#0f1424;color:#dce3f5;border-radius:8px;padding:9px 10px;font:8.5px/1.65 var(--mono);overflow:hidden}
+  .codebox .ln{white-space:pre;opacity:.35;transition:opacity .2s;padding:1px 2px;border-radius:3px}.codebox .ln.on{opacity:1}.codebox .ln.hot{background:rgba(91,91,214,.35)}
+  .caption{margin-top:11px;display:grid;grid-template-columns:1.55fr .9fr .9fr 1fr;gap:10px;align-items:end}
+  .kicker{font:8px var(--mono);letter-spacing:.1em;color:var(--accent)}.caption h2{margin:2px 0 3px;font-size:17px;letter-spacing:-.02em}.caption p{margin:0;color:var(--muted);font-size:9.5px;line-height:1.45}
+  .code-line{background:#fff;border:1px solid var(--line);border-radius:7px;padding:8px 9px;font:8.5px/1.45 var(--mono);color:var(--ink-soft);min-height:34px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.code-line b{color:var(--brand);font-weight:600}
+  .progress{display:flex;align-items:center;gap:4px}.seg{flex:1;height:4px;border-radius:999px;background:var(--line)}.seg.done{background:color-mix(in srgb,var(--accent) 38%,var(--line))}.seg.on{background:var(--accent)}.progress-label{flex:0 0 30px;text-align:right;font:8px var(--mono);color:var(--muted)}
+  /* widgets */
+  .meter{height:14px;border-radius:999px;background:#e8ebf4;overflow:hidden;border:1px solid var(--line)}.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--green),#7ac9a6);transition:width .35s}.meter.warn i{background:linear-gradient(90deg,var(--amber),#e0b25c)}.meter.danger i{background:linear-gradient(90deg,var(--red),#d87878)}
+  .row{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font:8.5px var(--mono);color:var(--muted)}.row b{color:var(--ink-soft);font-weight:500}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 6px;font:8px var(--mono);color:var(--muted)}.pill.ok{color:var(--green);border-color:color-mix(in srgb,var(--green) 30%,var(--line));background:var(--green-soft)}.pill.warn{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 30%,var(--line));background:var(--amber-soft)}.pill.bad{color:var(--red);border-color:color-mix(in srgb,var(--red) 30%,var(--line));background:var(--red-soft)}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:7px}.card{border:1px solid var(--line);border-radius:7px;padding:7px;background:#fff;font:8px var(--mono);color:var(--muted)}.card b{display:block;color:var(--ink-soft);font-weight:600;margin-bottom:3px;font-size:9px}
+  .msgrow{display:flex;gap:5px;align-items:center;padding:4px 0;font:8px var(--mono);color:var(--muted);border-bottom:1px solid var(--line)}.msgrow b{color:var(--ink-soft);font-weight:500}.msgrow .cut{color:var(--red);text-decoration:line-through}
+  .tree{font:8.5px/1.8 var(--mono);color:var(--muted)}.tree b{color:var(--ink-soft)}.tree .indent{padding-left:13px}.tree .ok{color:var(--green)}
+  .spans{display:flex;flex-direction:column;gap:5px}.span{display:grid;grid-template-columns:70px 1fr 38px;gap:6px;align-items:center;font:8px var(--mono);color:var(--muted)}.span i{height:7px;border-radius:3px;background:var(--brand)}.span b{color:var(--ink-soft);font-weight:500}
+  .matrix{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.cell{border:1px solid var(--line);border-radius:5px;padding:5px;font:7.5px var(--mono);color:var(--muted);text-align:center}.cell.ok{background:var(--green-soft);color:var(--green)}.cell.bad{background:var(--red-soft);color:var(--red)}
+  .page{border:1px solid var(--line);border-radius:7px;overflow:hidden;background:#fff}.pagebar{display:flex;gap:5px;align-items:center;padding:5px 7px;background:#f1f3f9;border-bottom:1px solid var(--line);font:7.5px var(--mono);color:var(--muted)}.pagebar i{width:5px;height:5px;border-radius:50%;background:#c8cede}.pagebody{padding:9px;font:8px/1.5 var(--mono);color:var(--muted)}.ref{display:inline-block;border:1px solid color-mix(in srgb,var(--brand) 30%,var(--line));background:var(--brand-soft);color:var(--brand);border-radius:4px;padding:1px 3px;font-size:7px}
+  .shot{height:110px;border:1px dashed color-mix(in srgb,var(--brand) 35%,var(--line));border-radius:7px;background:repeating-linear-gradient(135deg,#f6f7fc,#f6f7fc 8px,#eef1fa 8px,#eef1fa 16px);position:relative;font:8px var(--mono);color:var(--muted);display:grid;place-items:center}.shot:after{content:"1280 × 720";position:absolute;right:6px;bottom:5px;font-size:7px;color:var(--faint)}
+  .coord{position:absolute;width:12px;height:12px;border:2px solid var(--red);border-radius:50%;background:rgba(179,58,58,.15);display:grid;place-items:center;font-size:6px;color:var(--red)}
+  .rpc{font:8px/1.7 var(--mono);color:var(--muted)}.rpc .req{color:var(--brand)}.rpc .res{color:var(--green)}.rpc .err{color:var(--red)}
+  .cards .card.hot{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));background:#fbfbff}.card .state{float:right;font-size:7px;color:var(--green)}
+  .controls{position:fixed;left:0;right:0;bottom:0;z-index:3;display:flex;flex-wrap:wrap;align-items:center;gap:7px;padding:8px 14px;background:rgba(255,255,255,.95);border-top:1px solid var(--line);font:11px var(--sans)}.controls button{border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);padding:5px 9px;font:10px var(--sans);cursor:pointer;white-space:nowrap}.stage-jump{display:flex;gap:3px;flex-wrap:wrap}.stage-jump button{padding:4px 6px;font:8px var(--mono);color:var(--muted)}.stage-jump button.active{border-color:var(--brand);color:var(--brand);background:var(--brand-soft)}.stage-jump button:hover{border-color:color-mix(in srgb,var(--brand) 45%,var(--line));color:var(--brand);background:var(--brand-soft)}.stage-jump button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}#scrub{flex:1;min-width:100px;accent-color:var(--brand)}#counter{font:9px var(--mono);color:var(--muted)}
+  body.capture .controls{display:none}body.capture *,body.capture *:before,body.capture *:after{transition:none!important;animation:none!important}
+</style>
+</head>
+<body>
+<div class="stage" id="stage"><div class="frame">
+  <div class="top"><div><div class="eyebrow"><i></i><span id="eyebrow">S11 · CORE · AGENT RUN</span></div><h1 id="title"></h1><p class="subtitle" id="subtitle"></p></div><div class="badge-live"><b></b> LIVE RUN</div></div>
+  <div class="statusbar"><span><i class="dot"></i><b id="run-state">running</b></span><span class="spacer"></span><span>turn <b id="turn">1</b></span><span>step <b id="step">1</b></span><span>seq <b id="seq">6</b></span><span id="status-note"></span></div>
+  <div class="main">
+    <section class="panel"><div class="panel-head"><b>Session event log</b><span>seq / type / data</span></div><div class="panel-body"><div class="events" id="events"></div></div></section>
+    <section class="panel"><div class="panel-head"><b id="center-title">机制</b><span>actual state</span></div><div class="panel-body center" id="center"></div></section>
+    <section class="panel"><div class="panel-head"><b id="right-title">payload</b><span>actual data</span></div><div class="panel-body"><div class="codebox" id="right"></div></div></section>
+  </div>
+  <div class="caption"><div><div class="kicker" id="kicker">STAGE 01 / 05</div><h2 id="caption-title"></h2><p id="caption-desc"></p></div><div class="code-line" id="code-line"></div><div class="code-line" id="code-line2"></div><div class="progress" id="progress"><div class="seg" data-seg="0"></div><div class="seg" data-seg="1"></div><div class="seg" data-seg="2"></div><div class="seg" data-seg="3"></div><div class="seg" data-seg="4"></div><span class="progress-label" id="progress-label">0%</span></div></div>
+</div></div>
+<div class="controls"><button id="play">暂停</button><button id="prev">← 上一幕</button><button id="next">下一幕 →</button><div class="stage-jump" id="stage-jump"></div><input id="scrub" type="range" min="0" max="1000" value="0" aria-label="进度"><span id="counter">0 / 119</span></div>
+<script src="run-data.js"></script>
+<script>
+  const params=new URLSearchParams(location.search),capture=params.get('capture')==='1'||params.has('frame');
+  const id=/^s\d{2}$/.test(params.get('lesson')||'')?params.get('lesson'):'s11';
+  const run=(window.RUNS||{})[id]; if(!run){document.body.innerHTML='<p>missing run '+id+'</p>';throw new Error('missing run')}
+  const TOTAL=120;let frame=Number(params.get('frame')??0);if(!Number.isFinite(frame))frame=0;let playing=!capture,raf=0,last=0;if(capture)document.body.classList.add('capture');
+  const stageAt=t=>{let i=0;for(let j=0;j<run.stages.length;j++)if(t>=run.stages[j].at)i=j;return i};
+  const els={eyebrow:document.getElementById('eyebrow'),title:document.getElementById('title'),subtitle:document.getElementById('subtitle'),events:document.getElementById('events'),center:document.getElementById('center'),right:document.getElementById('right'),centerTitle:document.getElementById('center-title'),rightTitle:document.getElementById('right-title'),kicker:document.getElementById('kicker'),captionTitle:document.getElementById('caption-title'),captionDesc:document.getElementById('caption-desc'),code:document.getElementById('code-line'),code2:document.getElementById('code-line2'),progress:document.getElementById('progress-label'),segs:[...document.querySelectorAll('[data-seg]')],state:document.getElementById('run-state'),turn:document.getElementById('turn'),step:document.getElementById('step'),seq:document.getElementById('seq'),note:document.getElementById('status-note')};
+  els.eyebrow.textContent=`${id.toUpperCase()} · ${run.part.toUpperCase()} · AGENT RUN`;els.title.innerHTML=run.title;els.subtitle.textContent=run.subtitle;els.centerTitle.textContent=run.centerTitle;els.rightTitle.textContent=run.rightTitle;
+  els.events.innerHTML=run.events.map((e,i)=>`<div class="ev" data-ev="${i}"><span class="seq">#${String(e.seq).padStart(2,'0')}</span><span class="type">${e.type}</span><span class="data">${e.data}</span></div>`).join('');
+  const evEls=[...els.events.querySelectorAll('[data-ev]')];
+  const jump=document.getElementById('stage-jump');jump.innerHTML=run.stages.map((s,i)=>`<button data-stage="${i}" aria-label="跳到第 ${i+1} 幕">${i+1} ${s.short}</button>`).join('');const jumps=[...jump.querySelectorAll('[data-stage]')];
+  function render(t){const stage=stageAt(t),s=run.stages[stage];els.kicker.textContent=`STAGE ${String(stage+1).padStart(2,'0')} / ${String(run.stages.length).padStart(2,'0')}`;els.captionTitle.textContent=s.title;els.captionDesc.textContent=s.desc;els.code.innerHTML=s.code;els.code2.innerHTML=s.code2;els.center.innerHTML=s.center;els.right.innerHTML=s.right;els.state.textContent=s.state||'running';els.turn.textContent=String(s.turn??1);els.step.textContent=String(s.step??1);els.seq.textContent=String(s.seq??run.events.at(-1)?.seq??0);els.note.textContent=s.note||'';els.progress.textContent=`${Math.round(t*100)}%`;
+    evEls.forEach((el,i)=>{const ev=run.events[i];const on=stage>=ev.stage;el.classList.toggle('on',on);el.classList.toggle('hot',on&&stage===ev.stage)});
+    els.segs.forEach((seg,i)=>{seg.classList.toggle('done',i<stage);seg.classList.toggle('on',i===stage)});jumps.forEach((b,i)=>{b.classList.toggle('active',i===stage);b.setAttribute('aria-pressed',String(i===stage))});}
+  function setFrame(n){frame=(n+TOTAL)%TOTAL;render(frame/(TOTAL-1));document.getElementById('scrub').value=String(Math.round(frame/(TOTAL-1)*1000));document.getElementById('counter').textContent=`${frame} / ${TOTAL-1}`}
+  window.setFrame=setFrame;function pause(){playing=false;document.getElementById('play').textContent='播放';cancelAnimationFrame(raf)}function goStage(i){pause();const b=(i+run.stages.length)%run.stages.length;setFrame(Math.min(TOTAL-1,Math.ceil(run.stages[b].at*(TOTAL-1))))}
+  function tick(time){if(!playing)return;if(!last)last=time;if(time-last>1000/10){last=time;setFrame(frame+1)}raf=requestAnimationFrame(tick)}function fit(){if(capture)return;const scale=Math.min(window.innerWidth/1280,(window.innerHeight-48)/720);document.getElementById('stage').style.transform=`scale(${scale})`;document.body.style.height=`${720*scale+40}px`}
+  document.getElementById('play').addEventListener('click',e=>{playing=!playing;e.currentTarget.textContent=playing?'暂停':'播放';if(playing){last=0;raf=requestAnimationFrame(tick)}else cancelAnimationFrame(raf)});document.getElementById('prev').addEventListener('click',()=>goStage(stageAt(frame/(TOTAL-1))-1));document.getElementById('next').addEventListener('click',()=>goStage(stageAt(frame/(TOTAL-1))+1));jumps.forEach(b=>b.addEventListener('click',()=>goStage(Number(b.dataset.stage))));document.getElementById('scrub').addEventListener('input',e=>{pause();setFrame(Math.round(Number(e.currentTarget.value)/1000*(TOTAL-1)))});window.addEventListener('resize',fit);fit();setFrame(frame);window.RUN_READY=true;if(playing){document.getElementById('play').textContent='暂停';raf=requestAnimationFrame(tick)}
+</script>
+</body>
+</html>

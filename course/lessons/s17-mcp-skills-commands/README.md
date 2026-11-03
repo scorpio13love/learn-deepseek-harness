@@ -30,11 +30,11 @@ MCP 工具发现/调用、skill catalog、slash command。
 
 ### 先看机制动画
 
-![s17 机制动画](../../../docs/visuals/s17-flow.gif)
+![s17 agent 运行动画](../../../docs/visuals/s17-agent-run.gif)
 
-*不修改 loop 的外部能力：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s17) · [MP4](../../../docs/visuals/s17-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s17) · [MP4](../../../docs/visuals/s17-agent-run.mp4)
 
 ## 0. 先跑起来
 

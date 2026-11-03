@@ -20,11 +20,11 @@
 
 ### 先看机制动画
 
-![s26 机制动画](../../../docs/visuals/s26-flow.gif)
+![s26 agent 运行动画](../../../docs/visuals/s26-agent-run.gif)
 
-*可重复的 scenario 与故障矩阵：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s26) · [MP4](../../../docs/visuals/s26-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s26) · [MP4](../../../docs/visuals/s26-agent-run.mp4)
 
 ## 0. 先跑起来
 

@@ -30,11 +30,11 @@ token 压力、工具结果裁剪、摘要、surface replace、overflow 重试�
 
 ### 先看机制动画
 
-![s11 机制动画](../../../docs/visuals/s11-flow.gif)
+![s11 agent 运行动画](../../../docs/visuals/s11-agent-run.gif)
 
-*上下文压力下改变模型视图：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s11) · [MP4](../../../docs/visuals/s11-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s11) · [MP4](../../../docs/visuals/s11-agent-run.mp4)
 
 ## 0. 先跑起来
 

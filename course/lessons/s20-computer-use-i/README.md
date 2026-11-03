@@ -51,11 +51,11 @@ cua screenshot { appId: "notes", windowId: 2 }
 
 ### 先看机制动画
 
-![s20 机制动画](../../../docs/visuals/s20-flow.gif)
+![s20 agent 运行动画](../../../docs/visuals/s20-agent-run.gif)
 
-*应用、窗口、AX 与截图：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s20) · [MP4](../../../docs/visuals/s20-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s20) · [MP4](../../../docs/visuals/s20-agent-run.mp4)
 
 ## 1. 先跑起来
 

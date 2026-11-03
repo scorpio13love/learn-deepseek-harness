@@ -25,8 +25,11 @@ README 里放静态首帧或 GIF；网站里放可交互版本。
 | `s08-inbox.html` / `.gif` / `.mp4` | s08 inbox/steering 原型 |
 | `s09-llm-seam.html` / `.gif` / `.mp4` | s09 Messages 请求/SSE/StreamChunk 原型 |
 | `s10-persistence.html` / `.gif` / `.mp4` | s10 JSONL / flush / torn tail / fork 原型 |
+| `agent-run.html` + `run-data.js` | 12 课实际 agent run 播放器 |
+| `s11-agent-run.gif` … `s26-agent-run.gif` | s11–s26 实际运行动画（GIF/MP4） |
+| `capture-agent-run.mjs` | 抓帧 + 编码 |
 | `lesson-flow.html` + `flow-data.js` | 通用机制动画播放器（只给需要看时序的课） |
-| `sNN-flow.gif` | 14 课通用 flow 动画（GIF/MP4） |
+| `sNN-flow.gif` | s04/s06 两张通用 flow 动画 |
 | `build-flow-data.mjs` / `capture-flow.mjs` | 生成 flow 数据、抓帧与编码 |
 | `maps/s01.svg` … `maps/s28.svg` | 28 张本课机制地图 |
 | `build-maps.mjs` | 生成 28 张地图的脚本 |
@@ -49,6 +52,7 @@ ffmpeg -version
 node docs/visuals/build-maps.mjs
 node docs/visuals/build-flow-data.mjs
 node docs/visuals/capture-flow.mjs
+node docs/visuals/capture-agent-run.mjs
 ./docs/visuals/build-s01.sh
 ./docs/visuals/build-s02.sh
 ./docs/visuals/build-s03.sh
@@ -94,7 +98,8 @@ node docs/visuals/capture-flow.mjs
 | s08 inbox | followup / steer / inject → claim | `s08-inbox.*` |
 | s09 LLM seam | 请求 JSON → SSE 事件 → StreamChunk | `s09-llm-seam.*` |
 | s10 persistence | JSONL → flush → torn tail → fork | `s10-persistence.*` |
-| 16 课 flow | 本课问题 / 节点 / 源码锚点 | `lesson-flow.html?lesson=sNN` |
+| s11–s26 agent run | 真实 SessionEvent + 本课机制 | `agent-run.html?lesson=sNN` |
+| s04/s06 flow | 本课问题 / 节点 / 源码锚点 | `lesson-flow.html?lesson=sNN` |
 
 ## 后续课程视觉
 

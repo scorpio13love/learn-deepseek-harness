@@ -30,11 +30,11 @@ session projection、SSE 快照+增量、断线重连、多客户端。
 
 ### 先看机制动画
 
-![s22 机制动画](../../../docs/visuals/s22-flow.gif)
+![s22 agent 运行动画](../../../docs/visuals/s22-agent-run.gif)
 
-*投影、SSE 与断线重连：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s22) · [MP4](../../../docs/visuals/s22-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s22) · [MP4](../../../docs/visuals/s22-agent-run.mp4)
 
 ## 0. 先跑起来
 

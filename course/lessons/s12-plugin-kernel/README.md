@@ -30,11 +30,11 @@ Context、Service、Fiber、effect、events、scope：把前面课程重构成�
 
 ### 先看机制动画
 
-![s12 机制动画](../../../docs/visuals/s12-flow.gif)
+![s12 agent 运行动画](../../../docs/visuals/s12-agent-run.gif)
 
-*能力如何变成可卸载的插件：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s12) · [MP4](../../../docs/visuals/s12-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s12) · [MP4](../../../docs/visuals/s12-agent-run.mp4)
 
 ## 0. 先跑起来
 

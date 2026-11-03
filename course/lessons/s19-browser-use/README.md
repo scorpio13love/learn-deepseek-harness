@@ -55,11 +55,11 @@ browser_click e1            # 现在 e1 是 "Back home"
 
 ### 先看机制动画
 
-![s19 机制动画](../../../docs/visuals/s19-flow.gif)
+![s19 agent 运行动画](../../../docs/visuals/s19-agent-run.gif)
 
-*浏览器 provider 与会话：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s19) · [MP4](../../../docs/visuals/s19-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s19) · [MP4](../../../docs/visuals/s19-agent-run.mp4)
 
 ## 1. 先跑起来
 

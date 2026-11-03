@@ -79,11 +79,11 @@ PTC 让模型把「点哪里、输入什么、失败怎么重试」写成一个�
 
 ### 先看机制动画
 
-![s16 机制动画](../../../docs/visuals/s16-flow.gif)
+![s16 agent 运行动画](../../../docs/visuals/s16-agent-run.gif)
 
-*模型写代码调用 tools.*：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s16) · [MP4](../../../docs/visuals/s16-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s16) · [MP4](../../../docs/visuals/s16-agent-run.mp4)
 
 ## 0. 先跑起来
 

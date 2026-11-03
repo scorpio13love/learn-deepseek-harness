@@ -20,11 +20,11 @@
 
 ### 先看机制动画
 
-![s24 机制动画](../../../docs/visuals/s24-flow.gif)
+![s24 agent 运行动画](../../../docs/visuals/s24-agent-run.gif)
 
-*事件如何变成可渲染卡片：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s24) · [MP4](../../../docs/visuals/s24-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s24) · [MP4](../../../docs/visuals/s24-agent-run.mp4)
 
 ## 0. 先跑起来
 

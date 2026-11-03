@@ -50,11 +50,11 @@ cua getState { appId:"notes", windowId:1 }        # 必须重新观察
 
 ### 先看机制动画
 
-![s21 机制动画](../../../docs/visuals/s21-flow.gif)
+![s21 agent 运行动画](../../../docs/visuals/s21-agent-run.gif)
 
-*坐标、动作、权限与失效：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s21) · [MP4](../../../docs/visuals/s21-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s21) · [MP4](../../../docs/visuals/s21-agent-run.mp4)
 
 ## 1. 先跑起来
 

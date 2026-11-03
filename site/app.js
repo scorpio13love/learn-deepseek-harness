@@ -369,8 +369,21 @@
       ['s08-inbox-steering', { gif: 's08-inbox.gif', html: 's08-inbox.html', sub: 'followup · steer · inject → claim' }],
       ['s09-llm-seam', { gif: 's09-llm-seam.gif', html: 's09-llm-seam.html', sub: 'request → Messages → SSE → StreamChunk' }],
       ['s10-persistence', { gif: 's10-persistence.gif', html: 's10-persistence.html', sub: 'JSONL · flush · torn tail · fork' }],
+      ['s11-compaction', { gif: 's11-agent-run.gif', html: 'agent-run.html?lesson=s11', sub: 'context % → prune → summary → replace' }],
+      ['s12-plugin-kernel', { gif: 's12-agent-run.gif', html: 'agent-run.html?lesson=s12', sub: 'plugins → inject → effect → turn' }],
+      ['s15-subagents-presets', { gif: 's15-agent-run.gif', html: 'agent-run.html?lesson=s15', sub: 'spawn → child session → result' }],
+      ['s16-ptc', { gif: 's16-agent-run.gif', html: 'agent-run.html?lesson=s16', sub: 'run_code → tools.* → result' }],
+      ['s17-mcp-skills-commands', { gif: 's17-agent-run.gif', html: 'agent-run.html?lesson=s17', sub: 'tools/list → tools/call' }],
+      ['s19-browser-use', { gif: 's19-agent-run.gif', html: 'agent-run.html?lesson=s19', sub: 'navigate → read → click → refs' }],
+      ['s20-computer-use-i', { gif: 's20-agent-run.gif', html: 'agent-run.html?lesson=s20', sub: 'auth → app/window → AX → shot' }],
+      ['s21-computer-use-ii', { gif: 's21-agent-run.gif', html: 'agent-run.html?lesson=s21', sub: 'coords → dispatch → stale → verify' }],
+      ['s22-web', { gif: 's22-agent-run.gif', html: 'agent-run.html?lesson=s22', sub: 'events → projection → SSE' }],
+      ['s24-client-ui', { gif: 's24-agent-run.gif', html: 'agent-run.html?lesson=s24', sub: 'events → action cards → reconnect' }],
+      ['s25-observability-eval', { gif: 's25-agent-run.gif', html: 'agent-run.html?lesson=s25', sub: 'spans → record → replay' }],
+      ['s26-eval', { gif: 's26-agent-run.gif', html: 'agent-run.html?lesson=s26', sub: 'scenario → faults → report' }],
+
     ]);
-    const animatedGeneric = new Set(['s04-streaming','s06-tool-runtime','s11-compaction','s12-plugin-kernel','s15-subagents-presets','s16-ptc','s17-mcp-skills-commands','s19-browser-use','s20-computer-use-i','s21-computer-use-ii','s22-web','s24-client-ui','s25-observability-eval','s26-eval']);
+    const animatedGeneric = new Set(['s04-streaming','s06-tool-runtime']);
     const slugs = C.parts.flatMap(part => part.lessons).filter(slug => custom.has(slug) || animatedGeneric.has(slug));
     const cards = slugs.map(slug => {
       const lesson = lessons[slug];

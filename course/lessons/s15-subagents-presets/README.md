@@ -30,11 +30,11 @@ spawn、子会话、深度/并发预算、preset。
 
 ### 先看机制动画
 
-![s15 机制动画](../../../docs/visuals/s15-flow.gif)
+![s15 agent 运行动画](../../../docs/visuals/s15-agent-run.gif)
 
-*委派、隔离与预算：每一步的边界、输入和产出。*
+*实际 agent run：SessionEvent 与运行中的状态。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s15) · [MP4](../../../docs/visuals/s15-flow.mp4)
+[交互版](../../../docs/visuals/agent-run.html?lesson=s15) · [MP4](../../../docs/visuals/s15-agent-run.mp4)
 
 ## 0. 先跑起来
 
