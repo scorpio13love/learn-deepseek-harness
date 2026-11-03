@@ -2,7 +2,7 @@
 
 > 本课代码：`src/mcp.ts`、`src/skills/catalog.ts`、`src/commands/registry.ts`、`src/mock-mcp-server.ts`
 >
-> 测试：`tests/s15.test.ts`（4 个离线用例）+ s14 回归
+> 测试：`tests/s17.test.ts`（4 个离线用例）+ s14 回归
 >
 > 本课不调用模型；重点是三种「不碰 loop」的扩展面。
 
@@ -28,12 +28,20 @@ MCP 工具发现/调用、skill catalog、slash command。
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s17 机制动画](../../../docs/visuals/s17-flow.gif)
+
+*不修改 loop 的外部能力：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s17) · [MP4](../../../docs/visuals/s17-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s15-mcp-skills-commands
+cd course/lessons/s17-mcp-skills-commands
 node src/demo.ts
-node --test tests/s15.test.ts
+node --test tests/s17.test.ts
 ```
 
 Demo 会：

@@ -2,7 +2,7 @@
 
 > 本课代码：`src/observability.ts`（span、record/replay、snapshot、fault）
 >
-> 测试：`tests/s18.test.ts`（4 个离线用例）+ s17 回归
+> 测试：`tests/s25.test.ts`（4 个离线用例）+ s17 回归
 >
 > 模型：真实 DeepSeek，默认 `deepseek-flash`。
 
@@ -28,13 +28,21 @@ agent 行为不确定，必须能录制、回放、对比和注入失败。
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s25 机制动画](../../../docs/visuals/s25-flow.gif)
+
+*span、回放与快照：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s25) · [MP4](../../../docs/visuals/s25-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s18-observability-eval
+cd course/lessons/s25-observability-eval
 cp env.example .env
 node src/demo.ts
-node --test tests/s18.test.ts
+node --test tests/s25.test.ts
 ```
 
 Demo 用真实模型录制一次调用，再用 replay 离线重放，并比较 session snapshot。

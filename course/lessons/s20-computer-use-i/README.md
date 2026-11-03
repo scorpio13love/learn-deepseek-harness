@@ -8,10 +8,6 @@
 
 ---
 
-![s20 本课地图](../../../docs/visuals/maps/s20.svg)
-
-*本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
-
 ## 0. 开篇三问
 
 ### 0.1 这一课学什么？
@@ -48,6 +44,18 @@ cua screenshot { appId: "notes", windowId: 2 }
 如果用户还没允许控制 Notes，第三步会直接失败，前两步里也不会泄露任何 AX 内容。
 
 ---
+
+![s20 本课地图](../../../docs/visuals/maps/s20.svg)
+
+*本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
+
+### 先看机制动画
+
+![s20 机制动画](../../../docs/visuals/s20-flow.gif)
+
+*应用、窗口、AX 与截图：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s20) · [MP4](../../../docs/visuals/s20-flow.mp4)
 
 ## 1. 先跑起来
 

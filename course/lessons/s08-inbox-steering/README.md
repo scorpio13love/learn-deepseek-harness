@@ -226,7 +226,7 @@ cancel(cause, { keepInbox }) {
 
 ## 5. 验收
 
-离线（`tests/s07.test.ts`）：
+离线（`tests/s08.test.ts`）：
 
 | 测试 | 证明 |
 |---|---|

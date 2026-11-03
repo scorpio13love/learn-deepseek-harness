@@ -2,7 +2,7 @@
 
 > 本课代码：`src/capabilities.ts`（本地 fs/shell 提供方、沙箱包装、审批、read/write/bash 工具）
 >
-> 测试：`tests/s13.test.ts`（6 个离线用例）+ s12 回归
+> 测试：`tests/s14.test.ts`（6 个离线用例）+ s12 回归
 >
 > 本课不调用模型；重点是「执行世界」的 seam。
 
@@ -28,12 +28,20 @@ fs、shell、sandbox、approval：agent 如何安全地碰真实世界。
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s14 机制动画](../../../docs/visuals/s14-flow.gif)
+
+*agent 如何安全地碰真实世界：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s14) · [MP4](../../../docs/visuals/s14-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s13-capability-seams
+cd course/lessons/s14-capability-seams
 node src/demo.ts
-node --test tests/s13.test.ts
+node --test tests/s14.test.ts
 ```
 
 Demo 会在临时工作区里写文件、读文件、跑 shell，并演示：

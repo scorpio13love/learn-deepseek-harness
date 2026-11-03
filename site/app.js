@@ -353,6 +353,44 @@
     $$('.nav-lesson').forEach(item => item.classList.toggle('done', completed.has(item.dataset.slug)));
   }
 
+  function renderAnimations() {
+    state.current = null;
+    state.doc = null;
+    document.body.classList.add('is-home');
+    $('#source-link').hidden = true;
+    $('#toc-list').innerHTML = '';
+    $('#toc').classList.add('is-hidden');
+    $('#breadcrumb').innerHTML = '<a href="#/">课程首页</a><span>/</span><span>机制动画</span>';
+    document.title = `机制动画 · ${C.title}`;
+    const custom = new Map([
+      ['s01-agent-loop', { gif: 's01-loop.gif', html: 's01-loop.html', sub: 'chunk → assembler → message → event' }],
+      ['s02-tool-round-trip', { gif: 's02-tools.gif', html: 's02-tools.html', sub: 'tool-call → execute → tool/result' }],
+      ['s03-session-log', { gif: 's03-surface.gif', html: 's03-surface.html', sub: 'event log → surface → derive' }],
+      ['s08-inbox-steering', { gif: 's08-inbox.gif', html: 's08-inbox.html', sub: 'followup · steer · inject → claim' }],
+    ]);
+    const slugs = C.parts.flatMap(part => part.lessons);
+    const cards = slugs.map(slug => {
+      const lesson = lessons[slug];
+      const c = custom.get(slug) || { gif: `${slug.slice(0,3)}-flow.gif`, html: `lesson-flow.html?lesson=${slug.slice(0,3)}`, sub: lesson.short };
+      return `<a class="visual-card" href="../docs/visuals/${c.html}" target="_blank" rel="noreferrer">
+        <img src="../docs/visuals/${c.gif}" alt="s${String(lesson.n).padStart(2, '0')} ${escapeHtml(lesson.title)} 动画" loading="lazy">
+        <span><b>s${String(lesson.n).padStart(2, '0')} · ${escapeHtml(lesson.title)}</b><small>${escapeHtml(c.sub)}</small></span>
+      </a>`;
+    }).join('');
+    $('#content').innerHTML = `<div class="home">
+      <section class="hero">
+        <span class="eyebrow">28 animations · carousel</span>
+        <h1>每一课，<br><em>都可以单步看</em></h1>
+        <p>28 张机制动画：s01–s03、s08 是专属分镜；其余 24 课由本课地图、开篇问题和源码锚点驱动。点开任意一张，按阶段前后播放。</p>
+        <div class="hero-actions"><a class="primary-button" href="#/">回到课程地图 <span>→</span></a></div>
+      </section>
+      <section class="section">
+        <div class="section-head"><div><h2>全部 28 课</h2><p>GIF 预览；点开为可单步 HTML</p></div></div>
+        <div class="visual-grid">${cards}</div>
+      </section>
+    </div>`;
+  }
+
   function renderHome() {
     state.current = null;
     state.doc = null;
@@ -409,7 +447,7 @@
       </section>
 
       <section class="section">
-        <div class="section-head"><div><h2>机制动画</h2><p>点开可单步：chunk → message → event / tool round-trip / surface</p></div></div>
+        <div class="section-head"><div><h2>机制动画</h2><p>点开可单步：chunk → message → event / tool round-trip / surface</p></div><a class="section-link" href="#/animations">全部 28 个 →</a></div>
         <div class="visual-grid">
           <a class="visual-card" href="../docs/visuals/s01-loop.html" target="_blank" rel="noreferrer">
             <img src="../docs/visuals/s01-loop.gif" alt="s01 agent loop 动画" loading="lazy">
@@ -590,6 +628,7 @@
     const hash = location.hash.replace(/^#\/?/, '');
     try {
       if (!hash) renderHome();
+      else if (hash === 'animations') renderAnimations();
       else if (hash.startsWith('docs/')) await loadDoc(hash.slice(5));
       else await loadLesson(hash);
     } catch (error) {

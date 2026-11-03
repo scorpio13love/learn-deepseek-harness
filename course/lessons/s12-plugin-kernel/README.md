@@ -2,7 +2,7 @@
 
 > 本课代码：`src/kernel.ts`（mini Cordis）+ `src/demo.ts`
 >
-> 测试：`tests/s11.test.ts`（8 个离线用例）+ s03-s10 回归
+> 测试：`tests/s12.test.ts`（8 个离线用例）+ s03-s10 回归
 >
 > 本课不调用模型；重点是把前面 10 课的对象组装成插件树。
 
@@ -28,12 +28,20 @@ Context、Service、Fiber、effect、events、scope：把前面课程重构成�
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s12 机制动画](../../../docs/visuals/s12-flow.gif)
+
+*能力如何变成可卸载的插件：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s12) · [MP4](../../../docs/visuals/s12-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s11-plugin-kernel
+cd course/lessons/s12-plugin-kernel
 node src/demo.ts
-node --test tests/s11.test.ts
+node --test tests/s12.test.ts
 node --test tests/s10-regression.test.ts
 ```
 
@@ -137,7 +145,7 @@ fiber.dispose()  // 逆序撤销 effect、监听器、子插件
 
 ## 5. 验收
 
-`tests/s11.test.ts`：
+`tests/s12.test.ts`：
 
 | 测试 | 证明 |
 |---|---|

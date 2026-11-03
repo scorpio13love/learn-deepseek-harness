@@ -2,7 +2,7 @@
 
 > 本课代码：`src/boot.ts`（JSON 配置、patch 叠加、Boot）
 >
-> 测试：`tests/s12.test.ts`（8 个离线用例）+ s11 回归
+> 测试：`tests/s13.test.ts`（8 个离线用例）+ s11 回归
 >
 > 本课不调用模型；重点是「一棵可替换的插件树如何被组装出来」。
 
@@ -28,12 +28,20 @@ CLI、headless、web 三种 profile 共用一套 bundle。
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s13 机制动画](../../../docs/visuals/s13-flow.gif)
+
+*profile、bundle、patch 如何叠加：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s13) · [MP4](../../../docs/visuals/s13-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s12-composition-boot
+cd course/lessons/s13-composition-boot
 node src/demo.ts
-node --test tests/s12.test.ts
+node --test tests/s13.test.ts
 ```
 
 Demo 会叠加 base bundle、mode bundle、profile patch，然后启动插件树，并演示 required entry 失败。

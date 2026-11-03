@@ -2,7 +2,7 @@
 
 > 本课代码：`src/`（新增 `pipeline.ts`、`batch.ts`、`recovery.ts`；`tools.ts` / `agent.ts` 接入）
 >
-> 测试：`tests/s05.test.ts`（11 个离线用例）+ s03/s04 回归 + `tests/live.test.ts`（1 个真实模型用例）
+> 测试：`tests/s06.test.ts`（11 个离线用例）+ s03/s04 回归 + `tests/live.test.ts`（1 个真实模型用例）
 >
 > 模型：真实 DeepSeek，默认 `deepseek-flash`。
 
@@ -28,16 +28,24 @@
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s06 机制动画](../../../docs/visuals/s06-flow.gif)
+
+*一次工具调用的运行时流水线：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s06) · [MP4](../../../docs/visuals/s06-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s05-tool-pipeline
+cd course/lessons/s06-tool-runtime
 
 cp env.example .env
 # 编辑 .env，至少填入 DEEPSEEK_API_KEY
 
 node src/demo.ts
-node --test tests/s05.test.ts
+node --test tests/s06.test.ts
 node --test tests/s04-regression.test.ts
 node --test tests/s03-regression.test.ts
 node --test tests/live.test.ts     # 需要 key
@@ -207,7 +215,7 @@ for (context of batch.additionalContexts) append('user/message', context)
 
 ## 5. 验收
 
-离线（`tests/s05.test.ts`）：
+离线（`tests/s06.test.ts`）：
 
 | 测试 | 证明 |
 |---|---|

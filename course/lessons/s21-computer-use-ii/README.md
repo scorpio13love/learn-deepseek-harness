@@ -8,10 +8,6 @@
 
 ---
 
-![s21 本课地图](../../../docs/visuals/maps/s21.svg)
-
-*本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
-
 ## 0. 开篇三问
 
 ### 0.1 这一课学什么？
@@ -47,6 +43,18 @@ cua getState { appId:"notes", windowId:1 }        # 必须重新观察
 如果第二步之后直接 `click` 一个旧 `snapshotId` 的元素，会得到 `STALE_SNAPSHOT`；如果这时窗口被用户拉大，会先得到 `WINDOW_CHANGED`。
 
 ---
+
+![s21 本课地图](../../../docs/visuals/maps/s21.svg)
+
+*本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
+
+### 先看机制动画
+
+![s21 机制动画](../../../docs/visuals/s21-flow.gif)
+
+*坐标、动作、权限与失效：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s21) · [MP4](../../../docs/visuals/s21-flow.mp4)
 
 ## 1. 先跑起来
 

@@ -18,6 +18,14 @@
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s26 机制动画](../../../docs/visuals/s26-flow.gif)
+
+*可重复的 scenario 与故障矩阵：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s26) · [MP4](../../../docs/visuals/s26-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh

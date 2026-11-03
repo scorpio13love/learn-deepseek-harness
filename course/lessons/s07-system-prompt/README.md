@@ -2,7 +2,7 @@
 
 > 本课代码：`src/`（新增 `prompt.ts`；`agent.ts` 接入提示词组装与 head 替换）
 >
-> 测试：`tests/s06.test.ts`（10 个离线用例）+ s03/s04/s05 回归（34 个）+ `tests/live.test.ts`（1 个真实模型用例）
+> 测试：`tests/s07.test.ts`（10 个离线用例）+ s03/s04/s05 回归（34 个）+ `tests/live.test.ts`（1 个真实模型用例）
 >
 > 模型：真实 DeepSeek，默认 `deepseek-flash`。
 
@@ -28,16 +28,24 @@
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s07 机制动画](../../../docs/visuals/s07-flow.gif)
+
+*提示词是组装结果，不是字符串常量：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s07) · [MP4](../../../docs/visuals/s07-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s06-system-prompt
+cd course/lessons/s07-system-prompt
 
 cp env.example .env
 # 编辑 .env，至少填入 DEEPSEEK_API_KEY
 
 node src/demo.ts
-node --test tests/s06.test.ts
+node --test tests/s07.test.ts
 node --test tests/s05-regression.test.ts tests/s04-regression.test.ts tests/s03-regression.test.ts
 node --test tests/live.test.ts     # 需要 key
 
@@ -214,7 +222,7 @@ return sections
 
 ## 5. 验收
 
-离线（`tests/s06.test.ts`）：
+离线（`tests/s07.test.ts`）：
 
 | 测试 | 证明 |
 |---|---|

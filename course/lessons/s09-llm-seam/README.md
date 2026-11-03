@@ -2,7 +2,7 @@
 
 > 本课代码：`src/`（新增 `llm.ts`；`deepseek.ts` 增加 Provider/`prepare`；`agent.ts` 接入 prepared call 与重试）
 >
-> 测试：`tests/s08.test.ts`（8 个离线用例）+ s03-s07 回归（54 个）+ `tests/live.test.ts`（1 个真实模型用例）
+> 测试：`tests/s09.test.ts`（8 个离线用例）+ s03-s07 回归（54 个）+ `tests/live.test.ts`（1 个真实模型用例）
 >
 > 模型：真实 DeepSeek，默认 `deepseek-flash`。
 
@@ -28,16 +28,24 @@ Provider 注册、prepareCall、能力元数据、in-history 与 step 内重试�
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s09 机制动画](../../../docs/visuals/s09-flow.gif)
+
+*模型调用是可替换的 I/O 边界：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s09) · [MP4](../../../docs/visuals/s09-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s08-llm-seam
+cd course/lessons/s09-llm-seam
 
 cp env.example .env
 # 编辑 .env，至少填入 DEEPSEEK_API_KEY
 
 node src/demo.ts
-node --test tests/s08.test.ts
+node --test tests/s09.test.ts
 node --test tests/s07-regression.test.ts tests/s06-regression.test.ts tests/s05-regression.test.ts tests/s04-regression.test.ts tests/s03-regression.test.ts
 node --test tests/live.test.ts     # 需要 key
 ```
@@ -199,7 +207,7 @@ for (let attempt = 0; ; attempt++) {
 
 ## 5. 验收
 
-离线（`tests/s08.test.ts`）：
+离线（`tests/s09.test.ts`）：
 
 | 测试 | 证明 |
 |---|---|

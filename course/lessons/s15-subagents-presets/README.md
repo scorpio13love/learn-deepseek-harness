@@ -2,7 +2,7 @@
 
 > 本课代码：`src/subagent.ts`（LocalSubagentBackend、SubagentManager、subagent 工具、preset）
 >
-> 测试：`tests/s14.test.ts`（3 个离线用例）+ s13 回归
+> 测试：`tests/s15.test.ts`（3 个离线用例）+ s13 回归
 >
 > 模型：真实 DeepSeek，默认 `deepseek-flash`。
 
@@ -28,13 +28,21 @@ spawn、子会话、深度/并发预算、preset。
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s15 机制动画](../../../docs/visuals/s15-flow.gif)
+
+*委派、隔离与预算：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s15) · [MP4](../../../docs/visuals/s15-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s14-subagents-presets
+cd course/lessons/s15-subagents-presets
 cp env.example .env
 node src/demo.ts
-node --test tests/s14.test.ts
+node --test tests/s15.test.ts
 ```
 
 Demo 委派一个「用 calc 算 6*7」的子 agent，并演示深度上限。

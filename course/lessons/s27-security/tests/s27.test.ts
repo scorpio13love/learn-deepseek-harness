@@ -151,7 +151,7 @@ test('redaction: keys, values, arrays and errors', () => {
   const fakeKey = ['sk', 'fake', '0000000000'].join('-')
   const fakeNestedKey = ['sk', 'nested', '0000000000'].join('-')
   const fakeListKey = ['sk', 'list', '0000000000'].join('-')
-  const fakeAws = ['AKIA', 'FAKE', '0000000000'].join('')
+  const fakeAws = ['AKIA', 'FAKE', '000000000000'].join('')
   const fakeBearer = ['Bearer', 'fake-token-value'].join(' ')
   const input = {
     apiKey: fakeKey,

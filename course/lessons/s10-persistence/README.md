@@ -2,7 +2,7 @@
 
 > 本课代码：`src/`（新增 `storage.ts`；`session.ts` 增加 `onAppend`）
 >
-> 测试：`tests/s09.test.ts`（10 个离线用例）+ s03-s08 回归（72 个）+ `tests/live.test.ts`（1 个真实模型用例）
+> 测试：`tests/s10.test.ts`（10 个离线用例）+ s03-s08 回归（72 个）+ `tests/live.test.ts`（1 个真实模型用例）
 >
 > 模型：真实 DeepSeek，默认 `deepseek-flash`。
 
@@ -28,16 +28,24 @@ JSONL 会话日志、flush 屏障、resume、截断修复、未闭合 turn、for
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s10 机制动画](../../../docs/visuals/s10-flow.gif)
+
+*会话如何活过进程重启：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s10) · [MP4](../../../docs/visuals/s10-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s09-persistence
+cd course/lessons/s10-persistence
 
 cp env.example .env
 # 编辑 .env，至少填入 DEEPSEEK_API_KEY
 
 node src/demo.ts
-node --test tests/s09.test.ts
+node --test tests/s10.test.ts
 node --test tests/s08-regression.test.ts tests/s07-regression.test.ts tests/s06-regression.test.ts tests/s05-regression.test.ts tests/s04-regression.test.ts tests/s03-regression.test.ts
 node --test tests/live.test.ts     # 需要 key
 ```
@@ -210,7 +218,7 @@ writeChild(header { parentSession, isSeeded: true }, prefix)
 
 ## 5. 验收
 
-离线（`tests/s09.test.ts`）：
+离线（`tests/s10.test.ts`）：
 
 | 测试 | 证明 |
 |---|---|

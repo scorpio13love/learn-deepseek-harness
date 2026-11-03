@@ -354,3 +354,5 @@ body.is-home .page { max-width: 980px; }
 .visual-card span { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; }
 .visual-card b { font-size: 12.5px; }
 .visual-card small { color: var(--muted); font-size: 10.5px; }
+.section-link { align-self: end; color: var(--brand); font-size: 11px; text-decoration: none; white-space: nowrap; }
+.section-link:hover { text-decoration: underline; }

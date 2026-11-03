@@ -2,7 +2,7 @@
 
 > 本课代码：`src/projection.ts`、`src/web.ts`、`src/demo.ts`
 >
-> 测试：`tests/s16.test.ts`（2 个离线用例）+ s15 回归
+> 测试：`tests/s22.test.ts`（2 个离线用例）+ s15 回归
 >
 > 本课不调用模型；重点是把会话状态送到浏览器并在断线后恢复。
 
@@ -28,12 +28,20 @@ session projection、SSE 快照+增量、断线重连、多客户端。
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s22 机制动画](../../../docs/visuals/s22-flow.gif)
+
+*投影、SSE 与断线重连：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s22) · [MP4](../../../docs/visuals/s22-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s16-web
+cd course/lessons/s22-web
 node src/demo.ts
-node --test tests/s16.test.ts
+node --test tests/s22.test.ts
 ```
 
 Demo 启动 `http://127.0.0.1:<port>`：

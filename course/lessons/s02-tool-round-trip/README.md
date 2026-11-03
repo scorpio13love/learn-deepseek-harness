@@ -66,7 +66,7 @@ cp env.example .env
 # 编辑 .env，至少填入 DEEPSEEK_API_KEY
 
 node src/demo.ts
-node --test tests/s01.test.ts      # 不需要 key
+node --test tests/s02.test.ts      # 不需要 key
 node --test tests/live.test.ts     # 需要 key；没有则 SKIP
 
 # 可选：类型检查
@@ -408,7 +408,7 @@ execute 抛错      → Error: <message>
 
 ## 6. 验收：16 个离线测试 + 2 个真实模型测试
 
-离线测试（`tests/s01.test.ts`）不需要 key：
+离线测试（`tests/s02.test.ts`）不需要 key：
 
 | 组 | 覆盖 |
 |---|---|
@@ -425,7 +425,7 @@ execute 抛错      → Error: <message>
 运行：
 
 ```sh
-node --test tests/s01.test.ts
+node --test tests/s02.test.ts
 node --test tests/live.test.ts
 ```
 

@@ -122,7 +122,7 @@ deepseek-harness/   上游源码 clone（不提交，仅本地阅读）
 | [`course/README.md`](course/README.md) | 课程工程说明、运行方式、代码约定 |
 | [`course/lessons/`](course/lessons) | 28 课自包含讲义：每课 README 含源码阅读路径、实现说明、验收、练习与带答案的思考题 |
 | [`docs/02-course-v3.zh.md`](docs/02-course-v3.zh.md) | v3 课程设计：28 课、computer use、每课开篇模板与可视化规范 |
-| [`docs/visuals/README.md`](docs/visuals/README.md) | 可视化规范与 s01 动图的重新生成方式 |
+| [`docs/visuals/README.md`](docs/visuals/README.md) | 28 课机制动画、课程地图与生成脚本 |
 
 ## 课程网站
 

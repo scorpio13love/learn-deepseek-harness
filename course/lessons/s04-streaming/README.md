@@ -2,7 +2,7 @@
 
 > 本课代码：`src/`（新增 `stream.ts`；`types.ts` / `session.ts` / `agent.ts` 扩展）
 >
-> 测试：`tests/s03.test.ts`（12 个离线用例）+ `tests/live.test.ts`（1 个真实模型用例）
+> 测试：`tests/s04.test.ts`（12 个离线用例）+ `tests/live.test.ts`（1 个真实模型用例）
 >
 > 模型：真实 DeepSeek，默认 `deepseek-flash`。
 
@@ -28,16 +28,24 @@ SSE chunk 如何变成可回放的 attempt：block 组装、usage、live 帧、�
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看机制动画
+
+![s04 机制动画](../../../docs/visuals/s04-flow.gif)
+
+*chunk 如何变成可回放的 attempt：每一步的边界、输入和产出。*
+
+[交互版](../../../docs/visuals/lesson-flow.html?lesson=s04) · [MP4](../../../docs/visuals/s04-flow.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s03-streaming
+cd course/lessons/s04-streaming
 
 cp env.example .env
 # 编辑 .env，至少填入 DEEPSEEK_API_KEY
 
 node src/demo.ts
-node --test tests/s03.test.ts      # 不需要 key
+node --test tests/s04.test.ts      # 不需要 key
 node --test tests/live.test.ts     # 需要 key；没有则 SKIP
 
 # 可选：类型检查
@@ -241,7 +249,7 @@ const expanded = expandStream(event.data.stream)
 
 ## 5. 验收
 
-离线（`tests/s03.test.ts`）：
+离线（`tests/s04.test.ts`）：
 
 | 测试 | 证明 |
 |---|---|

@@ -307,7 +307,7 @@ static restore(id, events) {
 
 ## 5. 验收
 
-离线（`tests/s02.test.ts`）：
+离线（`tests/s03.test.ts`）：
 
 | 测试 | 证明 |
 |---|---|
