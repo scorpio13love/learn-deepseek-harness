@@ -2,1016 +2,1128 @@
 <opml version="2.0"><head><title>DSH 运行时知识图谱</title></head><body>
   <outline text="DSH 运行时知识图谱">
     <outline text="控制平面">
-      <outline text="turn / step / request">
+      <outline text="turn / step / request 三个边界">
       </outline>
-      <outline text="cancel 是协作式">
+      <outline text="取消是协作式，不是回滚">
       </outline>
-      <outline text="请求从日志派生">
+      <outline text="模型请求必须从日志派生">
       </outline>
-      <outline text="失败与恢复分离">
+      <outline text="失败事实与恢复策略分开">
       </outline>
     </outline>
     <outline text="事实与上下文">
-      <outline text="append-only session log">
+      <outline text="Session Log 是唯一事实源">
       </outline>
-      <outline text="surface 是视图">
+      <outline text="surface 是当前模型视图">
       </outline>
-      <outline text="replace 不删历史">
+      <outline text="replace 遮蔽旧消息不删事件">
       </outline>
-      <outline text="compaction 是工作集">
+      <outline text="compaction 是工作集管理">
       </outline>
     </outline>
     <outline text="工具与权限">
       <outline text="模型面 / 执行面 / 投影面">
       </outline>
-      <outline text="guard 只能收紧">
+      <outline text="guard 单调收紧">
       </outline>
-      <outline text="approval fail closed">
+      <outline text="审批是协议，不是弹窗">
       </outline>
       <outline text="并发默认独占">
       </outline>
     </outline>
     <outline text="组合与生命周期">
-      <outline text="Context / inject">
+      <outline text="Context 按服务键发现">
       </outline>
-      <outline text="Fiber / effect">
+      <outline text="inject 推导启动顺序">
+      </outline>
+      <outline text="effect 必须可逆">
       </outline>
       <outline text="Bundle / Profile / Patch">
       </outline>
-      <outline text="Definition–Provider–Consumer">
-      </outline>
     </outline>
     <outline text="执行边界">
-      <outline text="fs / shell / sandbox">
+      <outline text="fs / shell / sandbox seam">
       </outline>
       <outline text="MCP 外部工具">
       </outline>
-      <outline text="browser / CUA">
+      <outline text="browser / CUA provider">
       </outline>
-      <outline text="subagent 预算">
+      <outline text="subagent 预算与隔离">
       </outline>
     </outline>
     <outline text="质量与宿主">
-      <outline text="projection / SSE">
+      <outline text="projection + SSE">
       </outline>
       <outline text="record / replay">
       </outline>
       <outline text="snapshot / eval">
       </outline>
-      <outline text="Web / SDK / UI">
+      <outline text="Web / SDK / client UI">
       </outline>
     </outline>
   </outline>
 
   <outline text="s01 · 最小 agent loop">
-    <outline text="turn / step">
-      <outline text="turn/start → turn/end">
+    <outline text="为什么">
+      <outline text="取消后第二天接不上，因为发生过什么只在内存 messages 里。">
       </outline>
-      <outline text="step = 一次模型请求">
-      </outline>
-      <outline text="turn/end 放 finally">
+      <outline text="只看最终回答，无法解释哪一步被中断、哪一步失败。">
       </outline>
     </outline>
-    <outline text="流式组装">
-      <outline text="SSE chunk">
+    <outline text="核心概念">
+      <outline text="turn：一次任务唤醒，从 turn/start 到 turn/end。">
       </outline>
-      <outline text="block index">
+      <outline text="step：turn 里的一次模型请求，可能没有工具。">
       </outline>
-      <outline text="StreamAssembler">
-      </outline>
-    </outline>
-    <outline text="取消">
-      <outline text="协作式 AbortSignal">
-      </outline>
-      <outline text="已交付前缀保留">
-      </outline>
-      <outline text="assistant/attempt">
+      <outline text="attempt：一次流式请求的结算，成功/失败/取消都要收口。">
       </outline>
     </outline>
-    <outline text="日志">
-      <outline text="deriveMessages()">
+    <outline text="运行顺序">
+      <outline text="turn/start → step/start → request/header 先入日志。">
       </outline>
-      <outline text="surface = 模型视图">
+      <outline text="SSE chunk 按 block index 进入 StreamAssembler。">
       </outline>
-      <outline text="拒绝隐藏 messages 数组">
+      <outline text="block-end → assistant/message → turn/end。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="turn/end 必须放在 finally，失败也要收口。">
+      </outline>
+      <outline text="取消保留已交付前缀，不丢用户看到的内容。">
+      </outline>
+      <outline text="请求从 deriveMessages 派生，不允许隐藏 messages 数组。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s02 把工具调用与结果接进同一条 turn。">
+      </outline>
+      <outline text="s03 把事件日志投影成 surface。">
       </outline>
     </outline>
   </outline>
   <outline text="s02 · 工具往返">
-    <outline text="调用">
-      <outline text="assistant tool-call">
+    <outline text="为什么">
+      <outline text="只有 tool-call 没有 result，模型下一轮只能猜。">
       </outline>
-      <outline text="参数是原始 JSON 字符串">
-      </outline>
-      <outline text="模型不执行工具">
+      <outline text="工具异常直接终止 turn，模型学不到“失败也是一种结果”。">
       </outline>
     </outline>
-    <outline text="执行">
-      <outline text="ToolRegistry">
+    <outline text="核心概念">
+      <outline text="tool-call：assistant 请求工具，参数是原始 JSON。">
       </outline>
-      <outline text="tool/call 事件">
+      <outline text="tool/call：运行时的日志事实，带 turn/step 归属。">
       </outline>
-      <outline text="结果规范化">
-      </outline>
-    </outline>
-    <outline text="结果">
-      <outline text="tool/result 回到 surface">
-      </outline>
-      <outline text="toolCallId 配对">
-      </outline>
-      <outline text="isError 也是结果">
+      <outline text="tool/result：模型可见结果，isError 也是正常结果。">
       </outline>
     </outline>
-    <outline text="下一步">
-      <outline text="deriveMessages 带结果">
+    <outline text="运行顺序">
+      <outline text="assistant message 产出 tool-call block。">
       </outline>
-      <outline text="turn/step 归属">
+      <outline text="ToolRegistry 执行、校验参数、规范化结果。">
       </outline>
-      <outline text="失败不终止 turn">
+      <outline text="tool/result 写回；deriveMessages 在下一步带上它。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="调用与结果必须配对，否则下一步是非法历史。">
+      </outline>
+      <outline text="未知工具、参数非法、工具抛错都变成 isError。">
+      </outline>
+      <outline text="原始参数不重新序列化，避免破坏模型给的 JSON。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s01 提供 turn/step 与日志。">
+      </outline>
+      <outline text="s05 把参数 schema 与输出契约前移。">
       </outline>
     </outline>
   </outline>
   <outline text="s03 · Session Log">
-    <outline text="事实">
-      <outline text="append-only events">
+    <outline text="为什么">
+      <outline text="可变的 messages 数组只说明现在，不说明为什么变成这样。">
       </outline>
-      <outline text="seq 连续递增">
-      </outline>
-      <outline text="事件不可原地修改">
+      <outline text="恢复、审计、fork 都需要原始事实，而不是最终视图。">
       </outline>
     </outline>
-    <outline text="surface">
-      <outline text="当前模型视图">
+    <outline text="核心概念">
+      <outline text="事件信封：seq / time / type / data，追加后不改。">
       </outline>
-      <outline text="deriveMessages()">
+      <outline text="surface：当前模型视图的 seq 列表。">
       </outline>
-      <outline text="append / replace">
-      </outline>
-    </outline>
-    <outline text="replace">
-      <outline text="摘要遮蔽旧视图">
-      </outline>
-      <outline text="sourceEventSeqs">
-      </outline>
-      <outline text="原始事件保留">
+      <outline text="replace：用新摘要遮蔽旧视图，不删除事件。">
       </outline>
     </outline>
-    <outline text="恢复">
-      <outline text="Session.restore()">
+    <outline text="运行顺序">
+      <outline text="append 事件到日志，seq 连续递增。">
       </outline>
-      <outline text="重放">
+      <outline text="deriveMessages 按 surface 投影模型历史。">
       </outline>
-      <outline text="fork 前缀">
+      <outline text="restore 从日志和 surface 重建会话。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="模型可见即已记录，不能在发送前偷偷塞消息。">
+      </outline>
+      <outline text="replace 只改变视图，sourceEventSeqs 保留来源。">
+      </outline>
+      <outline text="fork 只能复制稳定前缀，不能截出悬空历史。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s10 把日志落成 JSONL。">
+      </outline>
+      <outline text="s11 用 replace 做上下文压缩。">
       </outline>
     </outline>
   </outline>
   <outline text="s04 · 流式与 attempt">
-    <outline text="chunk">
-      <outline text="text/reasoning/tool delta">
+    <outline text="为什么">
+      <outline text="用户已经看到一半文本，取消不能当没发生。">
       </outline>
-      <outline text="按 block index 归位">
-      </outline>
-      <outline text="live 帧先给 UI">
+      <outline text="断流后要能解释模型说到哪、为什么停。">
       </outline>
     </outline>
-    <outline text="组装">
-      <outline text="block-start / delta / end">
+    <outline text="核心概念">
+      <outline text="chunk：流式增量，按 block index 归位。">
       </outline>
-      <outline text="完整 assistant/message">
+      <outline text="attempt：一次模型请求的结算，带完整 stream。">
       </outline>
-      <outline text="stream 一并持久化">
-      </outline>
-    </outline>
-    <outline text="attempt">
-      <outline text="失败/取消也结算">
-      </outline>
-      <outline text="保留已交付前缀">
-      </outline>
-      <outline text="不进模型历史">
+      <outline text="live 帧：进程内给 UI 的 start/chunk/end。">
       </outline>
     </outline>
-    <outline text="usage / 重放">
-      <outline text="usage 在 finish 前">
+    <outline text="运行顺序">
+      <outline text="chunk 到达，先推 live 帧，再进 assembler。">
       </outline>
-      <outline text="取消可解释">
+      <outline text="block-start / delta / block-end 组装 message。">
       </outline>
-      <outline text="stream 可回放">
+      <outline text="assistant/message 或 assistant/attempt 持久化 stream。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="usage 必须出现在 finish 之前。">
+      </outline>
+      <outline text="取消保留已交付前缀，attempt 不进模型历史。">
+      </outline>
+      <outline text="原始 chunk 持久化，重放才能解释断流。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s01 的 loop 调用模型。">
+      </outline>
+      <outline text="s05 的工具参数也走同一套流式组装。">
       </outline>
     </outline>
   </outline>
   <outline text="s05 · 工具契约">
-    <outline text="作者 DSL">
-      <outline text="TypeScript 参数">
+    <outline text="为什么">
+      <outline text="模型给错参数时，副作用绝不能先发生。">
       </outline>
-      <outline text="编译成 JSON Schema">
-      </outline>
-      <outline text="模型只看 schema">
+      <outline text="TypeScript 类型不能直接给模型看，必须编译成 schema。">
       </outline>
     </outline>
-    <outline text="参数校验">
-      <outline text="validateParameters">
+    <outline text="核心概念">
+      <outline text="DSL：作者写参数、输出、作用域。">
       </outline>
-      <outline text="执行前拒绝">
+      <outline text="JSON Schema：模型看到的 input_schema。">
       </outline>
-      <outline text="isError 给模型看">
-      </outline>
-    </outline>
-    <outline text="输出契约">
-      <outline text="规范值">
-      </outline>
-      <outline text="output.schema">
-      </outline>
-      <outline text="render 投影">
+      <outline text="输出契约：execute 返回规范值，render 投影给模型。">
       </outline>
     </outline>
-    <outline text="作用域">
-      <outline text="scoped 工具">
+    <outline text="运行顺序">
+      <outline text="defineTool 编译参数与输出 schema。">
       </outline>
-      <outline text="conditions">
+      <outline text="validateParameters 在执行前拒绝坏参数。">
       </outline>
-      <outline text="restrictions">
+      <outline text="validateOutput 通过后，render 生成 ContentBlock。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="坏参数返回 isError，不进入 execute。">
+      </outline>
+      <outline text="输出非法也是错误结果，不是崩溃。">
+      </outline>
+      <outline text="条件工具是步骤级，不是注册时一次决定。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s06 给工具调用加策略与审批。">
+      </outline>
+      <outline text="s19 浏览器工具也遵循同一 schema 边界。">
       </outline>
     </outline>
   </outline>
   <outline text="s06 · 工具运行时">
-    <outline text="前置闸门">
-      <outline text="pre-execute">
+    <outline text="为什么">
+      <outline text="模型选择工具，不等于这次调用已经合法。">
       </outline>
-      <outline text="单调 guard 只能收紧">
-      </outline>
-      <outline text="ask / deny / allow">
+      <outline text="写文件、Shell、并发批处理都可能互相踩踏。">
       </outline>
     </outline>
-    <outline text="审批">
-      <outline text="approval/request">
+    <outline text="核心概念">
+      <outline text="pre-execute：可扩展前置决策。">
       </outline>
-      <outline text="绑定参数与调用者">
+      <outline text="guard：单调收紧，只能拒绝不能放行。">
       </outline>
-      <outline text="fail closed">
-      </outline>
-    </outline>
-    <outline text="执行">
-      <outline text="tools/execute">
-      </outline>
-      <outline text="显式并发声明">
-      </outline>
-      <outline text="exclusive batch">
+      <outline text="approval：高风险动作的显式协议。">
       </outline>
     </outline>
-    <outline text="结果">
-      <outline text="post-execute">
+    <outline text="运行顺序">
+      <outline text="pre-execute → guard → approval。">
       </outline>
-      <outline text="finalizeContent">
+      <outline text="approval 通过后进入 tools/execute。">
       </outline>
-      <outline text="tools/result 只读">
+      <outline text="post-execute → finalizeContent → tools/result。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="审批不可用必须 fail closed。">
+      </outline>
+      <outline text="并发必须显式声明，默认独占。">
+      </outline>
+      <outline text="tools/result 发布后只读，监听器不能改。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s05 定义工具契约。">
+      </outline>
+      <outline text="s14 把 fs/shell/sandbox 变成可替换能力。">
       </outline>
     </outline>
   </outline>
   <outline text="s07 · 系统提示词">
-    <outline text="sections">
-      <outline text="name / order / text">
+    <outline text="为什么">
+      <outline text="提示词不是常量，会随工作区、权限、工具变化。">
       </outline>
-      <outline text="稳定前缀">
-      </outline>
-      <outline text="KV cache">
+      <outline text="每次重拼字符串会破坏稳定前缀与 KV cache。">
       </outline>
     </outline>
-    <outline text="动态上下文">
-      <outline text="variables">
+    <outline text="核心概念">
+      <outline text="sections：有名字、顺序、稳定文本。">
       </outline>
-      <outline text="contexts">
+      <outline text="contexts / variables：运行时注入的动态片段。">
       </outline>
-      <outline text="toolOrder">
-      </outline>
-    </outline>
-    <outline text="准入">
-      <outline text="head admission">
-      </outline>
-      <outline text="system head 替换/追加">
-      </outline>
-      <outline text="in-history">
+      <outline text="head admission：决定 system 放开头还是追加历史。">
       </outline>
     </outline>
-    <outline text="泄露风险">
-      <outline text="不要塞临时秘密">
+    <outline text="运行顺序">
+      <outline text="注册 section 与 context。">
       </outline>
-      <outline text="renderContextMessage">
+      <outline text="renderContextMessage 渲染动态片段。">
       </outline>
-      <outline text="可重放">
+      <outline text="system head 准入后生成请求。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="稳定内容放前缀，动态内容放后部。">
+      </outline>
+      <outline text="秘密不进入提示词或日志。">
+      </outline>
+      <outline text="in-history 只追加，不回写开头 head。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s08 的 inbox 输入进入 prompt。">
+      </outline>
+      <outline text="s09 的 provider 决定请求如何发出。">
       </outline>
     </outline>
   </outline>
   <outline text="s08 · Inbox / steering">
-    <outline text="两条队列">
-      <outline text="next-turn">
+    <outline text="为什么">
+      <outline text="用户中途插话，不能都伪装成普通消息。">
       </outline>
-      <outline text="next-step">
-      </outline>
-      <outline text="claim 是纯删除">
+      <outline text="取消不是删除，已经发生的输入要有因果。">
       </outline>
     </outline>
-    <outline text="三种输入">
-      <outline text="followup 唤醒">
+    <outline text="核心概念">
+      <outline text="next-turn：每条消息独占一个新轮次。">
       </outline>
-      <outline text="steer 改变当前路径">
+      <outline text="next-step：下次步骤边界消费。">
       </outline>
-      <outline text="inject 不唤醒">
-      </outline>
-    </outline>
-    <outline text="边界">
-      <outline text="turn 边界领取全部 next-step">
-      </outline>
-      <outline text="step 边界只领 next-step">
-      </outline>
-      <outline text="step/end 之后进入历史">
+      <outline text="claim：从队列删除，逐条发 claimed。">
       </outline>
     </outline>
-    <outline text="取消">
-      <outline text="keepInbox">
+    <outline text="运行顺序">
+      <outline text="followup 进 next-turn 并唤醒。">
       </outline>
-      <outline text="取消不是删除">
+      <outline text="steer/inject 进 next-step；inject 不唤醒。">
       </outline>
-      <outline text="whenIdle 跨轮次">
+      <outline text="turn 边界领全部 next-step + 一条 next-turn；step 边界只领 next-step。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="steering 在 step/end 后进历史。">
+      </outline>
+      <outline text="取消 keepInbox 保留待处理输入。">
+      </outline>
+      <outline text="whenIdle 等待整个 agent，不等待单条消息。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s01 的 turn/step 提供边界。">
+      </outline>
+      <outline text="s03 的日志记录输入。">
       </outline>
     </outline>
   </outline>
   <outline text="s09 · LLM seam">
-    <outline text="统一词汇">
-      <outline text="Message / ContentBlock">
+    <outline text="为什么">
+      <outline text="loop 不能理解每家模型的消息、工具、流和错误。">
       </outline>
-      <outline text="StreamChunk">
-      </outline>
-      <outline text="loop 不出现 provider 分支">
+      <outline text="replay 需要 provider 私有状态，不能只存文本。">
       </outline>
     </outline>
-    <outline text="prepareCall">
-      <outline text="绑定 config">
+    <outline text="核心概念">
+      <outline text="Message / ContentBlock：provider-neutral 词汇。">
       </outline>
-      <outline text="capabilities">
+      <outline text="StreamChunk：有序、带终止语义的流协议。">
       </outline>
-      <outline text="retryPolicy">
-      </outline>
-    </outline>
-    <outline text="Messages">
-      <outline text="/v1/messages">
-      </outline>
-      <outline text="tool_use / tool_result">
-      </outline>
-      <outline text="thinking / usage">
+      <outline text="prepareCall：绑定 config、capabilities、retryPolicy。">
       </outline>
     </outline>
-    <outline text="失败与重试">
-      <outline text="失败事实归一化">
+    <outline text="运行顺序">
+      <outline text="provider 注册到 runtime。">
       </outline>
-      <outline text="step 内重试">
+      <outline text="prepare 解析模型与能力。">
       </outline>
-      <outline text="不重跑 pre-step">
+      <outline text="stream 把 SSE 翻译成 StreamChunk。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="失败事实在 adapter 归一化。">
+      </outline>
+      <outline text="重试是 loop/策略的事，adapter 不擅自重试。">
+      </outline>
+      <outline text="取消信号必须穿过 adapter。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s10 把会话事实落盘。">
+      </outline>
+      <outline text="s11 用新的 surface 控制模型输入。">
       </outline>
     </outline>
   </outline>
   <outline text="s10 · JSONL 持久化">
-    <outline text="写入">
-      <outline text="append 到 buffer">
+    <outline text="为什么">
+      <outline text="进程会崩，内存 buffer 会丢。">
       </outline>
-      <outline text="flush + fsync">
-      </outline>
-      <outline text="显式持久屏障">
+      <outline text="半行 JSON 不是一个完整事件。">
       </outline>
     </outline>
-    <outline text="文件">
-      <outline text="session.jsonl">
+    <outline text="核心概念">
+      <outline text="JSONL：一行一个事件，可直接读。">
       </outline>
-      <outline text="一行一个事件">
+      <outline text="flush/fsync：显式持久屏障。">
       </outline>
-      <outline text="不压缩/不校验和">
-      </outline>
-    </outline>
-    <outline text="修复">
-      <outline text="torn tail">
-      </outline>
-      <outline text="丢弃无效后缀">
-      </outline>
-      <outline text="未闭合 turn 补 interrupted">
+      <outline text="torn tail：崩溃留下的无效后缀。">
       </outline>
     </outline>
-    <outline text="fork">
-      <outline text="复制前缀">
+    <outline text="运行顺序">
+      <outline text="append 只进 buffer。">
       </outline>
-      <outline text="forked closer">
+      <outline text="flush 写文件并 fsync。">
       </outline>
-      <outline text="session/end-seed">
+      <outline text="open 逐行解析，修复后 restore。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="无效尾行丢弃，不破坏有效前缀。">
+      </outline>
+      <outline text="未闭合 turn 补 interrupted。">
+      </outline>
+      <outline text="fork 复制前缀并加 seed 标记。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s03 定义事件和 surface。">
+      </outline>
+      <outline text="s11 压缩后仍需可恢复。">
       </outline>
     </outline>
   </outline>
   <outline text="s11 · Compaction">
-    <outline text="触发">
-      <outline text="token estimate">
+    <outline text="为什么">
+      <outline text="48KB 工具结果会把上下文顶满。">
       </outline>
-      <outline text="thresholdRatio">
-      </outline>
-      <outline text="beforeStep / overflow">
+      <outline text="简单截断会连目标、约束、未完成调用一起删。">
       </outline>
     </outline>
-    <outline text="prune">
-      <outline text="超长 tool/result">
+    <outline text="核心概念">
+      <outline text="threshold/retain：按窗口比例决定何时压、留多少。">
       </outline>
-      <outline text="语义损失小">
+      <outline text="prune：先裁剪语义密度低的工具结果。">
       </outline>
-      <outline text="先裁剪再摘要">
-      </outline>
-    </outline>
-    <outline text="summary">
-      <outline text="独立模型请求">
-      </outline>
-      <outline text="保留目标/约束">
-      </outline>
-      <outline text="不污染主历史">
+      <outline text="summary：独立模型请求生成摘要。">
       </outline>
     </outline>
-    <outline text="replace">
-      <outline text="surfaceOp: replace">
+    <outline text="运行顺序">
+      <outline text="estimate 超过阈值。">
       </outline>
-      <outline text="sourceEventSeqs">
+      <outline text="prune 替换超长 tool/result。">
       </outline>
-      <outline text="旧事件仍在">
+      <outline text="summary 写回，surfaceOp replace 遮蔽旧段。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="旧事件不删除，只改变当前视图。">
+      </outline>
+      <outline text="sourceEventSeqs 说明摘要来源。">
+      </outline>
+      <outline text="overflow 在仍打开的 step 内重试。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s03 的 surface replace。">
+      </outline>
+      <outline text="s10 的日志恢复。">
       </outline>
     </outline>
   </outline>
   <outline text="s12 · Plugin kernel">
-    <outline text="Plugin">
-      <outline text="函数/类/对象">
+    <outline text="为什么">
+      <outline text="硬编码 loop 无法替换控制流。">
       </outline>
-      <outline text="贡献能力">
-      </outline>
-      <outline text="不占主流程">
+      <outline text="卸载插件必须撤销副作用，否则 HMR 不可靠。">
       </outline>
     </outline>
-    <outline text="Context">
-      <outline text="服务键">
+    <outline text="核心概念">
+      <outline text="Context：按服务键发现能力。">
       </outline>
-      <outline text="extend / isolate">
+      <outline text="inject：依赖未满足就等待。">
       </outline>
-      <outline text="作用域">
-      </outline>
-    </outline>
-    <outline text="inject / Fiber">
-      <outline text="依赖未满足则等待">
-      </outline>
-      <outline text="effect 注册">
-      </outline>
-      <outline text="dispose 逆序撤销">
+      <outline text="Fiber/effect：副作用有归属、可逆。">
       </outline>
     </outline>
-    <outline text="事件">
-      <outline text="emit">
+    <outline text="运行顺序">
+      <outline text="plugin 注册服务与监听器。">
       </outline>
-      <outline text="waterfall">
+      <outline text="inject 解析依赖，Fiber 激活。">
       </outline>
-      <outline text="serial / bail">
+      <outline text="dispose 逆序撤销 effect。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="effect 必须登记 disposer。">
+      </outline>
+      <outline text="waterfall 观察者必须委托下游。">
+      </outline>
+      <outline text="scope 限制监听器可见范围。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s13 用 bundle/profile/patch 组装插件树。">
+      </outline>
+      <outline text="s09 provider 也是插件。">
       </outline>
     </outline>
   </outline>
   <outline text="s13 · 组合与启动">
-    <outline text="Bundle">
-      <outline text="分发插件行">
+    <outline text="为什么">
+      <outline text="Web/headless 不能各复制一份内核。">
       </outline>
-      <outline text="共享基础能力">
-      </outline>
-      <outline text="不决定机器偏好">
+      <outline text="多个配置冲突时，必须知道谁获胜。">
       </outline>
     </outline>
-    <outline text="Profile">
-      <outline text="产品配方">
+    <outline text="核心概念">
+      <outline text="Bundle：分发一组插件行。">
       </outline>
-      <outline text="Web / headless / 自定义">
+      <outline text="Profile：产品形态的有序配方。">
       </outline>
-      <outline text="有序装配">
-      </outline>
-    </outline>
-    <outline text="Patch">
-      <outline text="覆盖顺序">
-      </outline>
-      <outline text="整段替换不深合并">
-      </outline>
-      <outline text="!!js 逃生口">
+      <outline text="Patch：按层级覆盖或插入。">
       </outline>
     </outline>
-    <outline text="Seam">
-      <outline text="Definition">
+    <outline text="运行顺序">
+      <outline text="bundle 按 profile 顺序叠加。">
       </outline>
-      <outline text="Provider">
+      <outline text="home patch / CLI patch 覆盖。">
       </outline>
-      <outline text="Consumer 不绕过">
+      <outline text="loader 激活最终插件树。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="按 id 覆盖是整段替换，不深合并。">
+      </outline>
+      <outline text="!!js 是可审计的运行时逃生口。">
+      </outline>
+      <outline text="dump-config 复现一次运行。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s12 提供 kernel。">
+      </outline>
+      <outline text="s22 web 是 profile 的宿主产物。">
       </outline>
     </outline>
   </outline>
   <outline text="s14 · 能力接缝">
-    <outline text="FS">
-      <outline text="read/write">
+    <outline text="为什么">
+      <outline text="agent 要读写文件、执行 Shell、访问网络。">
       </outline>
-      <outline text="工作区边界">
-      </outline>
-      <outline text="provider 可替换">
+      <outline text="工具直连宿主，就无法替换成沙箱/远程。">
       </outline>
     </outline>
-    <outline text="Shell">
-      <outline text="进程执行">
+    <outline text="核心概念">
+      <outline text="Definition：稳定能力契约。">
       </outline>
-      <outline text="超时/取消">
+      <outline text="Provider：本地/远程/沙箱实现。">
       </outline>
-      <outline text="approval">
-      </outline>
-    </outline>
-    <outline text="Sandbox">
-      <outline text="隔离级别">
-      </outline>
-      <outline text="fail closed">
-      </outline>
-      <outline text="策略解析">
+      <outline text="Consumer：工具/终端/LSP。">
       </outline>
     </outline>
-    <outline text="审批">
-      <outline text="风险动作">
+    <outline text="运行顺序">
+      <outline text="tool 只调 ctx.fs / ctx.shell。">
       </outline>
-      <outline text="来源/有效期">
+      <outline text="provider 解析实际执行环境。">
       </outline>
-      <outline text="可审计">
+      <outline text="approval/sandbox 在执行前决定。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="消费者不能绕过 seam。">
+      </outline>
+      <outline text="路径边界与工作区容器。">
+      </outline>
+      <outline text="策略失败 fail closed。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s06 的 pipeline 调能力。">
+      </outline>
+      <outline text="s19 browser 也是 provider seam。">
       </outline>
     </outline>
   </outline>
   <outline text="s15 · Subagents / presets">
-    <outline text="spawn">
-      <outline text="新 session">
+    <outline text="为什么">
+      <outline text="复制 loop 会放大会话、权限、预算和失败传播。">
       </outline>
-      <outline text="任务 + 权限">
-      </outline>
-      <outline text="child id 引用">
+      <outline text="子任务需要独立上下文，而不是污染父历史。">
       </outline>
     </outline>
-    <outline text="预算">
-      <outline text="maxDepth">
+    <outline text="核心概念">
+      <outline text="spawn：新会话，只带任务与继承权限。">
       </outline>
-      <outline text="maxActive">
+      <outline text="maxDepth/maxActive：硬预算。">
       </outline>
-      <outline text="启动前检查">
-      </outline>
-    </outline>
-    <outline text="preset">
-      <outline text="提示词/persona">
-      </outline>
-      <outline text="工具子集">
-      </outline>
-      <outline text="按会话组装">
+      <outline text="preset：按会话组装提示词与工具子集。">
       </outline>
     </outline>
-    <outline text="结果">
-      <outline text="child 日志独立">
+    <outline text="运行顺序">
+      <outline text="父工具调用 spawn。">
       </outline>
-      <outline text="结果回父 inbox">
+      <outline text="manager 检查预算后创建 child。">
       </outline>
-      <outline text="父只留摘要">
+      <outline text="child 跑独立 loop，结果回父。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="预算启动前检查，不能靠工具描述。">
+      </outline>
+      <outline text="child 日志独立、可恢复。">
+      </outline>
+      <outline text="父只保留摘要，不复制 child 事件。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s08 的 inbox 接收结果。">
+      </outline>
+      <outline text="s28 用多个子任务完成 capstone。">
       </outline>
     </outline>
   </outline>
   <outline text="s16 · PTC">
-    <outline text="program">
-      <outline text="async 函数体">
+    <outline text="为什么">
+      <outline text="工具多时，模型读 schema 和多次往返很贵。">
       </outline>
-      <outline text="顶层 await">
-      </outline>
-      <outline text="return 值">
+      <outline text="多步组合需要程序，而不是逐条调用。">
       </outline>
     </outline>
-    <outline text="tools.*">
-      <outline text="Proxy 进入 callTool">
+    <outline text="核心概念">
+      <outline text="program：async 函数体，可 await。">
       </outline>
-      <outline text="未知工具结构化错误">
+      <outline text="tools：Proxy，每次访问进入 callTool。">
       </outline>
-      <outline text="调用记录">
-      </outline>
-    </outline>
-    <outline text="序列化">
-      <outline text="Date/Map/Set">
-      </outline>
-      <outline text="循环引用失败">
-      </outline>
-      <outline text="console 捕获">
+      <outline text="scope：fresh / persistent 变量容器。">
       </outline>
     </outline>
-    <outline text="边界">
-      <outline text="fresh / persistent scope">
+    <outline text="运行顺序">
+      <outline text="run_code 编译 program。">
       </outline>
-      <outline text="timeout">
+      <outline text="program 调 tools.calc 等。">
       </outline>
-      <outline text="失败是结果">
+      <outline text="结果、日志、调用记录一起返回。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="PTC 不是沙箱，仍需 timeout/取消。">
+      </outline>
+      <outline text="失败是结构化结果，不是异常。">
+      </outline>
+      <outline text="循环引用序列化失败。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s06 的子调用仍走 tool pipeline。">
+      </outline>
+      <outline text="s21 CUA 可用 PTC 组合多步动作。">
       </outline>
     </outline>
   </outline>
   <outline text="s17 · MCP / skills / commands">
-    <outline text="MCP">
-      <outline text="initialize">
+    <outline text="为什么">
+      <outline text="外部工具不应该修改 loop。">
       </outline>
-      <outline text="tools/list">
-      </outline>
-      <outline text="tools/call">
+      <outline text="所有 skill 正文一次塞入上下文太贵。">
       </outline>
     </outline>
-    <outline text="命名">
-      <outline text="mcp__server__tool">
+    <outline text="核心概念">
+      <outline text="MCP：JSON-RPC 外部工具协议。">
       </outline>
-      <outline text="inputSchema 来自 server">
+      <outline text="mcp__server__tool：避免命名冲突。">
       </outline>
-      <outline text="错误变 isError">
-      </outline>
-    </outline>
-    <outline text="skills">
-      <outline text="SKILL.md frontmatter">
-      </outline>
-      <outline text="只注入 catalog">
-      </outline>
-      <outline text="按需 load">
+      <outline text="skill catalog / slash command：扩展上下文与宿主操作。">
       </outline>
     </outline>
-    <outline text="commands">
-      <outline text="slash command">
+    <outline text="运行顺序">
+      <outline text="initialize → tools/list。">
       </outline>
-      <outline text="host 直接分派">
+      <outline text="模型调 tools/call。">
       </outline>
-      <outline text="不产生模型轮次">
+      <outline text="结果转 tool/result；skill 按需 load。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="schema 来自 server，不手写。">
+      </outline>
+      <outline text="工具错误映射 isError。">
+      </outline>
+      <outline text="slash command 不产生模型轮次。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s18 单独拆 skills/commands。">
+      </outline>
+      <outline text="s19 browser 通过 provider 接外部能力。">
       </outline>
     </outline>
   </outline>
   <outline text="s18 · Skills / commands">
-    <outline text="目录">
-      <outline text="bundle">
+    <outline text="为什么">
+      <outline text="把所有 skill 正文放进 prompt 会挤占上下文。">
       </outline>
-      <outline text="flat .md">
-      </outline>
-      <outline text="frontmatter">
+      <outline text="用户命令不应该走一次模型。">
       </outline>
     </outline>
-    <outline text="加载">
-      <outline text="catalog 不含正文">
+    <outline text="核心概念">
+      <outline text="SKILL.md：frontmatter + 正文。">
       </outline>
-      <outline text="load_skill(name)">
+      <outline text="catalog：只含元数据，不含正文。">
       </outline>
-      <outline text="按需注入">
-      </outline>
-    </outline>
-    <outline text="命令">
-      <outline text="registry">
-      </outline>
-      <outline text="host route">
-      </outline>
-      <outline text="0 模型轮次">
+      <outline text="load_skill：模型按需读取。">
       </outline>
     </outline>
-    <outline text="边界">
-      <outline text="重名拒绝">
+    <outline text="运行顺序">
+      <outline text="扫描 bundle / flat .md。">
       </outline>
-      <outline text="无效目录">
+      <outline text="catalog 注入上下文。">
       </outline>
-      <outline text="刷新 catalog">
+      <outline text="模型 load_skill，正文才进入。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="catalog 不泄露正文。">
+      </outline>
+      <outline text="重名 skill 拒绝。">
+      </outline>
+      <outline text="command 由 host 直接分派。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s17 MCP 是外部工具。">
+      </outline>
+      <outline text="s24 UI 可展示 skill/command 结果。">
       </outline>
     </outline>
   </outline>
   <outline text="s19 · Browser use">
-    <outline text="provider">
-      <outline text="单槽位注册">
+    <outline text="为什么">
+      <outline text="浏览器不是 RPC，页面会在动作后变化。">
       </outline>
-      <outline text="第二个注册失败">
-      </outline>
-      <outline text="dispose 幂等">
+      <outline text="模型不能直接操作 DOM 或浏览器进程。">
       </outline>
     </outline>
-    <outline text="session">
-      <outline text="openSession">
+    <outline text="核心概念">
+      <outline text="BrowserProvider：单槽位注册。">
       </outline>
-      <outline text="会话所有权">
+      <outline text="BrowserSession：会话拥有页面。">
       </outline>
-      <outline text="关闭页面">
-      </outline>
-    </outline>
-    <outline text="工具">
-      <outline text="navigate">
-      </outline>
-      <outline text="read / click">
-      </outline>
-      <outline text="screenshot">
+      <outline text="ref 表：给模型稳定元素引用。">
       </outline>
     </outline>
-    <outline text="回合制">
-      <outline text="ref 表">
+    <outline text="运行顺序">
+      <outline text="navigate 打开页面。">
       </outline>
-      <outline text="动作后新快照">
+      <outline text="read 返回文本与 ref。">
       </outline>
-      <outline text="旧 ref 失效">
+      <outline text="click(ref) 返回新快照。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="动作后必须重新观测。">
+      </outline>
+      <outline text="旧 ref 失效。">
+      </outline>
+      <outline text="元素/会话错误变 isError。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s20 把同样思路带到桌面。">
+      </outline>
+      <outline text="s14 用 capability seam 隔离宿主。">
       </outline>
     </outline>
   </outline>
   <outline text="s20 · Computer use I">
-    <outline text="provider">
-      <outline text="单槽位">
+    <outline text="为什么">
+      <outline text="桌面应用不是网页，读取需要系统授权。">
       </outline>
-      <outline text="macOS CUA">
-      </outline>
-      <outline text="app/window">
+      <outline text="截图、AX、窗口都是外部状态。">
       </outline>
     </outline>
-    <outline text="授权">
-      <outline text="读取前检查">
+    <outline text="核心概念">
+      <outline text="CUA provider：单槽位。">
       </outline>
-      <outline text="fail closed">
+      <outline text="app/window：应用与窗口边界。">
       </outline>
-      <outline text="session 级">
-      </outline>
-    </outline>
-    <outline text="快照">
-      <outline text="AX tree">
-      </outline>
-      <outline text="screenshot">
-      </outline>
-      <outline text="scale">
+      <outline text="AX/screenshot：模型可读的桌面快照。">
       </outline>
     </outline>
-    <outline text="工具">
-      <outline text="getApp">
+    <outline text="运行顺序">
+      <outline text="authorize 应用。">
       </outline>
-      <outline text="getWindows">
+      <outline text="getState 返回 app/window/AX。">
       </outline>
-      <outline text="getState">
+      <outline text="screenshot 返回图像与尺寸。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="读取前必须授权。">
+      </outline>
+      <outline text="未授权 fail closed。">
+      </outline>
+      <outline text="scale 影响后续坐标。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s21 在快照上执行动作。">
+      </outline>
+      <outline text="s19 是浏览器版本。">
       </outline>
     </outline>
   </outline>
   <outline text="s21 · Computer use II">
-    <outline text="坐标">
-      <outline text="截图像素">
+    <outline text="为什么">
+      <outline text="动作 dispatched 不等于 UI 已改变。">
       </outline>
-      <outline text="relative 0–999">
-      </outline>
-      <outline text="越界拒绝">
+      <outline text="点击/输入不可撤销，必须能重新观测。">
       </outline>
     </outline>
-    <outline text="动作">
-      <outline text="click/type/press/scroll">
+    <outline text="核心概念">
+      <outline text="绝对坐标：截图像素。">
       </outline>
-      <outline text="dispatched">
+      <outline text="相对坐标：0–999 千分比。">
       </outline>
-      <outline text="verified:false">
-      </outline>
-    </outline>
-    <outline text="失效">
-      <outline text="STALE_SNAPSHOT">
-      </outline>
-      <outline text="WINDOW_CHANGED">
-      </outline>
-      <outline text="重新截图">
+      <outline text="dispatched/verified：派发与验证分开。">
       </outline>
     </outline>
-    <outline text="权限">
-      <outline text="持久/会话授权">
+    <outline text="运行顺序">
+      <outline text="拿最新 screenshot。">
       </outline>
-      <outline text="撤销">
+      <outline text="click/type/press/scroll。">
       </outline>
-      <outline text="输入不可逆">
+      <outline text="再截图确认，旧快照失效。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="STALE_SNAPSHOT / WINDOW_CHANGED 要重新观测。">
+      </outline>
+      <outline text="权限撤销立即生效。">
+      </outline>
+      <outline text="输入不可 undo。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s20 的 state。">
+      </outline>
+      <outline text="s27 的 allowlist 与审计。">
       </outline>
     </outline>
   </outline>
   <outline text="s22 · Web projection">
-    <outline text="projection">
-      <outline text="事件 → 卡片">
+    <outline text="为什么">
+      <outline text="客户端各自 fold 事件会渲染不一致。">
       </outline>
-      <outline text="纯 fold">
-      </outline>
-      <outline text="确定性">
+      <outline text="断线重连不能把已结束的卡变回 running。">
       </outline>
     </outline>
-    <outline text="snapshot">
-      <outline text="首屏">
+    <outline text="核心概念">
+      <outline text="projection：事件 → 卡片的纯 fold。">
       </outline>
-      <outline text="当前 seq">
+      <outline text="snapshot：首屏状态 + seq。">
       </outline>
-      <outline text="多客户端">
-      </outline>
-    </outline>
-    <outline text="SSE">
-      <outline text="增量">
-      </outline>
-      <outline text="按 seq 去重">
-      </outline>
-      <outline text="断线重连">
+      <outline text="SSE delta：seq 之后的增量。">
       </outline>
     </outline>
-    <outline text="边界">
-      <outline text="客户端不 fold">
+    <outline text="运行顺序">
+      <outline text="host 读 session events。">
       </outline>
-      <outline text="host 计算">
+      <outline text="projection 生成 snapshot。">
       </outline>
-      <outline text="回放一致">
+      <outline text="客户端订阅 after=seq，接收 delta。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="客户端不自己 fold。">
+      </outline>
+      <outline text="按 seq 去重，不重放已有卡。">
+      </outline>
+      <outline text="多客户端看同一投影。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s24 把投影渲染成 UI。">
+      </outline>
+      <outline text="s23 用 SDK 暴露同一运行时。">
       </outline>
     </outline>
   </outline>
   <outline text="s23 · SDK / headless">
-    <outline text="协议">
-      <outline text="JSON-RPC">
+    <outline text="为什么">
+      <outline text="编辑器/CI 不应嵌入 loop。">
       </outline>
-      <outline text="stdio">
-      </outline>
-      <outline text="newline framed">
+      <outline text="进程边界需要稳定协议与错误语义。">
       </outline>
     </outline>
-    <outline text="方法">
-      <outline text="session/create">
+    <outline text="核心概念">
+      <outline text="JSON-RPC：请求/响应/通知。">
       </outline>
-      <outline text="prompt">
+      <outline text="stdio：newline framed。">
       </outline>
-      <outline text="session/event">
-      </outline>
-    </outline>
-    <outline text="边界">
-      <outline text="进程外服务">
-      </outline>
-      <outline text="编辑器/CI 接入">
-      </outline>
-      <outline text="不复制 loop">
+      <outline text="session/event：服务端推送。">
       </outline>
     </outline>
-    <outline text="错误">
-      <outline text="结构化 code">
+    <outline text="运行顺序">
+      <outline text="客户端 session/create。">
       </outline>
-      <outline text="取消">
+      <outline text="发送 prompt 请求。">
       </outline>
-      <outline text="退出码">
+      <outline text="订阅 session/event。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="错误结构化 code。">
+      </outline>
+      <outline text="取消要传递。">
+      </outline>
+      <outline text="退出码可判断。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s22 web 是另一种宿主。">
+      </outline>
+      <outline text="s24 client UI 消费事件。">
       </outline>
     </outline>
   </outline>
   <outline text="s24 · Client UI">
-    <outline text="卡片">
-      <outline text="text">
+    <outline text="为什么">
+      <outline text="原始事件不能直接渲染。">
       </outline>
-      <outline text="tool">
-      </outline>
-      <outline text="approval / error">
+      <outline text="工具/审批状态变化必须稳定映射。">
       </outline>
     </outline>
-    <outline text="状态">
-      <outline text="running → done/failed">
+    <outline text="核心概念">
+      <outline text="action card：text/tool/approval/error。">
       </outline>
-      <outline text="host 决定">
+      <outline text="状态：running/done/failed/denied。">
       </outline>
-      <outline text="payload">
-      </outline>
-    </outline>
-    <outline text="同步">
-      <outline text="snapshot + delta">
-      </outline>
-      <outline text="seq 对齐">
-      </outline>
-      <outline text="不重复渲染">
+      <outline text="snapshot + delta：首屏与增量。">
       </outline>
     </outline>
-    <outline text="重连">
-      <outline text="lastSeq">
+    <outline text="运行顺序">
+      <outline text="project events。">
       </outline>
-      <outline text="补缺失事件">
+      <outline text="工具卡合并 call/result。">
       </outline>
-      <outline text="已结束卡不回 running">
+      <outline text="重连按 lastSeq 补事件。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="已结束卡不回 running。">
+      </outline>
+      <outline text="状态由 host projection 决定。">
+      </outline>
+      <outline text="payload 必须可序列化。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s22 提供 projection。">
+      </outline>
+      <outline text="s25 记录可回放 UI 状态。">
       </outline>
     </outline>
   </outline>
   <outline text="s25 · Observability">
-    <outline text="span">
-      <outline text="turn/step/tool">
+    <outline text="为什么">
+      <outline text="agent 行为不确定，必须能录、能回放。">
       </outline>
-      <outline text="trace">
-      </outline>
-      <outline text="耗时">
+      <outline text="只看最终文本无法定位哪一步退化。">
       </outline>
     </outline>
-    <outline text="record">
-      <outline text="事件 + chunk">
+    <outline text="核心概念">
+      <outline text="span：turn/step/tool 层级。">
       </outline>
-      <outline text="replay">
+      <outline text="record/replay：事件与 chunk。">
       </outline>
-      <outline text="不访问网络">
-      </outline>
-    </outline>
-    <outline text="snapshot">
-      <outline text="归一化">
-      </outline>
-      <outline text="去掉时间戳噪声">
-      </outline>
-      <outline text="diff">
+      <outline text="snapshot：归一化的事实。">
       </outline>
     </outline>
-    <outline text="门禁">
-      <outline text="回归">
+    <outline text="运行顺序">
+      <outline text="run 生成 span。">
       </outline>
-      <outline text="失败可定位">
+      <outline text="record 写事件与 chunk。">
       </outline>
-      <outline text="不阻塞主路径">
+      <outline text="replay 不请求网络，重放同一 loop。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="快照去时间戳噪声。">
+      </outline>
+      <outline text="失败也要记录。">
+      </outline>
+      <outline text="观测不阻塞主路径。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s26 用回放做 eval。">
+      </outline>
+      <outline text="s03 的日志是事实源。">
       </outline>
     </outline>
   </outline>
   <outline text="s26 · Eval / fault injection">
-    <outline text="scenario">
-      <outline text="模型脚本">
+    <outline text="为什么">
+      <outline text="一次失败无法稳定复现。">
       </outline>
-      <outline text="工具">
-      </outline>
-      <outline text="seed">
+      <outline text="只测成功路径，无法知道故障时行为。">
       </outline>
     </outline>
-    <outline text="fault">
-      <outline text="429">
+    <outline text="核心概念">
+      <outline text="scenario：模型脚本、工具、seed。">
       </outline>
-      <outline text="timeout">
+      <outline text="fault：429/timeout/断流/工具错误。">
       </outline>
-      <outline text="断流 / 工具错误">
-      </outline>
-    </outline>
-    <outline text="replay">
-      <outline text="同失败">
-      </outline>
-      <outline text="同事件">
-      </outline>
-      <outline text="可重复">
+      <outline text="report：矩阵与结论。">
       </outline>
     </outline>
-    <outline text="report">
-      <outline text="矩阵">
+    <outline text="运行顺序">
+      <outline text="scenario 固定输入。">
       </outline>
-      <outline text="结论">
+      <outline text="record 真实 run。">
       </outline>
-      <outline text="失败定位">
+      <outline text="replay + 故障矩阵。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="seed 固定，结果可重复。">
+      </outline>
+      <outline text="失败不包装成成功。">
+      </outline>
+      <outline text="diff 必须能解释。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s25 提供 record/replay。">
+      </outline>
+      <outline text="s28 用 eval 验收 capstone。">
       </outline>
     </outline>
   </outline>
   <outline text="s27 · Security">
-    <outline text="路径">
-      <outline text="realpath + relative">
+    <outline text="为什么">
+      <outline text="模型会被间接内容注入。">
       </outline>
-      <outline text="symlink">
-      </outline>
-      <outline text="工作区容器">
+      <outline text="策略不能依赖模型自觉，必须运行时强制。">
       </outline>
     </outline>
-    <outline text="审批">
-      <outline text="fail closed">
+    <outline text="核心概念">
+      <outline text="路径容器：realpath + relative。">
       </outline>
-      <outline text="绑定参数">
+      <outline text="审批：绑定参数、调用者、有效期。">
       </outline>
-      <outline text="不可复用">
-      </outline>
-    </outline>
-    <outline text="秘密">
-      <outline text="redaction">
-      </outline>
-      <outline text="key/value">
-      </outline>
-      <outline text="日志不泄露">
+      <outline text="redaction / allowlist：秘密与 CUA 授权。">
       </outline>
     </outline>
-    <outline text="CUA">
-      <outline text="allowlist">
+    <outline text="运行顺序">
+      <outline text="工具参数物化并冻结。">
       </outline>
-      <outline text="拒绝先于读取">
+      <outline text="路径/审批在副作用前检查。">
       </outline>
-      <outline text="审计">
+      <outline text="结果截断、脱敏、审计。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="fail closed，不静默放宽。">
+      </outline>
+      <outline text="审批不复用。">
+      </outline>
+      <outline text="秘密不进日志或上下文。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="s14 的能力 seam。">
+      </outline>
+      <outline text="s21 的 CUA 授权。">
       </outline>
     </outline>
   </outline>
   <outline text="s28 · Capstone">
-    <outline text="任务">
-      <outline text="真实模型">
+    <outline text="为什么">
+      <outline text="知识点不串起来，遇到真实任务仍然不会。">
       </outline>
-      <outline text="多工具">
-      </outline>
-      <outline text="仓库审计">
+      <outline text="真实仓库会同时暴露工具、日志、审批和 eval 问题。">
       </outline>
     </outline>
-    <outline text="日志">
-      <outline text="JSONL">
+    <outline text="核心概念">
+      <outline text="多工具 agent。">
       </outline>
-      <outline text="surface 摘要">
+      <outline text="JSONL 事件日志 + surface 摘要。">
       </outline>
-      <outline text="可恢复">
-      </outline>
-    </outline>
-    <outline text="评测">
-      <outline text="checks">
-      </outline>
-      <outline text="报告">
-      </outline>
-      <outline text="失败不包装">
+      <outline text="eval report：验收事实。">
       </outline>
     </outline>
-    <outline text="边界">
-      <outline text="审批">
+    <outline text="运行顺序">
+      <outline text="读任务与工作区。">
       </outline>
-      <outline text="工具错误">
+      <outline text="工具调用、审批、日志。">
       </outline>
-      <outline text="退出码">
+      <outline text="写 artifacts 与 eval report。">
+      </outline>
+    </outline>
+    <outline text="边界/失败">
+      <outline text="工具错误/审批拒绝必须记录。">
+      </outline>
+      <outline text="报告不包装失败。">
+      </outline>
+      <outline text="结果可复现。">
+      </outline>
+    </outline>
+    <outline text="连接">
+      <outline text="回看 s01–s27 的接缝。">
+      </outline>
+      <outline text="下一步：用同一套边界做自己的 agent。">
       </outline>
     </outline>
   </outline>

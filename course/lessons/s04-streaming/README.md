@@ -28,7 +28,7 @@ SSE chunk 如何变成可回放的 attempt：block 组装、usage、live 帧、�
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
-### 先看机制动画
+### 先看一次真实运行
 
 ![s04 agent 运行动画](../../../docs/visuals/s04-agent-run.gif)
 

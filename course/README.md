@@ -21,6 +21,8 @@
 - [OPML（通用大纲）](../docs/visuals/mindmaps/course.opml)
 - [Markdown 大纲](../docs/visuals/mindmaps/course.md)
 
+> XMind 内含 29 张 sheet（1 张总图谱 + 28 张每课知识点）。如果本机 Xmind 版本提示格式不兼容，直接导入 `.opml`。
+
 ## 课程目录
 
 ```text

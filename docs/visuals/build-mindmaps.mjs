@@ -25,14 +25,14 @@ function textLines(lines, x, y, size, color, weight = 400, anchor = 'start') {
   return lines.map((line, i) => `<text x="${x}" y="${y + i * (size + 3)}" font-size="${size}" font-weight="${weight}" fill="${color}" text-anchor="${anchor}" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(line)}</text>`).join('')
 }
 function lessonMap([slug, title, branches]) {
-  const p = palette[partOf(slug)]; const W = 1120, H = 640, cx = 132, cy = H / 2
-  const nodeX = 342; const top = 70; const gap = (H - 140) / branches.length
+  const p = palette[partOf(slug)]; const W = 1200, H = 780, cx = 138, cy = H / 2
+  const nodeX = 360; const top = 62; const gap = (H - 142) / branches.length
   const branchSvg = branches.map(([label, leaves], i) => {
     const y = top + i * gap
     return `<path d="M${cx + 58} ${cy} C${cx + 170} ${cy} ${nodeX - 70} ${y + 20} ${nodeX} ${y + 20}" fill="none" stroke="${p}" stroke-opacity=".4" stroke-width="1.4"/>
       <rect x="${nodeX}" y="${y}" width="205" height="42" rx="9" fill="${p}"/>
       <text x="${nodeX + 16}" y="${y + 26}" font-size="13.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(label)}</text>
-      ${textLines(leaves.flatMap(x => wrap(x, 26)).slice(0, 4), nodeX + 228, y + 23, 11, '#3c3c43')}`
+      ${textLines(leaves.flatMap((leaf, k) => wrap(leaf, 28).map((line, j) => `${j === 0 ? '• ' : '  '}${line}`)).slice(0, 7), nodeX + 232, y + 22, 10.5, '#3c3c43')}`
   }).join('')
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="title">
   <title id="title">${esc(title)} 知识点导图</title>
@@ -51,7 +51,7 @@ function lessonMap([slug, title, branches]) {
 }
 
 function courseMap() {
-  const W = 1600, H = 960, cx = W / 2, cy = 90
+  const W = 1600, H = 760, cx = W / 2, cy = 86
   const cols = course.branches.length; const colW = W / cols
   const branches = course.branches.map(([label, leaves], i) => {
     const x = i * colW + 38; const color = ['#5b5bd6','#0c93ad','#8b5cf6','#b87412','#158a63','#b33a3a'][i]
@@ -59,7 +59,7 @@ function courseMap() {
       const y = 260 + j * 92
       return `<path d="M${x + 100} 208 C${x + 100} ${y} ${x + 105} ${y} ${x + 120} ${y}" fill="none" stroke="${color}" stroke-opacity=".35" stroke-width="1.1"/>
         <circle cx="${x + 120}" cy="${y}" r="3.5" fill="${color}"/>
-        <text x="${x + 134}" y="${y + 4}" font-size="11" fill="#2c2c32" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(leaf)}</text>`
+        ${textLines(wrap(leaf, 19).slice(0, 2), x + 134, y + 4, 10.5, '#2c2c32')}`
     }).join('')
     return `<path d="M${cx} ${cy + 54} C${cx} 160 ${x + 100} 150 ${x + 100} 205" fill="none" stroke="${color}" stroke-opacity=".38" stroke-width="1.4"/>
       <rect x="${x}" y="165" width="200" height="44" rx="10" fill="${color}"/>
