@@ -198,6 +198,6 @@ s14 解决了委派。s15 会接入外部能力：
 
 ![s15 知识导图](../../../docs/visuals/mindmaps/s15.svg)
 
-*用一张图记住本课的知识点：概念、事实、边界与失败模式。*
+*S 场景 / T 任务 / A 是什么·怎么做 / R 结果与边界。*
 
 [总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

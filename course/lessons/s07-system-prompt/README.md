@@ -386,6 +386,6 @@ s06 解决了「模型看到什么提示词」。s07 会解决「运行中的 ag
 
 ![s07 知识导图](../../../docs/visuals/mindmaps/s07.svg)
 
-*用一张图记住本课的知识点：概念、事实、边界与失败模式。*
+*S 场景 / T 任务 / A 是什么·怎么做 / R 结果与边界。*
 
 [总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

@@ -25,7 +25,7 @@ function textLines(lines, x, y, size, color, weight = 400, anchor = 'start') {
   return lines.map((line, i) => `<text x="${x}" y="${y + i * (size + 3)}" font-size="${size}" font-weight="${weight}" fill="${color}" text-anchor="${anchor}" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(line)}</text>`).join('')
 }
 function lessonMap([slug, title, branches]) {
-  const p = palette[partOf(slug)]; const W = 1200, H = 780, cx = 138, cy = H / 2
+  const p = palette[partOf(slug)]; const W = 1200, H = 820, cx = 138, cy = H / 2
   const nodeX = 360; const top = 62; const gap = (H - 142) / branches.length
   const branchSvg = branches.map(([label, leaves], i) => {
     const y = top + i * gap
