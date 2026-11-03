@@ -367,6 +367,6 @@ s09 让模型调用可替换、可重试。s10 会让会话活过进程重启：
 
 ![s09 知识导图](../../../docs/visuals/mindmaps/s09.svg)
 
-*S 场景 / T 任务 / A 是什么·怎么做 / R 结果与边界。*
+*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
 
 [总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)

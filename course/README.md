@@ -15,7 +15,7 @@
 
 ![DSH 知识图谱](../docs/visuals/mindmaps/course.svg)
 
-总图是六个知识域；每课导图按 **S 场景 / T 任务 / A 是什么·怎么做 / R 结果与边界** 展开。XMind 内含总图谱 + 28 张每课知识点。网页直接显示 SVG；需要编辑时下载 XMind。
+总图是六个知识域；每课导图围绕主体元素展开：**是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接**。XMind 内含总图谱 + 28 张每课知识点。网页直接显示 SVG；需要编辑时下载 XMind。
 
 - [XMind 源文件](../docs/visuals/mindmaps/course.xmind)
 - [OPML（通用大纲）](../docs/visuals/mindmaps/course.opml)

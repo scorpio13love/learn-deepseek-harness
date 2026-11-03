@@ -25,14 +25,14 @@ function textLines(lines, x, y, size, color, weight = 400, anchor = 'start') {
   return lines.map((line, i) => `<text x="${x}" y="${y + i * (size + 3)}" font-size="${size}" font-weight="${weight}" fill="${color}" text-anchor="${anchor}" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(line)}</text>`).join('')
 }
 function lessonMap([slug, title, branches]) {
-  const p = palette[partOf(slug)]; const W = 1200, H = 820, cx = 138, cy = H / 2
-  const nodeX = 360; const top = 62; const gap = (H - 142) / branches.length
+  const p = palette[partOf(slug)]; const W = 1200, H = 900, cx = 138, cy = H / 2
+  const nodeX = 360; const top = 58; const gap = (H - 150) / branches.length
   const branchSvg = branches.map(([label, leaves], i) => {
     const y = top + i * gap
     return `<path d="M${cx + 58} ${cy} C${cx + 170} ${cy} ${nodeX - 70} ${y + 20} ${nodeX} ${y + 20}" fill="none" stroke="${p}" stroke-opacity=".4" stroke-width="1.4"/>
       <rect x="${nodeX}" y="${y}" width="205" height="42" rx="9" fill="${p}"/>
       <text x="${nodeX + 16}" y="${y + 26}" font-size="13.5" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(label)}</text>
-      ${textLines(leaves.flatMap((leaf, k) => wrap(leaf, 28).map((line, j) => `${j === 0 ? '• ' : '  '}${line}`)).slice(0, 7), nodeX + 232, y + 22, 10.5, '#3c3c43')}`
+      ${textLines(leaves.flatMap((leaf, k) => wrap(leaf, 28).map((line, j) => `${j === 0 ? '• ' : '  '}${line}`)).slice(0, 8), nodeX + 232, y + 20, 10.5, '#3c3c43')}`
   }).join('')
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="title">
   <title id="title">${esc(title)} 知识点导图</title>

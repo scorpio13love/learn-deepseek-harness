@@ -386,6 +386,6 @@ s06 解决了「模型看到什么提示词」。s07 会解决「运行中的 ag
 
 ![s07 知识导图](../../../docs/visuals/mindmaps/s07.svg)
 
-*S 场景 / T 任务 / A 是什么·怎么做 / R 结果与边界。*
+*围绕本课主体元素：是什么 / 在 agent 里起什么作用 / 关键特征 / 运行位置 / 面试常问 / 架构连接。*
 
 [总知识导图](../../../docs/visuals/mindmaps/course.svg) · [XMind 源文件](../../../docs/visuals/mindmaps/course.xmind)
