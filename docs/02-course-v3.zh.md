@@ -163,6 +163,10 @@ browser use 则是另一套 provider registry：
 
 ![s03 surface](visuals/s03-surface.gif)
 
+**s09 · LLM seam**
+
+![s09 LLM seam](visuals/s09-llm-seam.gif)
+
 **s08 · inbox / steering**
 
 ![s08 inbox](visuals/s08-inbox.gif)

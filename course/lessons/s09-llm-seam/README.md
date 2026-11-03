@@ -30,11 +30,11 @@ Provider 注册、prepareCall、能力元数据、in-history 与 step 内重试�
 
 ### 先看机制动画
 
-![s09 机制动画](../../../docs/visuals/s09-flow.gif)
+![s09 LLM seam 动画](../../../docs/visuals/s09-llm-seam.gif)
 
-*模型调用是可替换的 I/O 边界：每一步的边界、输入和产出。*
+*真实 Messages 请求、SSE JSONL 行，以及写入 Session 的 assistant/message。*
 
-[交互版](../../../docs/visuals/lesson-flow.html?lesson=s09) · [MP4](../../../docs/visuals/s09-flow.mp4)
+[交互版](../../../docs/visuals/s09-llm-seam.html) · [MP4](../../../docs/visuals/s09-llm-seam.mp4)
 
 ## 0. 先跑起来
 

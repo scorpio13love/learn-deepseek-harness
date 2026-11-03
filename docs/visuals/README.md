@@ -23,12 +23,13 @@ README 里放静态首帧或 GIF；网站里放可交互版本。
 | `s02-tools.html` / `.gif` / `.mp4` | s02 tool round-trip 原型 |
 | `s03-surface.html` / `.gif` / `.mp4` | s03 surface/replace 原型 |
 | `s08-inbox.html` / `.gif` / `.mp4` | s08 inbox/steering 原型 |
+| `s09-llm-seam.html` / `.gif` / `.mp4` | s09 Messages 请求/SSE/JSONL 原型 |
 | `lesson-flow.html` + `flow-data.js` | 通用机制动画播放器（只给需要看时序的课） |
-| `sNN-flow.gif` | 16 课通用 flow 动画（GIF/MP4） |
+| `sNN-flow.gif` | 15 课通用 flow 动画（GIF/MP4） |
 | `build-flow-data.mjs` / `capture-flow.mjs` | 生成 flow 数据、抓帧与编码 |
 | `maps/s01.svg` … `maps/s28.svg` | 28 张本课机制地图 |
 | `build-maps.mjs` | 生成 28 张地图的脚本 |
-| `build-s01.sh` … `build-s08.sh` | 从 HTML 重新生成 GIF/MP4 的脚本 |
+| `build-s01.sh` … `build-s09.sh` | 从 HTML 重新生成 GIF/MP4 的脚本 |
 
 ## 生成
 
@@ -51,6 +52,7 @@ node docs/visuals/capture-flow.mjs
 ./docs/visuals/build-s02.sh
 ./docs/visuals/build-s03.sh
 ./docs/visuals/build-s08.sh
+./docs/visuals/build-s09.sh
 ```
 
 `s01-loop.html` 支持可点击幕导航和确定性帧：
@@ -88,6 +90,7 @@ node docs/visuals/capture-flow.mjs
 | s02 tool round-trip | tool-call → execute → tool/result → next step | `s02-tools.*` |
 | s03 surface | 事件日志 → surface → derive → replace | `s03-surface.*` |
 | s08 inbox | followup / steer / inject → claim | `s08-inbox.*` |
+| s09 LLM seam | 请求 JSON → SSE 行 → Session JSONL | `s09-llm-seam.*` |
 | 16 课 flow | 本课问题 / 节点 / 源码锚点 | `lesson-flow.html?lesson=sNN` |
 
 ## 后续课程视觉

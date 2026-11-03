@@ -367,8 +367,9 @@
       ['s02-tool-round-trip', { gif: 's02-tools.gif', html: 's02-tools.html', sub: 'tool-call → execute → tool/result' }],
       ['s03-session-log', { gif: 's03-surface.gif', html: 's03-surface.html', sub: 'event log → surface → derive' }],
       ['s08-inbox-steering', { gif: 's08-inbox.gif', html: 's08-inbox.html', sub: 'followup · steer · inject → claim' }],
+      ['s09-llm-seam', { gif: 's09-llm-seam.gif', html: 's09-llm-seam.html', sub: 'request → Messages → SSE → StreamChunk' }],
     ]);
-    const animatedGeneric = new Set(['s04-streaming','s06-tool-runtime','s09-llm-seam','s10-persistence','s11-compaction','s12-plugin-kernel','s15-subagents-presets','s16-ptc','s17-mcp-skills-commands','s19-browser-use','s20-computer-use-i','s21-computer-use-ii','s22-web','s24-client-ui','s25-observability-eval','s26-eval']);
+    const animatedGeneric = new Set(['s04-streaming','s06-tool-runtime','s10-persistence','s11-compaction','s12-plugin-kernel','s15-subagents-presets','s16-ptc','s17-mcp-skills-commands','s19-browser-use','s20-computer-use-i','s21-computer-use-ii','s22-web','s24-client-ui','s25-observability-eval','s26-eval']);
     const slugs = C.parts.flatMap(part => part.lessons).filter(slug => custom.has(slug) || animatedGeneric.has(slug));
     const cards = slugs.map(slug => {
       const lesson = lessons[slug];
