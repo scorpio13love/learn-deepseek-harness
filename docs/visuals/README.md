@@ -22,9 +22,10 @@ README 里放静态首帧或 GIF；网站里放可交互版本。
 | `s01-loop-poster.png` | 静态首帧，备用封面 |
 | `s02-tools.html` / `.gif` / `.mp4` | s02 tool round-trip 原型 |
 | `s03-surface.html` / `.gif` / `.mp4` | s03 surface/replace 原型 |
+| `s08-inbox.html` / `.gif` / `.mp4` | s08 inbox/steering 原型 |
 | `maps/s01.svg` … `maps/s28.svg` | 28 张本课机制地图 |
 | `build-maps.mjs` | 生成 28 张地图的脚本 |
-| `build-s01.sh` / `build-s02.sh` / `build-s03.sh` | 从 HTML 重新生成 GIF/MP4 的脚本 |
+| `build-s01.sh` … `build-s08.sh` | 从 HTML 重新生成 GIF/MP4 的脚本 |
 
 ## 生成
 
@@ -44,6 +45,7 @@ node docs/visuals/build-maps.mjs
 ./docs/visuals/build-s01.sh
 ./docs/visuals/build-s02.sh
 ./docs/visuals/build-s03.sh
+./docs/visuals/build-s08.sh
 ```
 
 `s01-loop.html` 支持可点击幕导航和确定性帧：
@@ -80,6 +82,7 @@ node docs/visuals/build-maps.mjs
 | s01 loop | chunk → assembler → message → event | `s01-loop.*` |
 | s02 tool round-trip | tool-call → execute → tool/result → next step | `s02-tools.*` |
 | s03 surface | 事件日志 → surface → derive → replace | `s03-surface.*` |
+| s08 inbox | followup / steer / inject → claim | `s08-inbox.*` |
 
 ## 后续课程视觉
 

@@ -423,6 +423,10 @@
             <img src="../docs/visuals/s03-surface.gif" alt="s03 surface 动画" loading="lazy">
             <span><b>s03 · surface</b><small>event log → surface → derive</small></span>
           </a>
+          <a class="visual-card" href="../docs/visuals/s08-inbox.html" target="_blank" rel="noreferrer">
+            <img src="../docs/visuals/s08-inbox.gif" alt="s08 inbox / steering 动画" loading="lazy">
+            <span><b>s08 · inbox / steering</b><small>followup · steer · inject → claim</small></span>
+          </a>
         </div>
       </section>
 

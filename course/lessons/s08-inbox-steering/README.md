@@ -2,7 +2,7 @@
 
 > 本课代码：`src/`（新增 `inbox.ts`；`agent.ts` 改成队列驱动，支持 followup / steer / inject / cancel / whenIdle）
 >
-> 测试：`tests/s07.test.ts`（10 个离线用例）+ s03-s06 回归（44 个）+ `tests/live.test.ts`（1 个真实模型用例）
+> 测试：`tests/s08.test.ts`（10 个离线用例）+ s03-s06 回归（44 个）+ `tests/live.test.ts`（1 个真实模型用例）
 >
 > 模型：真实 DeepSeek，默认 `deepseek-flash`。
 
@@ -28,16 +28,24 @@
 
 *本课地图：这一步新增的架构边界，以及它在数据流中的位置。*
 
+### 先看一张动图
+
+![s08 inbox / steering](../../../docs/visuals/s08-inbox.gif)
+
+*followup 启动一轮；inject 不唤醒；steer 在 step/end 之后进入历史。*
+
+[交互版](../../../docs/visuals/s08-inbox.html) · [MP4](../../../docs/visuals/s08-inbox.mp4)
+
 ## 0. 先跑起来
 
 ```sh
-cd course/lessons/s07-inbox-steering
+cd course/lessons/s08-inbox-steering
 
 cp env.example .env
 # 编辑 .env，至少填入 DEEPSEEK_API_KEY
 
 node src/demo.ts
-node --test tests/s07.test.ts
+node --test tests/s08.test.ts
 node --test tests/s06-regression.test.ts tests/s05-regression.test.ts tests/s04-regression.test.ts tests/s03-regression.test.ts
 node --test tests/live.test.ts     # 需要 key
 ```

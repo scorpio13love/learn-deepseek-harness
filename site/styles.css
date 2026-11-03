@@ -347,7 +347,7 @@ body.is-home .page { max-width: 980px; }
 .course-map-link { display: block; border-radius: 16px; border: 1px solid var(--line); overflow: hidden; background: var(--bg-elevated); box-shadow: var(--shadow-sm); }
 .course-map-link:hover { border-color: var(--line-strong); }
 .course-map { display: block; width: 100%; height: auto; }
-.visual-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.visual-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
 .visual-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-elevated); color: var(--ink); box-shadow: var(--shadow-sm); }
 .visual-card:hover { text-decoration: none; border-color: color-mix(in srgb, var(--brand) 30%, var(--line)); }
 .visual-card img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--bg); }
