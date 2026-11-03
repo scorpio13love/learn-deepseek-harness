@@ -48,14 +48,18 @@
 真正改变模型看到的，不是 `delete`，而是这个 `append` 上的 `surfaceOp`：
 
 ```ts
-session.append('user/message', { message: summaryMessage }, {
-  surfaceOp: {
-    op: 'replace',
-    startSeq: old[0]!.seq,
-    endSeq: old[old.length - 1]!.seq,
+session.append(
+  'user/message',
+  { message: summaryMessage },
+  {
+    surfaceOp: {
+      op: 'replace',
+      startSeq: old[0]!.seq,
+      endSeq: old[old.length - 1]!.seq,
+    },
+    sourceEventSeqs: old.map(node => node.seq),
   },
-  sourceEventSeqs: old.map(node => node.seq),
-})
+)
 ```
 
 *为什么读这里：`sourceEventSeqs` 把“这段摘要是从哪些旧事件来的”钉在日志里。没有它，回放时就说不清摘要凭什么替换了旧 surface。*

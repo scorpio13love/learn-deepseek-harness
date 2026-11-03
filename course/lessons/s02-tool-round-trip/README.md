@@ -52,8 +52,19 @@
 
 ```ts
 for (const call of calls) {
-  this.session.append('tool/call', { turn, step, callId: call.id, name: call.name, arguments: call.arguments })
-  const result = await this.#tools.execute(call, { signal, callId: call.id, sessionId: this.session.id })
+  this.session.append('tool/call', {
+    turn, step,
+    callId: call.id,
+    name: call.name,
+    arguments: call.arguments,
+  })
+
+  const result = await this.#tools.execute(call, {
+    signal,
+    callId: call.id,
+    sessionId: this.session.id,
+  })
+
   const message = createMessage({
     role: 'tool',
     toolCallId: call.id,

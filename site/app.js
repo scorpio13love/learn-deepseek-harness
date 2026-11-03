@@ -78,6 +78,45 @@
   /* Markdown                                                           */
   /* ------------------------------------------------------------------ */
 
+  function highlightCode(code, lang) {
+    const l = String(lang).toLowerCase();
+    let re;
+    if (l === 'json') {
+      re = /("(?:\\.|[^"\\])*")(?=\s*:)|("(?:\\.|[^"\\])*")|(-?\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b)|\b(true|false|null)\b/g;
+    } else if (['ts','js','javascript','typescript','tsx','jsx'].includes(l)) {
+      re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|('(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`)|\b(const|let|var|function|async|await|return|if|else|for|of|in|new|class|extends|implements|interface|type|import|from|export|throw|try|catch|finally|switch|case|break|continue|true|false|null|undefined|this|super|readonly|public|private)\b|\b(\d+(?:\.\d+)?)\b/g;
+    } else if (l === 'bash' || l === 'sh' || l === 'shell') {
+      re = /(#[^\n]*)|('(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*")|\b(echo|node|npm|pnpm|cd|cp|mv|git|test|curl)\b/g;
+    } else return escapeHtml(code);
+    let out = '';
+    let last = 0;
+    code.replace(re, (...args) => {
+      const match = args[0];
+      const offset = args[args.length - 2];
+      out += escapeHtml(code.slice(last, offset));
+      let cls = 'tok-keyword';
+      if (l === 'json') {
+        if (args[1] !== undefined) cls = 'tok-key';
+        else if (args[2] !== undefined) cls = 'tok-string';
+        else if (args[3] !== undefined) cls = 'tok-number';
+        else cls = 'tok-keyword';
+      } else if (l === 'bash' || l === 'sh' || l === 'shell') {
+        if (args[1] !== undefined) cls = 'tok-comment';
+        else if (args[2] !== undefined) cls = 'tok-string';
+        else cls = 'tok-keyword';
+      } else {
+        if (args[1] !== undefined) cls = 'tok-comment';
+        else if (args[2] !== undefined) cls = 'tok-string';
+        else if (args[4] !== undefined) cls = 'tok-number';
+      }
+      out += `<span class="${cls}">${escapeHtml(match)}</span>`;
+      last = offset + match.length;
+      return match;
+    });
+    out += escapeHtml(code.slice(last));
+    return out;
+  }
+
   function slugify(text) {
     return text.toLowerCase()
       .replace(/<[^>]+>/g, '')
@@ -243,7 +282,7 @@
         while (i < lines.length && !/^```/.test(lines[i])) { code.push(lines[i]); i += 1; }
         i += 1;
         const id = `code-${usedIds.size}-${Math.random().toString(36).slice(2, 7)}`;
-        html.push(`<div class="code-card"><div class="code-head"><span>${escapeHtml(lang)}</span><button class="copy-button" data-copy="${id}">复制</button></div><pre id="${id}"><code class="language-${escapeHtml(lang)}">${escapeHtml(code.join('\n'))}</code></pre></div>`);
+        html.push(`<div class="code-card"><div class="code-head"><span>${escapeHtml(lang)}</span><button class="copy-button" data-copy="${id}">复制</button></div><pre id="${id}"><code class="language-${escapeHtml(lang)}">${highlightCode(code.join('\n'), lang)}</code></pre></div>`);
         continue;
       }
       if (/^#{1,6}\s+/.test(line)) {
