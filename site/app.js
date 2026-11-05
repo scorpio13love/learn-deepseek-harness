@@ -510,7 +510,7 @@
 
       <section class="section quiz-section">
         <div class="quiz-banner coding-banner">
-          <div><div class="quiz-kicker">AI CODING LAB · REAL AGENT</div><h2>在编辑器里写 DSH</h2><p>6 道 TypeScript 核心题：工具配对、surface、压缩阈值、并发批次、路径边界、日志脱敏。本地 Node 跑测试，右侧与真实 agent 对话。</p></div>
+          <div><div class="quiz-kicker">AI CODING LAB · REAL AGENT</div><h2>在编辑器里写 DSH</h2><p>28 道 TypeScript 核心题：覆盖 28 课，工具配对、surface、压缩、并发、路径边界、日志脱敏等。本地 Node 跑测试，右侧与真实 agent 对话。</p></div>
           <a class="primary-button" href="#/coding">打开 Lab <span>→</span></a>
         </div>
       </section>

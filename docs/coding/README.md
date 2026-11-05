@@ -18,13 +18,6 @@ node --env-file=course/lessons/s01-agent-loop/.env site/serve.mjs
 
 也可以直接在页面「配置 Key」里填；Key 只存在当前浏览器 session，并通过 localhost 请求头发送给本地服务，不写入仓库。
 
-题目：
-
-- tool-call / tool-result 配对
-- surface append + replace
-- compaction 阈值
-- parallel / exclusive 批次
-- workspace 路径边界
-- 日志脱敏
+题目：28 课每课至少一道，共 28 道 TypeScript 题。
 
 运行测试使用本地 Node 24 的 TypeScript strip-types，不需要浏览器内编译器。
