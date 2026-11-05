@@ -59,6 +59,32 @@ node --test tests/s01.test.ts # 离线单元测试，不需要 key
 ```
 
 不需要 `pnpm install`，Node ≥ 24 直接运行 TypeScript。每课都是自包含文件夹：`README.md`、`src/`、`tests/`、`env.example` 都在该课目录内。
+### 用上一课代码开始练习
+
+学习第 6 课时，如果还没手动拷贝第 5 课代码：
+
+```sh
+node scripts/learn.mjs 6            # 把 s05 完整复制到 course/practice/
+node scripts/learn.mjs 6 --dry-run  # 只预览，不删除/复制
+```
+
+脚本会：
+
+- 清空 `course/practice/` 里的旧代码
+- 保留 `course/practice/.env`
+- 把上一课的 `src/`、`tests/`、`package.json`、`tsconfig.json` 等复制过去
+- 不复制上一课的 `.env` 和 `node_modules`
+
+复制后：
+
+```sh
+cd course/practice
+node src/demo.ts
+node --test tests/*.test.ts
+```
+
+`course/practice/` 已被忽略，不会提交。
+
 
 开源仓库**不包含**上游 `deepseek-harness/` 和本地练习目录 `course/practice/`。要读真实源码时，在本机单独 clone：
 

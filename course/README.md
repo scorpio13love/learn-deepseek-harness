@@ -61,6 +61,18 @@ course/lessons/
 ```
 每课都有 `README.md`、`env.example`、`package.json`、`tsconfig.json`、`src/`、`tests/`；DeepSeek Messages wire 实现在各课 `src/messages.ts`，`src/deepseek.ts` 只做本地导出。
 
+## 用上一课代码开始练习
+
+学习第 x 课时，把第 x-1 课复制到本地练习目录：
+
+```sh
+node scripts/learn.mjs 6
+cd course/practice
+node src/demo.ts
+```
+
+会清空旧代码，但保留 `course/practice/.env`；加 `--dry-run` 只预览。`course/practice/` 已被忽略，不会提交。
+
 ## 运行
 
 环境：Node ≥ 24。不需要 `pnpm install`，运行时零依赖。以 s01 为例（把路径和测试文件名换成对应课号）：
