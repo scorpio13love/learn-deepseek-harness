@@ -211,18 +211,23 @@
   const LESSON_REFS = {
     s01:['s01-agent-loop','3. 核心概念','3-核心概念'],s02:['s02-tool-round-trip','3. 核心概念','3-核心概念'],s03:['s03-session-log','3. 核心概念','3-核心概念'],s04:['s04-streaming','3. 核心概念','3-核心概念'],s05:['s05-tool-contract','3. 核心概念','3-核心概念'],s06:['s06-tool-runtime','3. 核心概念','3-核心概念'],s07:['s07-system-prompt','3. 核心概念','3-核心概念'],s08:['s08-inbox-steering','3. 核心概念','3-核心概念'],s09:['s09-llm-seam','3. 核心概念','3-核心概念'],s10:['s10-persistence','3. 核心概念','3-核心概念'],s11:['s11-compaction','3. 核心概念','3-核心概念'],s12:['s12-plugin-kernel','3. 核心概念','3-核心概念'],s13:['s13-composition-boot','3. 核心概念','3-核心概念'],s14:['s14-capability-seams','3. 核心概念','3-核心概念'],s15:['s15-subagents-presets','3. 核心概念','3-核心概念'],s16:['s16-ptc','3. 核心概念','3-核心概念'],s17:['s17-mcp-skills-commands','3. 核心概念','3-核心概念'],s18:['s18-skills-commands','3. 本课实现','3-本课实现'],s19:['s19-browser-use','3. 核心概念','3-核心概念'],s20:['s20-computer-use-i','3. 核心概念','3-核心概念'],s21:['s21-computer-use-ii','3. 核心概念','3-核心概念'],s22:['s22-web','3. 核心概念','3-核心概念'],s23:['s23-sdk-headless','3. 核心概念','3-核心概念'],s24:['s24-client-ui','3. 纯 fold 与增量一致性','3-纯-fold-与增量一致性'],s25:['s25-observability-eval','3. 核心概念','3-核心概念'],s26:['s26-eval','3. snapshot 与路径级 diff','3-snapshot-与路径级-diff'],s27:['s27-security','3. Redaction：按 key 和按值','3-redaction按-key-和按值'],s28:['s28-capstone','3. 任务与工具','3-任务与工具'],
   }
-  function refFor(q) {
-    const row = LESSON_REFS[q.lesson]
-    if (!row) return '<div class="ref">知识点：综合 · 跨课知识</div>'
-    const [slug, section, anchor] = row
-    return `<div class="ref">知识点：<a href="https://github.com/scorpio13love/learn-deepseek-harness/blob/main/course/lessons/${slug}/README.md#${anchor}" target="_blank" rel="noreferrer">${esc(q.lesson)} · ${esc(section)} ↗</a></div>`
+  const SOURCE_REFS = {
+    s01:['s01-agent-loop','src/agent.ts'],s02:['s02-tool-round-trip','src/agent.ts'],s03:['s03-session-log','src/session.ts'],s04:['s04-streaming','src/stream.ts'],s05:['s05-tool-contract','src/schema.ts'],s06:['s06-tool-runtime','src/batch.ts'],s07:['s07-system-prompt','src/prompt.ts'],s08:['s08-inbox-steering','src/inbox.ts'],s09:['s09-llm-seam','src/messages.ts'],s10:['s10-persistence','src/storage.ts'],s11:['s11-compaction','src/compaction.ts'],s12:['s12-plugin-kernel','src/kernel.ts'],s13:['s13-composition-boot','src/boot.ts'],s14:['s14-capability-seams','src/capabilities.ts'],s15:['s15-subagents-presets','src/subagent.ts'],s16:['s16-ptc','src/ptc.ts'],s17:['s17-mcp-skills-commands','src/mcp.ts'],s18:['s18-skills-commands','src/host.ts'],s19:['s19-browser-use','src/registry.ts'],s20:['s20-computer-use-i','src/tool.ts'],s21:['s21-computer-use-ii','src/coordinates.ts'],s22:['s22-web','src/projection.ts'],s23:['s23-sdk-headless','src/jsonrpc.ts'],s24:['s24-client-ui','src/projection.ts'],s25:['s25-observability-eval','src/observability.ts'],s26:['s26-eval','src/faults.ts'],s27:['s27-security','src/redact.ts'],s28:['s28-capstone','src/eval.ts'],
   }
-
-  window.addEventListener('message', event => {
-    if (event.data?.type !== 'dsh-coding-height') return
-    const frame = document.getElementById('inline-coding')
-    if (frame) frame.style.height = `${Math.max(600, Number(event.data.height) || 0)}px`
-  })
+  const OFFICIAL_REFS = {
+    s01:['docs/agent-lifecycle.zh.md','agent lifecycle'],s02:['docs/subsystems/tools.zh.md','tools'],s03:['docs/subsystems/session.zh.md','session'],s04:['docs/subsystems/llm-streaming.zh.md','LLM streaming'],s05:['docs/subsystems/tools.zh.md','tools'],s06:['docs/subsystems/tools.zh.md','tools'],s07:['docs/subsystems/system-prompt.zh.md','system prompt'],s08:['docs/architecture.zh.md','architecture'],s09:['docs/subsystems/llm-streaming.zh.md','LLM streaming'],s10:['docs/subsystems/persistence.zh.md','persistence'],s11:['docs/subsystems/compaction.zh.md','compaction'],s12:['docs/cordis-primer.zh.md','Cordis primer'],s13:['docs/subsystems/boot.zh.md','boot'],s14:['docs/capability-seams.zh.md','capability seams'],s15:['docs/subsystems/subagent.zh.md','subagent'],s16:['docs/subsystems/ptc-runtime.zh.md','PTC runtime'],s17:['docs/subsystems/mcp.zh.md','MCP'],s18:['docs/subsystems/skills.zh.md','skills'],s19:['docs/subsystems/browser-use.zh.md','browser use'],s20:['docs/subsystems/computer-use.zh.md','computer use'],s21:['docs/subsystems/computer-use.zh.md','computer use'],s22:['docs/subsystems/web.zh.md','web'],s23:['docs/subsystems/web-server.zh.md','web server'],s24:['docs/subsystems/session-projection.zh.md','session projection'],s25:['docs/subsystems/otel.zh.md','telemetry'],s26:['docs/testing.zh.md','testing'],s27:['docs/subsystems/approval.zh.md','approval'],s28:['docs/architecture.zh.md','architecture'],
+  }
+  function refFor(q) {
+    const lesson = LESSON_REFS[q.lesson]
+    if (!lesson) return `<div class="ref">知识点：综合 · <a href="https://github.com/deepseek-ai/deepseek-harness/blob/main/docs/architecture.zh.md" target="_blank" rel="noreferrer">官方架构</a></div>`
+    const [slug, section, anchor] = lesson
+    const project = `https://github.com/scorpio13love/learn-deepseek-harness/blob/main/course/lessons/${slug}/README.md#${anchor}`
+    const source = SOURCE_REFS[q.lesson]
+    const official = OFFICIAL_REFS[q.lesson]
+    const sourceLink = source ? `<a href="https://github.com/scorpio13love/learn-deepseek-harness/blob/main/course/lessons/${source[0]}/${source[1]}" target="_blank" rel="noreferrer">${esc(source[1].split('/').pop())} ↗</a>` : ''
+    const officialLink = official ? `<a href="https://github.com/deepseek-ai/deepseek-harness/blob/main/${official[0]}" target="_blank" rel="noreferrer">官方：${esc(official[1])} ↗</a>` : ''
+    return `<div class="ref">知识点：<a href="${project}" target="_blank" rel="noreferrer">${esc(q.lesson)} · ${esc(section)} ↗</a><br><span>源码：${sourceLink} · ${officialLink}</span></div>`
+  }
 
   document.addEventListener('keydown', event => {
     if (!app.querySelector('.question')) return
