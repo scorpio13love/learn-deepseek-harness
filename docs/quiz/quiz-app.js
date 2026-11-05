@@ -113,8 +113,9 @@
         <div class="qtag"><span>${esc(q.id)}</span><span>CODING</span><span>${esc(q.lesson)}</span></div>
         <h2>${esc(q.title)}</h2>
         <p class="lead" style="font-size:13px">${esc(q.prompt)}</p>
-        <div class="coding-state ${done ? 'ok' : ''}">${done ? '✓ 已通过该 coding 任务的测试' : '在 AI Coding Lab 里完成并跑通测试后，这里会标记完成。'}</div>
-        <div class="actions"><button class="secondary" id="prev" ${state.index === 0 ? 'disabled' : ''}>← 上一题</button><button class="primary" id="open-coding">打开 Coding Lab →</button><button class="secondary" id="next">${state.index === state.pool.length - 1 ? '提交试卷 →' : '下一题 →'}</button></div>
+        <div class="coding-state ${done ? 'ok' : ''}">${done ? '✓ 已通过该 coding 任务的测试' : '直接在下面编辑并运行测试；跑通后这里会标记完成。'}</div>
+        <div class="inline-coding-frame"><iframe id="inline-coding" src="../coding/index.html?embed=1&inline=1&task=${encodeURIComponent(q.taskId)}" title="${esc(q.title)}"></iframe></div>
+        <div class="actions"><button class="secondary" id="prev" ${state.index === 0 ? 'disabled' : ''}>← 上一题</button><button class="secondary" id="open-coding">单独打开 →</button><button class="secondary" id="next">${state.index === state.pool.length - 1 ? '提交试卷 →' : '下一题 →'}</button></div>
         <p class="ref">完成状态保存在本机；不会把代码发到远端。</p>
       </div>`
     document.getElementById('open-coding').onclick = () => openCoding(q.taskId)
@@ -216,6 +217,12 @@
     const [slug, section, anchor] = row
     return `<div class="ref">知识点：<a href="https://github.com/scorpio13love/learn-deepseek-harness/blob/main/course/lessons/${slug}/README.md#${anchor}" target="_blank" rel="noreferrer">${esc(q.lesson)} · ${esc(section)} ↗</a></div>`
   }
+
+  window.addEventListener('message', event => {
+    if (event.data?.type !== 'dsh-coding-height') return
+    const frame = document.getElementById('inline-coding')
+    if (frame) frame.style.height = `${Math.max(600, Number(event.data.height) || 0)}px`
+  })
 
   document.addEventListener('keydown', event => {
     if (!app.querySelector('.question')) return

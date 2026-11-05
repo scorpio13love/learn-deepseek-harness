@@ -85,6 +85,14 @@
   .setup code { display:block; margin-top:6px; color:var(--muted); font:10px var(--mono); }
   .notice { padding:10px 13px; border:1px solid #f0d6ac; background:#fff8e8; color:#7a531c; border-radius:9px; font-size:12px; margin-bottom:12px; }
   .hidden { display:none !important; }
+  html.inline .app { padding:0; max-width:none; }
+  html.inline .app-top { display:none; }
+  html.inline .task-list { display:none; }
+  html.inline .layout { grid-template-columns:minmax(0,1fr) 300px; gap:12px; }
+  html.inline .prompt { display:none; }
+  html.inline .editor-panel { border-radius:10px; }
+  html.inline .agent-panel { height:auto; }
+  @media(max-width:800px){ html.inline .layout{grid-template-columns:1fr} }
   html.embed .app { padding:8px 0 10px; max-width:none; }
   html.embed .app-top { display:none; }
   html.embed .agent-panel { height:auto; min-height:0; }
@@ -126,7 +134,9 @@
 <script>
   const $ = (selector) => document.querySelector(selector)
   const EMBED = new URLSearchParams(location.search).has('embed')
+  const INLINE = new URLSearchParams(location.search).has('inline')
   if (EMBED) document.documentElement.classList.add('embed')
+  if (INLINE) document.documentElement.classList.add('inline')
   const state = { tasks: [], task: null, code: new Map(), chats: new Map(), lastRun: null, busy: false, key: false }
   const WANTED_TASK = new URLSearchParams(location.search).get('task')
 
