@@ -20,6 +20,7 @@
   const progressKey = 'dsh-course-progress-v1';
   const themeKey = 'dsh-course-theme';
   const lastKey = 'dsh-course-last';
+  const sidebarKey = 'dsh-sidebar-collapsed';
 
   function safeGet(key) {
     try { return localStorage.getItem(key) } catch { return null }
@@ -754,9 +755,31 @@
     closeSidebar();
   }
 
+  function isMobileNav() { return window.matchMedia('(max-width: 900px)').matches }
+  function updateSidebarToggle() {
+    const button = $('#menu-button')
+    if (!button) return
+    const mobile = isMobileNav()
+    const collapsed = document.body.classList.contains('sidebar-collapsed')
+    button.setAttribute('aria-label', mobile ? '打开目录' : collapsed ? '展开目录' : '收起目录')
+    button.title = mobile ? '打开目录' : collapsed ? '展开目录' : '收起目录'
+    button.setAttribute('aria-expanded', String(mobile ? $('#sidebar')?.classList.contains('open') ?? false : !collapsed))
+  }
+  function toggleSidebar() {
+    if (isMobileNav()) {
+      $('#sidebar').classList.toggle('open')
+      $('#sidebar-scrim').classList.toggle('show')
+    } else {
+      document.body.classList.toggle('sidebar-collapsed')
+      const collapsed = document.body.classList.contains('sidebar-collapsed')
+      safeSet(sidebarKey, collapsed ? '1' : '0')
+    }
+    updateSidebarToggle()
+  }
   function closeSidebar() {
     $('#sidebar').classList.remove('open');
     $('#sidebar-scrim').classList.remove('show');
+    updateSidebarToggle();
   }
 
   function toggleComplete() {
@@ -809,6 +832,7 @@
 
   function init() {
     initTheme();
+    if (safeGet(sidebarKey) === '1') document.body.classList.add('sidebar-collapsed');
     renderSidebar();
     const last = safeGet(lastKey);
     if (!location.hash) {
@@ -816,8 +840,10 @@
       else renderHome();
     }
     route();
+    updateSidebarToggle();
 
     window.addEventListener('hashchange', route);
+    window.addEventListener('resize', updateSidebarToggle);
     window.addEventListener('message', (event) => {
       if (event.data?.type !== 'dsh-quiz-height' && event.data?.type !== 'dsh-coding-height') return;
       const frame = event.data.type === 'dsh-quiz-height' ? $('#quiz-frame') : event.data.type === 'dsh-coding-height' ? $('#coding-frame') : null;
@@ -827,10 +853,7 @@
     $('#theme-toggle').addEventListener('click', () => {
       setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
     });
-    $('#menu-button').addEventListener('click', () => {
-      $('#sidebar').classList.toggle('open');
-      $('#sidebar-scrim').classList.toggle('show');
-    });
+    $('#menu-button').addEventListener('click', toggleSidebar);
     $('#sidebar-scrim').addEventListener('click', closeSidebar);
     $('#lesson-search').addEventListener('input', filterNav);
     $('#content').addEventListener('click', (event) => {

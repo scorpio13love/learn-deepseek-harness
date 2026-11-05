@@ -426,3 +426,20 @@ body.is-quiz .content { padding-top:20px; }
 body.is-coding .page { max-width:none; }
 body.is-coding .content { padding-top:20px; }
 @media(max-width:1100px){.coding-page{max-width:none}.coding-frame{height:1100px}}
+
+/* 桌面端：折叠左侧目录，正文变宽 */
+.sidebar { transition: transform .22s ease; }
+.layout { transition: margin-left .22s ease; }
+@media (min-width: 901px) {
+  .menu-button { display: inline-flex; }
+  body.sidebar-collapsed .sidebar { transform: translateX(-100%); box-shadow: var(--shadow); }
+  body.sidebar-collapsed .layout { margin-left: 0; }
+  body.sidebar-collapsed .page { max-width: 1080px; }
+  body.sidebar-collapsed.is-home .page { max-width: 1180px; }
+  body.sidebar-collapsed .quiz-page { max-width: 1180px; }
+  body.sidebar-collapsed .coding-page { max-width: min(1600px, calc(100vw - 100px)); }
+}
+@media (min-width: 901px) {
+  body.sidebar-collapsed.is-coding .page,
+  body.sidebar-collapsed.is-quiz .page { max-width: none; }
+}
