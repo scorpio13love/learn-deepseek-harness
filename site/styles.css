@@ -376,3 +376,53 @@ body.is-home .page { max-width: 980px; }
 [data-theme="dark"] .tok-keyword { color:#c3b4ff; }
 [data-theme="dark"] .tok-number { color:#e2b07a; }
 [data-theme="dark"] .tok-key { color:#9cc8ee; }
+.quiz-entry { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:12px; padding:16px 18px; border:1px solid var(--line); border-radius:12px; background:var(--bg); }
+.quiz-entry b { display:block; font-size:14px; }
+.quiz-entry p { margin:4px 0 0; color:var(--muted); font-size:12.5px; }
+.quiz-start { flex:0 0 auto; display:inline-flex; align-items:center; border-radius:8px; background:var(--brand); color:#fff; padding:9px 13px; font-size:12.5px; font-weight:650; white-space:nowrap; }
+.quiz-start:hover { background:var(--brand-strong); text-decoration:none; }
+@media(max-width:700px){.quiz-entry{align-items:flex-start;flex-direction:column}.quiz-start{width:100%;justify-content:center}}
+
+/* 面试自测入口与内嵌页 */
+.nav-quiz { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:10px 0 14px; padding:11px 12px; border:1px solid color-mix(in srgb, var(--brand) 28%, var(--line)); border-radius:10px; background:color-mix(in srgb, var(--brand) 6%, var(--bg-elevated)); text-decoration:none; }
+.nav-quiz:hover { border-color:var(--brand); text-decoration:none; }
+.nav-quiz span { min-width:0; display:flex; flex-direction:column; gap:2px; }
+.nav-quiz b { color:var(--ink); font-size:12.5px; line-height:1.35; }
+.nav-quiz small { color:var(--muted); font:9.5px var(--mono); }
+.nav-quiz em { flex:0 0 auto; color:var(--brand); font:10px var(--mono); font-style:normal; }
+.nav-quiz.active { background:var(--brand); border-color:var(--brand); }
+.nav-quiz.active b, .nav-quiz.active small, .nav-quiz.active em { color:#fff; }
+.quiz-section { padding-top:6px; }
+.quiz-banner { display:flex; justify-content:space-between; align-items:center; gap:24px; padding:24px 26px; border:1px solid color-mix(in srgb, var(--brand) 25%, var(--line)); border-radius:14px; background:linear-gradient(120deg, color-mix(in srgb, var(--brand) 7%, var(--bg-elevated)), var(--bg-elevated)); }
+.quiz-banner h2 { margin:5px 0 6px; font-size:24px; letter-spacing:-.02em; }
+.quiz-banner p { margin:0; max-width:640px; color:var(--muted); font-size:13.5px; }
+.quiz-kicker { color:var(--brand); font:9px var(--mono); letter-spacing:.1em; }
+.quiz-banner .primary-button { flex:0 0 auto; background:var(--brand); color:#fff; border-color:var(--brand); box-shadow:none; }
+.quiz-banner .primary-button span { margin-left:6px; }
+.quiz-banner .primary-button:hover { background:var(--brand-strong); }
+.quiz-page { max-width:980px; margin:0 auto; }
+.quiz-page-head { padding:8px 0 18px; border-bottom:1px solid var(--line); margin-bottom:14px; }
+.quiz-page-head h1 { margin:6px 0 4px; font-size:30px; letter-spacing:-.03em; }
+.quiz-page-head p { margin:0; color:var(--muted); font-size:13px; }
+.quiz-frame { display:block; width:100%; min-height:1100px; border:0; background:#fff; }
+body.is-quiz .page { max-width:none; }
+body.is-quiz .content { padding-top:20px; }
+@media(max-width:700px){.quiz-banner{align-items:flex-start;flex-direction:column}.quiz-banner .primary-button{width:100%;justify-content:center}.quiz-frame{min-height:1300px}}
+
+/* AI Coding Lab */
+.nav-practice { display:flex; flex-direction:column; gap:6px; margin:10px 0 14px; }
+.nav-practice .nav-quiz { margin:0; }
+.nav-quiz.nav-coding { border-color:color-mix(in srgb, #158a63 28%, var(--line)); background:color-mix(in srgb, #158a63 5%, var(--bg-elevated)); }
+.nav-quiz.nav-coding em { color:#158a63; }
+.nav-quiz.nav-coding.active { background:#158a63; border-color:#158a63; }
+.nav-quiz.nav-coding.active em { color:#fff; }
+.coding-banner { border-color:color-mix(in srgb, #158a63 25%, var(--line)); background:linear-gradient(120deg, color-mix(in srgb, #158a63 6%, var(--bg-elevated)), var(--bg-elevated)); }
+.coding-banner .quiz-kicker { color:#158a63; }
+.coding-banner .primary-button { background:#158a63; border-color:#158a63; }
+.coding-banner .primary-button:hover { background:#0f7654; }
+.coding-page { max-width:min(1500px, calc(100vw - 300px)); margin:0 auto; }
+.coding-page .quiz-page-head { border-bottom:0; margin-bottom:0; padding-bottom:8px; }
+.coding-frame { display:block; width:100%; height:900px; border:0; background:#fff; }
+body.is-coding .page { max-width:none; }
+body.is-coding .content { padding-top:20px; }
+@media(max-width:1100px){.coding-page{max-width:none}.coding-frame{height:1100px}}

@@ -3,13 +3,13 @@
 <style>
 :root{--bg:#fff;--ink:#2c2c32;--soft:#3c3c43;--muted:#67676c;--line:#e6e6e9;--brand:#5b5bd6;--mono:"SFMono-Regular",Consolas,monospace}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","PingFang SC",sans-serif;font-size:16px;line-height:1.75}
-header{max-width:1180px;margin:0 auto;padding:52px 28px 24px}h1{font-size:34px;letter-spacing:-.03em;margin:0 0 10px}p.lead{color:var(--muted);max-width:760px;margin:0}
+header{max-width:1180px;margin:0 auto;padding:40px 28px 24px}h1{font-size:34px;letter-spacing:-.03em;margin:0 0 10px}p.lead{color:var(--muted);max-width:760px;margin:0}.topnav{display:flex;justify-content:space-between;gap:12px;margin-bottom:24px}.topnav a{font:11px var(--mono);color:var(--muted);text-decoration:none}.topnav a:hover{color:var(--brand)}.topnav .quiz{color:#fff;background:var(--brand);border-radius:7px;padding:7px 10px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;font-weight:650}
 .grid{max-width:1180px;margin:0 auto;padding:12px 28px 80px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .domain{border:1px solid var(--line);border-radius:14px;padding:18px 18px 8px;background:#fff}.domain h2{font-size:18px;margin:0 0 12px;color:var(--accent);letter-spacing:-.01em}
 .qa{border-top:1px solid var(--line);padding:10px 0}.qa summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--soft);list-style:none}.qa summary::-webkit-details-marker{display:none}.qa summary:before{content:"Q ";color:var(--accent);font-family:var(--mono);font-size:11px}.qa p{margin:8px 0 4px;color:var(--muted);font-size:13.5px;line-height:1.75}
 footer{max-width:1180px;margin:0 auto;padding:0 28px 40px;color:var(--muted);font-size:12px}@media(max-width:800px){.grid{grid-template-columns:1fr}h1{font-size:28px}}
 </style></head><body>
-<header><h1>DSH 运行时知识图谱</h1><p class="lead">不是课程目录。每个节点都是一道会被追问的题；答案落到 DSH 的边界、事件和失败语义。</p></header>
+<header><div class="topnav"><a href="mindmaps/course.svg">知识图谱 SVG</a><a class="quiz" href="../quiz/index.html">DSH 面试自测 →</a></div><h1>DSH 运行时知识图谱</h1><p class="lead">不是课程目录。每个节点都是一道会被追问的题；答案落到 DSH 的边界、事件和失败语义。</p></header>
 <main class="grid"><section class="domain" style="--accent:#5b5bd6">
     <h2>控制平面</h2>
     <details class="qa" open>

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DSH 面试自测 · 96 题</title>
+<style>
+  :root { --bg:#fff; --panel:#fff; --ink:#2c2c32; --soft:#3c3c43; --muted:#67676c; --line:#e6e6e9; --brand:#5b5bd6; --green:#158a63; --red:#b33a3a; --amber:#a15c1f; --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace; --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","PingFang SC",sans-serif; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.7; }
+  .wrap { max-width:900px; margin:0 auto; padding:42px 24px 100px; }
+  .eyebrow { font:10px var(--mono); letter-spacing:.1em; color:var(--brand); text-transform:uppercase; }
+  h1 { margin:10px 0 8px; font-size:34px; line-height:1.15; letter-spacing:-.035em; }
+  .lead { margin:0; color:var(--muted); max-width:680px; }
+  .meta { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 28px; }
+  .chip { border:1px solid var(--line); border-radius:999px; padding:4px 9px; font:11px var(--mono); color:var(--muted); background:#fff; }
+  .domain-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:10px 0 24px; }
+  .domain-card { display:flex; justify-content:space-between; align-items:center; gap:10px; border:1px solid var(--line); border-radius:11px; padding:12px 14px; background:#fff; color:var(--ink); cursor:pointer; font:inherit; text-align:left; }
+  .domain-card:hover { border-color:color-mix(in srgb,var(--brand) 45%,var(--line)); background:#fbfbff; }
+  .domain-card b { font-size:14px; } .domain-card small { display:block; color:var(--muted); font:10px var(--mono); margin-top:2px; }
+  .domain-card span { color:var(--brand); font:11px var(--mono); white-space:nowrap; }
+  .primary, .secondary { border:1px solid transparent; border-radius:9px; padding:10px 15px; font:13px var(--sans); font-weight:650; cursor:pointer; }
+  .primary { background:var(--brand); color:#fff; } .primary:hover { background:#4a4ac4; }
+  .secondary { background:#fff; color:var(--soft); border-color:var(--line); } .secondary:hover { border-color:var(--soft); }
+  .actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:20px; }
+  .quiz-head { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:10px; color:var(--muted); font:11px var(--mono); }
+  .bar { height:5px; border-radius:999px; background:#edeef3; overflow:hidden; margin:8px 0 24px; }
+  .bar i { display:block; height:100%; background:var(--brand); transition:width .2s; }
+  .question { border:1px solid var(--line); border-radius:14px; padding:22px 24px 20px; background:#fff; }
+  .qtag { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px; }
+  .qtag span { font:9px var(--mono); color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:3px 7px; }
+  .question h2 { font-size:20px; line-height:1.5; margin:0 0 18px; letter-spacing:-.01em; }
+  .option { display:flex; gap:10px; align-items:flex-start; width:100%; text-align:left; border:1px solid var(--line); border-radius:9px; padding:11px 13px; margin:8px 0; background:#fff; color:var(--soft); font:14px/1.6 var(--sans); cursor:pointer; }
+  .option:hover:not(:disabled) { border-color:color-mix(in srgb,var(--brand) 45%,var(--line)); background:#fbfbff; }
+  .option .num { flex:0 0 20px; height:20px; border-radius:5px; background:#f3f4f7; color:var(--muted); font:10px var(--mono); display:grid; place-items:center; margin-top:1px; }
+  .option.correct { border-color:color-mix(in srgb,var(--green) 45%,var(--line)); background:#f0faf5; }
+  .option.correct .num { background:var(--green); color:#fff; }
+  .option.wrong { border-color:color-mix(in srgb,var(--red) 45%,var(--line)); background:#fdf3f3; }
+  .option.wrong .num { background:var(--red); color:#fff; }
+  .option:disabled { cursor:default; opacity:.88; }
+  .explain { margin-top:16px; border-left:3px solid var(--brand); background:#f7f7fb; border-radius:0 8px 8px 0; padding:12px 14px; color:var(--soft); font-size:13.5px; display:none; }
+  .explain.show { display:block; }
+  .explain b { color:var(--ink); }
+  .ref { margin-top:8px; font:10.5px var(--mono); color:var(--muted); }
+  .ref a { color:var(--brand); text-decoration:none; } .ref a:hover { text-decoration:underline; }
+  .result { text-align:center; padding:26px 20px 10px; }
+  .score { font-size:64px; line-height:1; font-weight:760; letter-spacing:-.06em; color:var(--brand); }
+  .score small { font-size:18px; color:var(--muted); font-weight:500; letter-spacing:0; }
+  .result h2 { margin:14px 0 4px; font-size:24px; }
+  .result p { color:var(--muted); margin:0 0 20px; }
+  .breakdown { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; text-align:left; margin:22px 0; }
+  .brow { border:1px solid var(--line); border-radius:9px; padding:10px 12px; display:flex; justify-content:space-between; gap:8px; font:12px var(--mono); color:var(--muted); }
+  .brow b { color:var(--ink); font-weight:600; }
+  .wrong-list { text-align:left; margin:22px 0; }
+  .wrong { border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:10px 0; }
+  .wrong h3 { margin:0 0 8px; font-size:14px; line-height:1.5; }
+  .wrong p { margin:4px 0; font-size:12.5px; color:var(--muted); }
+  .wrong .yes { color:var(--green); } .wrong .no { color:var(--red); }
+  .hidden { display:none; }
+  .back{font:11px var(--mono);color:var(--muted);text-decoration:none}.back:hover{color:var(--brand)}
+  html.embed #quiz-header, html.embed .foot, body.embed #quiz-header, body.embed .foot { display:none; }
+  html.embed .wrap { max-width:none; padding:0 0 8px; }
+  .foot { margin-top:26px; color:var(--muted); font:10px var(--mono); display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  @media(max-width:700px){.wrap{padding:26px 16px 80px}h1{font-size:28px}.domain-grid,.breakdown{grid-template-columns:1fr}.question{padding:18px 16px}.score{font-size:52px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="app"></div>
+  <div class="foot"><span id="best"></span></div>
+</div>
+<script src="quiz-data.js"></script>
+<script>
+  const DOMAINS = new Map(window.QUIZ_DOMAINS)
+  const RAW = window.QUIZ_QUESTIONS
+  const QUESTIONS = RAW.map(([id, lesson, domain, q, options, answer, explain]) => ({ id, lesson, domain, q, options, answer, explain }))
+  const LESSON_REFS = {
+  s01: ['s01-agent-loop', '3. 核心概念', '3-核心概念'], s02: ['s02-tool-round-trip', '3. 核心概念', '3-核心概念'],
+  s03: ['s03-session-log', '3. 核心概念', '3-核心概念'], s04: ['s04-streaming', '3. 核心概念', '3-核心概念'],
+  s05: ['s05-tool-contract', '3. 核心概念', '3-核心概念'], s06: ['s06-tool-runtime', '3. 核心概念', '3-核心概念'],
+  s07: ['s07-system-prompt', '3. 核心概念', '3-核心概念'], s08: ['s08-inbox-steering', '3. 核心概念', '3-核心概念'],
+  s09: ['s09-llm-seam', '3. 核心概念', '3-核心概念'], s10: ['s10-persistence', '3. 核心概念', '3-核心概念'],
+  s11: ['s11-compaction', '3. 核心概念', '3-核心概念'], s12: ['s12-plugin-kernel', '3. 核心概念', '3-核心概念'],
+  s13: ['s13-composition-boot', '3. 核心概念', '3-核心概念'], s14: ['s14-capability-seams', '3. 核心概念', '3-核心概念'],
+  s15: ['s15-subagents-presets', '3. 核心概念', '3-核心概念'], s16: ['s16-ptc', '3. 核心概念', '3-核心概念'],
+  s17: ['s17-mcp-skills-commands', '3. 核心概念', '3-核心概念'], s18: ['s18-skills-commands', '3. 本课实现', '3-本课实现'],
+  s19: ['s19-browser-use', '3. 核心概念', '3-核心概念'], s20: ['s20-computer-use-i', '3. 核心概念', '3-核心概念'],
+  s21: ['s21-computer-use-ii', '3. 核心概念', '3-核心概念'], s22: ['s22-web', '3. 核心概念', '3-核心概念'],
+  s23: ['s23-sdk-headless', '3. 核心概念', '3-核心概念'], s24: ['s24-client-ui', '3. 纯 fold 与增量一致性', '3-纯-fold-与增量一致性'],
+  s25: ['s25-observability-eval', '3. 核心概念', '3-核心概念'], s26: ['s26-eval', '3. snapshot 与路径级 diff', '3-snapshot-与路径级-diff'],
+  s27: ['s27-security', '3. Redaction：按 key 和按值', '3-redaction按-key-和按值'], s28: ['s28-capstone', '3. 任务与工具', '3-任务与工具'],
+}
+function refFor(q) {
+  const r = LESSON_REFS[q.lesson]
+  if (!r) return `<div class="ref">知识点：综合 · 跨课知识</div>`
+  const [slug, section, anchor] = r
+  const href = `https://github.com/scorpio13love/learn-deepseek-harness/blob/main/course/lessons/${slug}/README.md#${anchor}`
+  return `<div class="ref">知识点：<a href="${href}" target="_blank" rel="noreferrer">${q.lesson} · ${section} ↗</a></div>`
+}
+const state = { pool: [], index: 0, answers: [], filter: 'all', wrong: [] }
+  const app = document.getElementById('app')
+  const bestEl = document.getElementById('best')
+  bestEl.textContent = `最高分：${localStorage.getItem('dsh-quiz-best') || '—'}`
+  const EMBED = new URLSearchParams(location.search).has('embed')
+  if (EMBED) {
+    document.documentElement.classList.add('embed'); document.body.classList.add('embed'); const hdr = document.getElementById('quiz-header'); if (hdr) hdr.style.display = 'none'; const ft = document.querySelector('.foot'); if (ft) ft.style.display = 'none'
+    const notify = () => { try { parent.postMessage({ type: 'dsh-quiz-height', height: document.documentElement.scrollHeight }, '*') } catch {} }
+    new ResizeObserver(notify).observe(document.body)
+    setTimeout(notify, 60)
+  }
+
+  const domainName = id => DOMAINS.get(id) || id
+  const domainQuestions = id => id === 'all' ? QUESTIONS : QUESTIONS.filter(q => q.domain === id)
+  const percent = (ok, total) => total === 0 ? 0 : Math.round(ok / total * 100)
+
+  function landing() {
+    const cards = [...DOMAINS.entries()].map(([id, name]) => {
+      const n = domainQuestions(id).length
+      return `<button class="domain-card" data-domain="${id}"><span><b>${name}</b><small>${n} 题 · 可单独练习</small></span><span>开始 →</span></button>`
+    }).join('')
+    app.innerHTML = `<div id="quiz-header">
+      <div class="eyebrow">DSH · INTERVIEW SELF-TEST · LOCAL</div>
+      <h1>DSH 面试自测</h1>
+      <p class="lead">96 道选择题，覆盖内核、上下文、组合、执行边界、产品面和质量。提交后立即判分并给解释；最后看总分、知识域分布和错题。</p>
+      <p><a class="back" href="../../site/#/">← 返回课程</a></p>
+      </div>
+      <div class="meta"><span class="chip">${QUESTIONS.length} 道选择题</span><span class="chip">${DOMAINS.size} 个知识域</span><span class="chip">提交后给分数</span><span class="chip">不联网</span></div>
+      <div class="actions"><button class="primary" id="start-all">开始全部 ${QUESTIONS.length} 题</button></div>
+      <div class="domain-grid" style="margin-top:24px">${cards}</div>
+      <p class="lead" style="font-size:13px">提示：键盘 1–4 选择，Enter 下一题。所有判分在浏览器本地完成。</p>`
+    document.getElementById('start-all').onclick = () => start('all')
+    app.querySelectorAll('[data-domain]').forEach(button => button.onclick = () => start(button.dataset.domain))
+  }
+
+  function start(filter = 'all') {
+    state.filter = filter
+    state.pool = domainQuestions(filter)
+    state.index = 0
+    state.answers = new Array(state.pool.length).fill(null)
+    state.wrong = []
+    renderQuestion()
+  }
+
+  function renderQuestion() {
+    const q = state.pool[state.index]
+    const chosen = state.answers[state.index]
+    const pct = Math.round((state.index / state.pool.length) * 100)
+    const options = q.options.map((opt, i) => {
+      let cls = 'option'
+      if (chosen !== null) {
+        if (i === q.answer) cls += ' correct'
+        else if (i === chosen) cls += ' wrong'
+      }
+      return `<button class="${cls}" data-opt="${i}" ${chosen !== null ? 'disabled' : ''}><span class="num">${String.fromCharCode(65 + i)}</span><span>${escapeHtml(opt)}</span></button>`
+    }).join('')
+    app.innerHTML = `<div class="quiz-head"><span>${state.index + 1} / ${state.pool.length}</span><span>${domainName(q.domain)} · ${q.lesson}</span><span>已答 ${state.answers.filter(x => x !== null).length}</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="question">
+        <div class="qtag"><span>${q.id}</span><span>${q.lesson}</span><span>${domainName(q.domain)}</span></div>
+        <h2>${escapeHtml(q.q)}</h2>
+        ${options}
+        <div class="explain ${chosen !== null ? 'show' : ''}" id="explain"><b>答案：</b>${chosen !== null ? `${String.fromCharCode(65 + q.answer)} · ${escapeHtml(q.options[q.answer])}<br><br>${escapeHtml(q.explain)}${refFor(q)}` : ''}</div>
+        <div class="actions">
+          ${chosen === null ? '<button class="secondary" id="hint" disabled>选择一个答案</button>' : ''}
+          <button class="primary ${chosen === null ? 'hidden' : ''}" id="next">${state.index === state.pool.length - 1 ? '提交试卷 →' : '下一题 →'}</button>
+        </div>
+      </div>`
+    if (chosen === null) {
+      app.querySelectorAll('[data-opt]').forEach(button => button.onclick = () => choose(Number(button.dataset.opt)))
+      document.getElementById('hint').textContent = '选择一个答案（1–4）'
+    } else {
+      document.getElementById('next').onclick = next
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+
+  function choose(index) {
+    if (state.answers[state.index] !== null) return
+    state.answers[state.index] = index
+    const q = state.pool[state.index]
+    if (index !== q.answer) state.wrong.push({ q, chosen: index })
+    renderQuestion()
+  }
+
+  function next() {
+    if (state.index >= state.pool.length - 1) return renderScore()
+    state.index += 1
+    renderQuestion()
+  }
+
+  function renderScore() {
+    const total = state.pool.length
+    const correct = state.answers.filter((a, i) => a === state.pool[i].answer).length
+    const score = percent(correct, total)
+    const best = Number(localStorage.getItem('dsh-quiz-best') || 0)
+    if (score > best) { localStorage.setItem('dsh-quiz-best', String(score)); bestEl.textContent = `最高分：${score}` }
+    const byDomain = new Map()
+    for (let i = 0; i < state.pool.length; i += 1) {
+      const q = state.pool[i]
+      if (!byDomain.has(q.domain)) byDomain.set(q.domain, { total: 0, ok: 0 })
+      const d = byDomain.get(q.domain); d.total += 1
+      if (state.answers[i] === q.answer) d.ok += 1
+    }
+    const domainRows = [...byDomain.entries()].map(([id, d]) => `<div class="brow"><span>${domainName(id)}</span><b>${d.ok} / ${d.total}</b></div>`).join('')
+    const wrongHtml = state.wrong.map(({ q, chosen }) => `<div class="wrong"><h3>${escapeHtml(q.q)}</h3><p class="no">你的答案：${String.fromCharCode(65 + chosen)} · ${escapeHtml(q.options[chosen])}</p><p class="yes">正确答案：${String.fromCharCode(65 + q.answer)} · ${escapeHtml(q.options[q.answer])}</p><p>${escapeHtml(q.explain)}</p>${refFor(q)}</div>`).join('')
+    app.innerHTML = `<div class="result">
+      <div class="eyebrow">RESULT · LOCAL SCORE</div>
+      <div class="score">${score}<small> / 100</small></div>
+      <h2>${score >= 80 ? '通过，面试可以继续深挖' : score >= 60 ? '基础有了，错题需要回看' : '先回课程，再回来做一遍'}</h2>
+      <p>答对 ${correct} / ${total} 题 · 已答 ${state.answers.filter(x => x !== null).length} / ${total}</p>
+      <div class="breakdown">${domainRows}</div>
+      <div class="actions" style="justify-content:center"><button class="primary" id="retry-all">重新开始</button>${state.wrong.length ? '<button class="secondary" id="retry-wrong">只做错题 ' + state.wrong.length + '</button>' : ''}</div>
+      ${state.wrong.length ? `<div class="wrong-list"><div class="eyebrow" style="margin:24px 0 6px">REVIEW · 错题</div>${wrongHtml}</div>` : '<p style="margin-top:20px">全部正确。可以换个知识域继续。</p>'}
+    </div>`
+    document.getElementById('retry-all').onclick = landing
+    const rw = document.getElementById('retry-wrong')
+    if (rw) rw.onclick = () => { state.pool = state.wrong.map(x => x.q); state.answers = new Array(state.pool.length).fill(null); state.wrong = []; state.index = 0; state.filter = 'wrong'; renderQuestion() }
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+
+  function escapeHtml(s) { return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;') }
+  document.addEventListener('keydown', event => {
+    if (!app.querySelector('.question')) return
+    if (/^[1-4]$/.test(event.key)) { const b = app.querySelector(`[data-opt="${Number(event.key) - 1}"]`); if (b && !b.disabled) b.click() }
+    if (event.key === 'Enter') { const n = document.getElementById('next'); if (n) n.click() }
+  })
+  landing()
+</script>
+</body>
+</html>

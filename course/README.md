@@ -11,19 +11,13 @@
 - 当前进度：**s01-s28 全部完成**
 - 课程网站：[`../site/`](../site/README.md)（`node site/serve.mjs`）
 
-## 知识图谱
+## 面试自测
 
-![DSH 知识图谱](../docs/visuals/mindmaps/course.svg)
+[**DSH 面试自测 · 96 题 →**](../docs/quiz/index.html)
 
-六个知识域，30 道面试题；图上有短答案，完整答案在网页/Markdown/XMind 里。
+28 课 + 12 道综合题，单选；每题即时判分并给解释，交卷后看总分、知识域分布和错题。
 
-- [带答案的网页](../docs/visuals/knowledge-map.html)
-- [Markdown 面试题与答案](../docs/04-knowledge-map.zh.md)
-- [XMind 源文件](../docs/visuals/mindmaps/course.xmind)（1 张 sheet，30 题 + 答案）
-- [OPML（通用大纲）](../docs/visuals/mindmaps/course.opml)
-- [Markdown 大纲](../docs/visuals/mindmaps/course.md)
-
-> XMind 里是一张总图：六个域 → 30 道题 → 答案。若本机 Xmind 版本提示格式不兼容，直接导入 `.opml`。
+[**AI Coding Lab →**](../site/#/coding) · TypeScript 核心题，本地测试，真实 DeepSeek agent。
 
 ## 课程目录
 

@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Coding Lab · DSH</title>
+<style>
+  :root { --bg:#fff; --ink:#2c2c32; --soft:#3c3c43; --muted:#67676c; --line:#e6e6e9; --brand:#5b5bd6; --green:#158a63; --red:#b33a3a; --amber:#9a5b18; --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace; --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","PingFang SC",sans-serif; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:18px; }
+  body { font-size:16px; line-height:1.7; }
+  .app { max-width:1500px; margin:0 auto; padding:22px 22px 40px; }
+  .app-top { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:18px; }
+  .eyebrow { color:var(--brand); font:10px var(--mono); letter-spacing:.1em; }
+  h1 { margin:5px 0 4px; font-size:30px; line-height:1.2; letter-spacing:-.03em; }
+  .app-top p { margin:0; color:var(--muted); font-size:13px; }
+  .status { display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+  .pill { border:1px solid var(--line); border-radius:999px; padding:4px 9px; color:var(--muted); font:10px var(--mono); }
+  .pill.ok { color:var(--green); border-color:color-mix(in srgb,var(--green) 35%,var(--line)); }
+  .pill.bad { color:var(--red); border-color:color-mix(in srgb,var(--red) 35%,var(--line)); }
+  .layout { display:grid; grid-template-columns:180px minmax(0,1fr) 300px; gap:12px; align-items:start; }
+  .panel { border:1px solid var(--line); border-radius:12px; background:#fff; }
+  .task-list { padding:8px; position:sticky; top:16px; }
+  .task-list h2 { margin:6px 8px 8px; font-size:11px; letter-spacing:.08em; color:var(--muted); font-family:var(--mono); text-transform:uppercase; }
+  .task { display:flex; flex-direction:column; gap:2px; width:100%; border:0; border-radius:8px; background:transparent; padding:9px 9px; text-align:left; cursor:pointer; color:var(--soft); font:inherit; }
+  .task:hover { background:#f7f7fb; }
+  .task.active { background:#f0f0ff; box-shadow:inset 3px 0 0 var(--brand); }
+  .task b { font-size:12px; line-height:1.45; font-weight:650; }
+  .task small { color:var(--muted); font:9px var(--mono); }
+  .workspace { min-width:0; }
+  .prompt { padding:15px 17px; margin-bottom:12px; }
+  .prompt h2 { margin:0 0 6px; font-size:16px; }
+  .prompt p { margin:0; color:var(--muted); font-size:12.5px; }
+  .knowledge { margin-top:8px; border-left:3px solid var(--brand); background:#f7f7fb; padding:8px 10px; color:var(--soft); font-size:12px; border-radius:0 6px 6px 0; }
+  .editor-panel { overflow:hidden; }
+  .toolbar { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 12px; border-bottom:1px solid var(--line); background:#fbfbfd; }
+  .toolbar strong { font-size:11px; font-family:var(--mono); color:var(--soft); font-weight:600; }
+  .btn { border:1px solid var(--line); border-radius:7px; padding:7px 11px; background:#fff; color:var(--soft); font:12px var(--sans); font-weight:650; cursor:pointer; }
+  .btn:hover { border-color:var(--soft); }
+  .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
+  .btn.primary:hover { background:#4a4ac4; }
+  .btn:disabled { opacity:.55; cursor:wait; }
+  .editor-wrap { display:flex; background:#fbfbfd; }
+  .lines { width:40px; padding:12px 8px 12px 0; color:#b0b2bd; font:12px/1.6 var(--mono); text-align:right; user-select:none; overflow:hidden; border-right:1px solid #eef0f5; }
+  textarea { display:block; width:100%; height:430px; resize:vertical; border:0; outline:0; padding:12px 14px; background:#fbfbfd; color:#2c2c32; font:12px/1.6 var(--mono); tab-size:2; }
+  .results { margin-top:12px; padding:0; overflow:hidden; }
+  .results-head { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 13px; border-bottom:1px solid var(--line); }
+  .results-head strong { font:11px var(--mono); color:var(--soft); }
+  .test-row { display:flex; gap:9px; align-items:flex-start; padding:8px 13px; border-bottom:1px solid #f0f0f4; font-size:12px; }
+  .test-row:last-child { border-bottom:0; }
+  .test-row .icon { flex:0 0 16px; height:16px; border-radius:50%; display:grid; place-items:center; font:10px var(--mono); color:#fff; margin-top:2px; }
+  .test-row .icon.ok { background:var(--green); } .test-row .icon.bad { background:var(--red); }
+  .test-row span { color:var(--soft); }
+  .raw { display:none; margin:0; padding:10px 13px; max-height:180px; overflow:auto; background:#fbfbfd; color:#686b75; font:10px/1.55 var(--mono); white-space:pre-wrap; border-top:1px solid var(--line); }
+  .raw.show { display:block; }
+  .agent-panel { position:sticky; top:16px; display:flex; flex-direction:column; height:calc(100vh - 44px); min-height:600px; }
+  .agent-head { padding:12px 14px; border-bottom:1px solid var(--line); }
+  .agent-head b { display:block; font-size:13px; }
+  .agent-head span { color:var(--muted); font:9.5px var(--mono); }
+  .chat { flex:1; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:10px; }
+  .msg { max-width:94%; padding:8px 10px; border-radius:9px; font-size:12px; line-height:1.65; white-space:pre-wrap; }
+  .msg.user { align-self:flex-end; background:var(--brand); color:#fff; border-bottom-right-radius:3px; }
+  .msg.assistant { align-self:flex-start; background:#f4f4f8; color:var(--soft); border-bottom-left-radius:3px; }
+  .msg.system { align-self:stretch; background:#fff8e8; color:#7a531c; font-size:11px; }
+  .composer { border-top:1px solid var(--line); padding:10px; }
+  .composer textarea { height:72px; border:1px solid var(--line); border-radius:8px; background:#fff; font:12px/1.5 var(--sans); padding:8px 9px; }
+  .composer-actions { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:6px; }
+  .composer-actions small { color:var(--muted); font:9px var(--mono); }
+  .composer-actions .btn { padding:6px 10px; font-size:11px; }
+  .setup { margin:0 0 12px; padding:13px 15px; border:1px solid color-mix(in srgb,var(--brand) 28%,var(--line)); border-radius:10px; background:#f8f8ff; }
+  .setup-copy { display:flex; flex-direction:column; gap:2px; margin-bottom:9px; }
+  .setup-copy b { font-size:13px; } .setup-copy span { color:var(--muted); font-size:11.5px; }
+  .setup-row { display:flex; gap:7px; flex-wrap:wrap; }
+  .setup input { flex:1 1 260px; min-width:180px; border:1px solid var(--line); border-radius:7px; padding:7px 9px; font:12px var(--mono); background:#fff; color:var(--ink); outline:0; }
+  .setup input:focus { border-color:var(--brand); }
+  .key-result { min-height:17px; margin-top:6px; color:var(--muted); font:10.5px var(--mono); }
+  .key-result.ok { color:var(--green); } .key-result.bad { color:var(--red); }
+  .setup code { display:block; margin-top:6px; color:var(--muted); font:10px var(--mono); }
+  .notice { padding:10px 13px; border:1px solid #f0d6ac; background:#fff8e8; color:#7a531c; border-radius:9px; font-size:12px; margin-bottom:12px; }
+  .hidden { display:none !important; }
+  html.embed .app { padding:8px 0 10px; max-width:none; }
+  html.embed .app-top { display:none; }
+  html.embed .agent-panel { height:560px; min-height:0; }
+  @media(max-width:900px){ .layout{grid-template-columns:180px minmax(0,1fr)} .agent-panel{grid-column:1/-1; position:static; height:520px; min-height:0} }
+  @media(max-width:720px){ .layout{grid-template-columns:1fr} .task-list{position:static; display:grid; grid-template-columns:1fr 1fr; gap:4px} .task-list h2{grid-column:1/-1} .agent-panel{height:560px} .app{padding:12px} }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-top">
+    <div><div class="eyebrow">DSH · AI CODING LAB · REAL AGENT</div><h1>AI Coding Lab</h1><p>在编辑器里实现 DSH 的核心机制；本地 Node 跑 TypeScript 测试，右侧和真实 DeepSeek agent 对话。</p></div>
+    <div class="status" id="status"><span class="pill">连接本地服务…</span></div>
+  </header>
+  <div id="notice"></div>
+  <section class="setup hidden" id="setup">
+    <div class="setup-copy"><b>配置 DeepSeek API Key</b><span>Key 只保存在当前浏览器 session，并发送到本地 Node 服务；不会写入仓库。也可以直接用环境变量启动服务端。</span></div>
+    <div class="setup-row"><input id="key-input" type="password" autocomplete="off" placeholder="sk-..."><button class="btn primary" id="save-key">保存并测试</button><button class="btn" id="test-conn">测试连接</button><button class="btn" id="clear-key">清除</button></div>
+    <div class="key-result" id="key-result"></div>
+    <code>DEEPSEEK_API_KEY=... node site/serve.mjs</code>
+  </section>
+  <div class="layout">
+    <aside class="panel task-list"><h2>题目</h2><div id="tasks"></div></aside>
+    <main class="workspace">
+      <section class="panel prompt" id="prompt"><div class="eyebrow">LOADING…</div></section>
+      <section class="panel editor-panel">
+        <div class="toolbar"><strong>submission.ts</strong><div><button class="btn" id="reset">重置</button> <button class="btn primary" id="run">运行测试</button></div></div>
+        <div class="editor-wrap"><div class="lines" id="lines">1</div><textarea id="code" spellcheck="false" aria-label="TypeScript 代码"></textarea></div>
+      </section>
+      <section class="panel results" id="results"><div class="results-head"><strong>测试结果</strong><span class="pill" id="result-status">未运行</span></div><div id="test-list"><div class="test-row"><span>点击“运行测试”开始。</span></div></div><pre class="raw" id="raw"></pre></section>
+    </main>
+    <aside class="panel agent-panel">
+      <div class="agent-head"><b>AI coding agent</b><span id="agent-status">真实 DeepSeek Messages</span></div>
+      <div class="chat" id="chat"><div class="msg system">先跑一次测试，再把你不确定的地方发给我。我会看当前代码和测试结果。</div></div>
+      <div class="composer"><textarea id="message" placeholder="例如：这个 test 2 为什么失败？"></textarea><div class="composer-actions"><small>Enter 发送 · Shift+Enter 换行</small><button class="btn primary" id="send">发送</button></div></div>
+    </aside>
+  </div>
+</div>
+<script>
+  const $ = (selector) => document.querySelector(selector)
+  const EMBED = new URLSearchParams(location.search).has('embed')
+  if (EMBED) document.documentElement.classList.add('embed')
+  const state = { tasks: [], task: null, code: new Map(), chats: new Map(), lastRun: null, busy: false, key: false }
+
+  function esc(value) { return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;') }
+  function notify(text, kind = '') { $('#notice').innerHTML = text ? `<div class="notice ${kind}">${text}</div>` : '' }
+  function setStatus() {
+    const source = state.key ? (sessionStorage.getItem('dsh-coding-key') ? '浏览器 session' : '服务端 env') : '未配置'
+    $('#status').innerHTML = `<span class="pill ${state.key ? 'ok' : 'bad'}">agent ${state.key ? '已连接 · ' + source : '未配置'}</span><button class="btn" id="config-key">配置 Key</button><button class="btn" id="test-connection">测试连接</button>`
+    $('#agent-status').textContent = state.key ? '真实 DeepSeek Messages' : '需要 DEEPSEEK_API_KEY'
+    bindConfig()
+  }
+  async function api(path, options) {
+    const key = sessionStorage.getItem('dsh-coding-key')
+    const response = await fetch(`/api/coding/${path}`, { headers: { 'content-type': 'application/json', ...(key ? { 'x-deepseek-key': key } : {}) }, ...options })
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`)
+    return data
+  }
+  function saveTask() {
+    if (state.task) state.code.set(state.task.id, $('#code').value)
+  }
+  function loadTask(id) {
+    saveTask()
+    const task = state.tasks.find(item => item.id === id)
+    if (!task) return
+    state.task = task
+    if (!state.code.has(task.id)) state.code.set(task.id, task.starter)
+    $('#code').value = state.code.get(task.id)
+    $('#prompt').innerHTML = `<div class="eyebrow">${esc(task.lesson)}</div><h2>${esc(task.title)}</h2><p>${esc(task.prompt)}</p><div class="knowledge"><b>知识点。</b>${esc(task.knowledge)}</div>`
+    document.querySelectorAll('[data-task]').forEach(button => button.classList.toggle('active', button.dataset.task === task.id))
+    renderLines(); renderChat(); renderResults(state.lastRun && state.lastRun.taskId === task.id ? state.lastRun : null)
+  }
+  function renderLines() {
+    const count = $('#code').value.split('\n').length
+    $('#lines').textContent = Array.from({ length: count }, (_, i) => i + 1).join('\n')
+    $('#lines').scrollTop = $('#code').scrollTop
+  }
+  function renderResults(run) {
+    const list = $('#test-list')
+    if (!run) { list.innerHTML = '<div class="test-row"><span>点击“运行测试”开始。</span></div>'; $('#result-status').textContent = '未运行'; $('#result-status').className = 'pill'; $('#raw').classList.remove('show'); return }
+    $('#result-status').textContent = run.ok ? '全部通过' : '有失败'
+    $('#result-status').className = `pill ${run.ok ? 'ok' : 'bad'}`
+    list.innerHTML = run.tests.map(test => `<div class="test-row"><span class="icon ${test.pass ? 'ok' : 'bad'}">${test.pass ? '✓' : '×'}</span><span><b>${esc(test.name)}</b> · ${test.pass ? '通过' : '失败'}</span></div>`).join('') + (run.stderr ? `<div class="test-row"><span>stderr 有输出，展开 raw 查看。</span></div>` : '')
+    $('#raw').textContent = [run.stdout, run.stderr].filter(Boolean).join('\n\n').slice(-12000)
+    $('#raw').classList.toggle('show', !run.ok || Boolean(run.stderr))
+  }
+  function renderChat() {
+    const chat = state.chats.get(state.task?.id) || []
+    $('#chat').innerHTML = `<div class="msg system">先跑一次测试，再把你不确定的地方发给我。我会看当前代码和测试结果。</div>` + chat.map(item => `<div class="msg ${item.role}">${esc(item.content)}</div>`).join('')
+    $('#chat').scrollTop = $('#chat').scrollHeight
+  }
+  async function runTests() {
+    if (state.busy) return
+    saveTask(); state.busy = true; $('#run').disabled = true; $('#run').textContent = '运行中…'
+    try {
+      const result = await api('run', { method: 'POST', body: JSON.stringify({ taskId: state.task.id, code: $('#code').value }) })
+      state.lastRun = { ...result, taskId: state.task.id }
+      renderResults(state.lastRun)
+      if (result.ok) addChat('system', '全部测试通过。可以继续问为什么，或者换下一题。')
+    } catch (error) { notify(`运行失败：${esc(error.message)}`); $('#result-status').textContent = '运行失败'; $('#result-status').className = 'pill bad' }
+    finally { state.busy = false; $('#run').disabled = false; $('#run').textContent = '运行测试' }
+  }
+  function addChat(role, content) {
+    const list = state.chats.get(state.task.id) || []
+    list.push({ role, content }); state.chats.set(state.task.id, list); renderChat()
+  }
+  async function send() {
+    const input = $('#message'); const text = input.value.trim()
+    if (!text || state.busy) return
+    if (!state.key) { addChat('assistant', '还没有配置 DeepSeek API Key。点上方“配置 Key”，或重启本地服务时设置 DEEPSEEK_API_KEY；测试和编辑代码仍然可用。'); showSetup(); return }
+    saveTask(); addChat('user', text); input.value = ''; state.busy = true; $('#send').disabled = true
+    try {
+      const history = (state.chats.get(state.task.id) || []).slice(0, -1).map(item => ({ role: item.role, content: item.content }))
+      const context = state.lastRun ? `\n\n最近一次测试：${state.lastRun.tests.map(test => `${test.name}=${test.pass ? 'pass' : 'fail'}`).join(', ')}\n${state.lastRun.stdout}\n${state.lastRun.stderr}` : ''
+      const result = await api('chat', { method: 'POST', body: JSON.stringify({ taskId: state.task.id, code: $('#code').value, message: text + context, history }) })
+      addChat('assistant', result.text)
+    } catch (error) { addChat('assistant', `请求失败：${error.message}`) }
+    finally { state.busy = false; $('#send').disabled = false; input.focus() }
+  }
+  function showSetup(show = true) { $('#setup').classList.toggle('hidden', !show) }
+  function setKeyResult(text, kind = '') { const el = $('#key-result'); el.textContent = text; el.className = `key-result ${kind}` }
+  async function testConnection() {
+    setKeyResult('测试中…')
+    try {
+      const result = await api('test', { method: 'POST', body: '{}' })
+      setKeyResult(`连接成功 · ${result.model} · ${result.text}`, 'ok')
+      state.key = true; setStatus(); setTimeout(() => showSetup(false), 450)
+      return true
+    } catch (error) {
+      setKeyResult(`连接失败：${error.message}`, 'bad')
+      state.key = Boolean(state.serverKey)
+      setStatus(); showSetup(true)
+      return false
+    }
+  }
+  function saveKey() {
+    const value = $('#key-input').value.trim()
+    if (!value) { setKeyResult('请输入 sk-... 开头的 Key', 'bad'); return }
+    sessionStorage.setItem('dsh-coding-key', value)
+    showSetup(true)
+    testConnection()
+  }
+  function clearKey() {
+    sessionStorage.removeItem('dsh-coding-key')
+    state.key = Boolean(state.serverKey)
+    setStatus(); showSetup(!state.key); setKeyResult('已清除浏览器 session key')
+  }
+  function bindConfig() {
+    $('#config-key')?.addEventListener('click', () => showSetup(true))
+    $('#test-connection')?.addEventListener('click', testConnection)
+  }
+  async function boot() {
+    try {
+      const health = await api('health')
+      state.key = Boolean(health.keyConfigured || sessionStorage.getItem('dsh-coding-key'))
+      state.serverKey = Boolean(health.keyConfigured)
+      setStatus()
+      if (!state.key) showSetup()
+      if (!state.key) showSetup()
+      const data = await api('tasks')
+      state.tasks = data.tasks
+      $('#tasks').innerHTML = state.tasks.map(task => `<button class="task" data-task="${task.id}"><b>${esc(task.title)}</b><small>${esc(task.lesson)}</small></button>`).join('')
+      document.querySelectorAll('[data-task]').forEach(button => button.onclick = () => loadTask(button.dataset.task))
+      loadTask(state.tasks[0].id)
+    } catch (error) {
+      notify(`无法连接本地服务：${esc(error.message)}。请运行 <code>node site/serve.mjs</code>，然后通过 <code>http://127.0.0.1:4173/site/#/coding</code> 打开。`)
+      $('#status').innerHTML = '<span class="pill bad">未连接</span>'
+    }
+  }
+  $('#code').addEventListener('input', () => { renderLines(); saveTask() })
+  $('#code').addEventListener('scroll', () => { $('#lines').scrollTop = $('#code').scrollTop })
+  $('#code').addEventListener('keydown', event => {
+    if (event.key === 'Tab') { event.preventDefault(); const el = event.target; const start = el.selectionStart; el.value = el.value.slice(0, start) + '  ' + el.value.slice(el.selectionEnd); el.selectionStart = el.selectionEnd = start + 2; renderLines(); saveTask() }
+  })
+  $('#run').onclick = runTests
+  $('#reset').onclick = () => { if (state.task) { $('#code').value = state.task.starter; state.code.set(state.task.id, state.task.starter); renderLines() } }
+  $('#send').onclick = send
+  $('#message').addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send() } })
+  window.addEventListener('message', event => { if (event.data?.type === 'dsh-coding' && event.data.height) document.documentElement.style.height = '' })
+  if (EMBED) { const app = document.querySelector('.app'); const notify = () => { const height = Math.min(1600, Math.max(720, Math.ceil(app.getBoundingClientRect().height + 18))); try { parent.postMessage({ type: 'dsh-coding-height', height }, '*') } catch {} }; new ResizeObserver(notify).observe(app); setTimeout(notify, 80) }
+  $('#save-key').onclick = saveKey
+  $('#test-conn').onclick = testConnection
+  $('#clear-key').onclick = clearKey
+  boot()
+</script>
+</body>
+</html>

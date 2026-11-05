@@ -118,14 +118,6 @@ window.COURSE = {
       "file": "../course/README.md",
       "desc": "课程目录、运行方式、环境约定与代码组织。",
       "badge": "运行指南"
-    },
-    {
-      "id": "knowledge-map",
-      "title": "知识图谱 · 30 道面试题",
-      "short": "知识图谱",
-      "file": "../docs/04-knowledge-map.zh.md",
-      "desc": "六个知识域、30 道面试题与答案；配可展开网页、SVG 与 XMind。",
-      "badge": "30 Q"
     }
   ],
   "lessons": {

@@ -52,6 +52,7 @@ function svgMap() {
   <text x="${cx}" y="57" text-anchor="middle" font-size="9" fill="rgba(255,255,255,.65)" font-family="SFMono-Regular,Consolas,monospace">SIX DOMAINS · 30 Q</text>
   <text x="${cx}" y="80" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">${esc(meta.subtitle)}</text>
   ${body}
+  <a href="../../quiz/index.html"><rect x="${W - 286}" y="${H - 82}" width="238" height="30" rx="7" fill="#5b5bd6"/><text x="${W - 167}" y="${H - 62}" text-anchor="middle" font-size="10.5" font-weight="650" fill="#fff" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans SC',sans-serif">DSH 面试自测 · 96 题 →</text></a>
   <line x1="48" y1="${H - 44}" x2="${W - 48}" y2="${H - 44}" stroke="#e3e6ef"/>
   <text x="48" y="${H - 20}" font-size="9" fill="#a0a6b6" font-family="SFMono-Regular,Consolas,monospace">完整答案：knowledge-map.html / 04-knowledge-map.zh.md / course.xmind</text>
   <text x="${W - 48}" y="${H - 20}" text-anchor="end" font-size="9" fill="#a0a6b6" font-family="SFMono-Regular,Consolas,monospace">控制面 → 事实 → 工具 → 组合 → 执行 → 质量</text>
@@ -59,7 +60,7 @@ function svgMap() {
 }
 
 function markdown() {
-  const out = [`# ${meta.title}`, '', `> ${meta.intro}`, '']
+  const out = [`# ${meta.title}`, '', `> ${meta.intro}`, '', '[**开始 96 题面试自测 →**](quiz/index.html)', '']
   for (const d of domains) {
     out.push(`## ${d.title}`, '')
     for (const q of d.questions) {
@@ -82,13 +83,13 @@ function html() {
 <style>
 :root{--bg:#fff;--ink:#2c2c32;--soft:#3c3c43;--muted:#67676c;--line:#e6e6e9;--brand:#5b5bd6;--mono:"SFMono-Regular",Consolas,monospace}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","PingFang SC",sans-serif;font-size:16px;line-height:1.75}
-header{max-width:1180px;margin:0 auto;padding:52px 28px 24px}h1{font-size:34px;letter-spacing:-.03em;margin:0 0 10px}p.lead{color:var(--muted);max-width:760px;margin:0}
+header{max-width:1180px;margin:0 auto;padding:40px 28px 24px}h1{font-size:34px;letter-spacing:-.03em;margin:0 0 10px}p.lead{color:var(--muted);max-width:760px;margin:0}.topnav{display:flex;justify-content:space-between;gap:12px;margin-bottom:24px}.topnav a{font:11px var(--mono);color:var(--muted);text-decoration:none}.topnav a:hover{color:var(--brand)}.topnav .quiz{color:#fff;background:var(--brand);border-radius:7px;padding:7px 10px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif;font-weight:650}
 .grid{max-width:1180px;margin:0 auto;padding:12px 28px 80px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 .domain{border:1px solid var(--line);border-radius:14px;padding:18px 18px 8px;background:#fff}.domain h2{font-size:18px;margin:0 0 12px;color:var(--accent);letter-spacing:-.01em}
 .qa{border-top:1px solid var(--line);padding:10px 0}.qa summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--soft);list-style:none}.qa summary::-webkit-details-marker{display:none}.qa summary:before{content:"Q ";color:var(--accent);font-family:var(--mono);font-size:11px}.qa p{margin:8px 0 4px;color:var(--muted);font-size:13.5px;line-height:1.75}
 footer{max-width:1180px;margin:0 auto;padding:0 28px 40px;color:var(--muted);font-size:12px}@media(max-width:800px){.grid{grid-template-columns:1fr}h1{font-size:28px}}
 </style></head><body>
-<header><h1>${esc(meta.title)}</h1><p class="lead">${esc(meta.intro)}</p></header>
+<header><div class="topnav"><a href="mindmaps/course.svg">知识图谱 SVG</a><a class="quiz" href="../quiz/index.html">DSH 面试自测 →</a></div><h1>${esc(meta.title)}</h1><p class="lead">${esc(meta.intro)}</p></header>
 <main class="grid">${cards}</main>
 <footer>点击问题展开答案 · 共 ${domains.reduce((n, d) => n + d.questions.length, 0)} 道面试题</footer>
 </body></html>`

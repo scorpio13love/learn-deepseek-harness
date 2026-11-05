@@ -143,9 +143,7 @@ node site/serve.mjs
 
 ![28 课课程地图](docs/visuals/course-map.svg)
 
-![DSH 知识图谱](docs/visuals/mindmaps/course.svg)
-
-[知识图谱带答案版](docs/visuals/knowledge-map.html) · [30 道面试题答案](docs/04-knowledge-map.zh.md) · [XMind](docs/visuals/mindmaps/course.xmind)
+[DSH 面试自测](docs/quiz/index.html)
 
 ## 课程进度
 
