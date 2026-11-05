@@ -51,7 +51,7 @@
     <div class="meta"><span class="chip">${QUESTIONS.length} 概念题</span><span class="chip">${CODING_TASKS.length} coding</span><span class="chip">6 个 Part</span><span class="chip">本地判分</span></div>
     <div class="actions"><button class="primary" id="start-all">开始全部 ${QUESTIONS.length + CODING_TASKS.length} 题</button></div>
     <div class="domain-grid" style="margin-top:24px">${cards}</div>
-    <p class="lead" style="font-size:13px">提示：键盘 1–4 选择，Enter 下一题。概念题计分；coding 单独标记通过。</p>`
+    <p class="lead" style="font-size:13px">提示：键盘 1–4 选择，←/→ 上一题/下一题；不选答案也可以跳过，未答按错计入。概念题计分；coding 单独标记通过。</p>`
     document.getElementById('start-all').onclick = () => start('all')
     app.querySelectorAll('[data-part]').forEach(button => button.onclick = () => start(button.dataset.part))
   }
@@ -92,13 +92,15 @@
         ${options}
         <div class="explain ${revealed ? 'show' : ''}" id="explain"><b>答案：</b>${revealed ? formatAnswer(q) + '<br><br>' + esc(q.explain) + refFor(q) : ''}</div>
         <div class="actions">
+          <button class="secondary" id="prev" ${state.index === 0 ? 'disabled' : ''}>← 上一题</button>
           ${!revealed && isMulti ? `<button class="secondary" id="submit-answer" ${selected.length === 0 ? 'disabled' : ''}>提交多选</button>` : ''}
-          ${revealed ? `<button class="primary" id="next">${state.index === state.pool.length - 1 ? '提交试卷 →' : '下一题 →'}</button>` : ''}
+          <button class="primary" id="next">${state.index === state.pool.length - 1 ? '提交试卷 →' : '下一题 →'}</button>
         </div>
       </div>`
     app.querySelectorAll('[data-opt]').forEach(button => button.onclick = () => choose(Number(button.dataset.opt)))
     if (!revealed && isMulti) document.getElementById('submit-answer').onclick = submitMulti
-    if (revealed) document.getElementById('next').onclick = next
+    document.getElementById('prev').onclick = prev
+    document.getElementById('next').onclick = next
     window.scrollTo({ top: 0, behavior: 'instant' })
   }
 
@@ -112,10 +114,11 @@
         <h2>${esc(q.title)}</h2>
         <p class="lead" style="font-size:13px">${esc(q.prompt)}</p>
         <div class="coding-state ${done ? 'ok' : ''}">${done ? '✓ 已通过该 coding 任务的测试' : '在 AI Coding Lab 里完成并跑通测试后，这里会标记完成。'}</div>
-        <div class="actions"><button class="primary" id="open-coding">打开 Coding Lab →</button><button class="secondary" id="next">${state.index === state.pool.length - 1 ? '提交试卷 →' : '跳过，下一题 →'}</button></div>
+        <div class="actions"><button class="secondary" id="prev" ${state.index === 0 ? 'disabled' : ''}>← 上一题</button><button class="primary" id="open-coding">打开 Coding Lab →</button><button class="secondary" id="next">${state.index === state.pool.length - 1 ? '提交试卷 →' : '下一题 →'}</button></div>
         <p class="ref">完成状态保存在本机；不会把代码发到远端。</p>
       </div>`
     document.getElementById('open-coding').onclick = () => openCoding(q.taskId)
+    document.getElementById('prev').onclick = prev
     document.getElementById('next').onclick = next
     window.scrollTo({ top: 0, behavior: 'instant' })
   }
@@ -155,6 +158,12 @@
     renderQuestion()
   }
 
+  function prev() {
+    if (state.index <= 0) return
+    state.index -= 1
+    renderQuestion()
+  }
+
   function next() {
     if (state.index >= state.pool.length - 1) return renderScore()
     state.index += 1
@@ -164,10 +173,12 @@
   function renderScore() {
     const concept = conceptOf(state.pool)
     const coding = codingOf(state.pool)
-    const correct = concept.filter(q => {
+    const conceptWrong = concept.filter(q => {
       const poolIndex = state.pool.indexOf(q)
-      return isCorrect(q, state.answers[poolIndex])
-    }).length
+      return !isCorrect(q, state.answers[poolIndex])
+    }).map(q => ({ q, chosen: state.answers[state.pool.indexOf(q)] }))
+    state.wrong = conceptWrong
+    const correct = concept.length - conceptWrong.length
     const score = percent(correct, concept.length)
     const done = coding.filter(q => completedCoding(q.taskId)).length
     const best = Number(localStorage.getItem('dsh-quiz-best') || 0)
@@ -180,7 +191,7 @@
       if (isCorrect(q, state.answers[index])) row.ok += 1
     }
     const rows = [...domainMap.entries()].map(([id, row]) => `<div class="brow"><span>${esc(partName(id))}</span><b>${row.ok} / ${row.total}</b></div>`).join('')
-    const wrongHtml = state.wrong.map(({ q, chosen }) => `<div class="wrong"><h3>${esc(q.q)}</h3><p class="no">你的答案：${Array.isArray(chosen) ? chosen.map(i => String.fromCharCode(65+i)).join(', ') : String.fromCharCode(65+chosen)}</p><p class="yes">正确答案：${formatAnswer(q)}</p><p>${esc(q.explain)}</p>${refFor(q)}</div>`).join('')
+    const wrongHtml = state.wrong.map(({ q, chosen }) => `<div class="wrong"><h3>${esc(q.q)}</h3><p class="no">你的答案：${chosen === null ? '未作答' : Array.isArray(chosen) ? chosen.map(i => String.fromCharCode(65+i)).join(', ') : String.fromCharCode(65+chosen)}</p><p class="yes">正确答案：${formatAnswer(q)}</p><p>${esc(q.explain)}</p>${refFor(q)}</div>`).join('')
     app.innerHTML = `<div class="result">
       <div class="eyebrow">RESULT · LOCAL SCORE</div>
       <div class="score">${score}<small> / 100</small></div>
@@ -208,6 +219,8 @@
 
   document.addEventListener('keydown', event => {
     if (!app.querySelector('.question')) return
+    if (event.key === 'ArrowLeft') { event.preventDefault(); prev(); return }
+    if (event.key === 'ArrowRight') { event.preventDefault(); next(); return }
     if (/^[1-4]$/.test(event.key)) {
       const option = app.querySelector(`[data-opt="${Number(event.key)-1}"]`)
       if (option && !option.disabled) option.click()
