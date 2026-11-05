@@ -44,7 +44,7 @@
   .btn:disabled { opacity:.55; cursor:wait; }
   .editor-wrap { display:flex; background:#fbfbfd; }
   .lines { width:40px; padding:12px 8px 12px 0; color:#b0b2bd; font:12px/1.6 var(--mono); text-align:right; user-select:none; overflow:hidden; border-right:1px solid #eef0f5; }
-  textarea { display:block; width:100%; height:430px; resize:vertical; border:0; outline:0; padding:12px 14px; background:#fbfbfd; color:#2c2c32; font:12px/1.6 var(--mono); tab-size:2; }
+  textarea { display:block; width:100%; height:auto; min-height:430px; resize:vertical; overflow:hidden; border:0; outline:0; padding:12px 14px; background:#fbfbfd; color:#2c2c32; font:12px/1.6 var(--mono); tab-size:2; }
   .results { margin-top:12px; padding:0; overflow:hidden; }
   .results-head { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 13px; border-bottom:1px solid var(--line); }
   .results-head strong { font:11px var(--mono); color:var(--soft); }
@@ -53,24 +53,24 @@
   .test-row .icon { flex:0 0 16px; height:16px; border-radius:50%; display:grid; place-items:center; font:10px var(--mono); color:#fff; margin-top:2px; }
   .test-row .icon.ok { background:var(--green); } .test-row .icon.bad { background:var(--red); }
   .test-row span { color:var(--soft); }
-  .raw { display:none; margin:0; padding:10px 13px; max-height:180px; overflow:auto; background:#fbfbfd; color:#686b75; font:10px/1.55 var(--mono); white-space:pre-wrap; border-top:1px solid var(--line); }
+  .raw { display:none; margin:0; padding:10px 13px; overflow:visible; background:#fbfbfd; color:#686b75; font:10px/1.55 var(--mono); white-space:pre-wrap; border-top:1px solid var(--line); }
   .raw.show { display:block; }
   .answer { margin-top:12px; overflow:hidden; }
   .answer-head { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 13px; border-bottom:1px solid var(--line); background:#fbfbfd; }
   .answer-head strong { font:11px var(--mono); color:var(--soft); }
   .answer-head .btn { padding:5px 9px; font-size:10.5px; }
-  .answer pre { margin:0; padding:14px; overflow:auto; max-height:520px; background:#fbfbfd; color:#2c2c32; font:11.5px/1.6 var(--mono); white-space:pre; }
-  .agent-panel { position:sticky; top:16px; display:flex; flex-direction:column; height:calc(100vh - 44px); min-height:600px; }
+  .answer pre { margin:0; padding:14px; overflow:visible; background:#fbfbfd; color:#2c2c32; font:11.5px/1.6 var(--mono); white-space:pre; }
+  .agent-panel { display:flex; flex-direction:column; min-height:0; }
   .agent-head { padding:12px 14px; border-bottom:1px solid var(--line); }
   .agent-head b { display:block; font-size:13px; }
   .agent-head span { color:var(--muted); font:9.5px var(--mono); }
-  .chat { flex:1; overflow:auto; padding:12px; display:flex; flex-direction:column; gap:10px; }
+  .chat { flex:none; overflow:visible; padding:12px; display:flex; flex-direction:column; gap:10px; }
   .msg { max-width:94%; padding:8px 10px; border-radius:9px; font-size:12px; line-height:1.65; white-space:pre-wrap; }
   .msg.user { align-self:flex-end; background:var(--brand); color:#fff; border-bottom-right-radius:3px; }
   .msg.assistant { align-self:flex-start; background:#f4f4f8; color:var(--soft); border-bottom-left-radius:3px; }
   .msg.system { align-self:stretch; background:#fff8e8; color:#7a531c; font-size:11px; }
   .composer { border-top:1px solid var(--line); padding:10px; }
-  .composer textarea { height:72px; border:1px solid var(--line); border-radius:8px; background:#fff; font:12px/1.5 var(--sans); padding:8px 9px; }
+  .composer textarea { height:72px; min-height:0; overflow:auto; border:1px solid var(--line); border-radius:8px; background:#fff; font:12px/1.5 var(--sans); padding:8px 9px; }
   .composer-actions { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:6px; }
   .composer-actions small { color:var(--muted); font:9px var(--mono); }
   .composer-actions .btn { padding:6px 10px; font-size:11px; }
@@ -87,9 +87,9 @@
   .hidden { display:none !important; }
   html.embed .app { padding:8px 0 10px; max-width:none; }
   html.embed .app-top { display:none; }
-  html.embed .agent-panel { height:560px; min-height:0; }
-  @media(max-width:900px){ .layout{grid-template-columns:180px minmax(0,1fr)} .agent-panel{grid-column:1/-1; position:static; height:520px; min-height:0} }
-  @media(max-width:720px){ .layout{grid-template-columns:1fr} .task-list{position:static; display:grid; grid-template-columns:1fr 1fr; gap:4px} .task-list h2{grid-column:1/-1} .agent-panel{height:560px} .app{padding:12px} }
+  html.embed .agent-panel { height:auto; min-height:0; }
+  @media(max-width:900px){ .layout{grid-template-columns:180px minmax(0,1fr)} .agent-panel{grid-column:1/-1; position:static; height:auto; min-height:0} }
+  @media(max-width:720px){ .layout{grid-template-columns:1fr} .task-list{position:static; display:grid; grid-template-columns:1fr 1fr; gap:4px} .task-list h2{grid-column:1/-1} .agent-panel{height:auto} .app{padding:12px} }
 </style>
 </head>
 <body>
@@ -161,7 +161,13 @@
     $('#answer-toggle').textContent = '查看参考答案'
     $('#answer-toggle').setAttribute('aria-expanded', 'false')
     document.querySelectorAll('[data-task]').forEach(button => button.classList.toggle('active', button.dataset.task === task.id))
-    renderLines(); renderChat(); renderResults(state.lastRun && state.lastRun.taskId === task.id ? state.lastRun : null)
+    fitEditor(); renderChat(); renderResults(state.lastRun && state.lastRun.taskId === task.id ? state.lastRun : null)
+  }
+  function fitEditor() {
+    const el = $('#code')
+    el.style.height = 'auto'
+    el.style.height = `${Math.max(430, el.scrollHeight + 2)}px`
+    renderLines()
   }
   function renderLines() {
     const count = $('#code').value.split('\n').length
@@ -270,17 +276,17 @@
       $('#status').innerHTML = '<span class="pill bad">未连接</span>'
     }
   }
-  $('#code').addEventListener('input', () => { renderLines(); saveTask() })
+  $('#code').addEventListener('input', () => { fitEditor(); saveTask() })
   $('#code').addEventListener('scroll', () => { $('#lines').scrollTop = $('#code').scrollTop })
   $('#code').addEventListener('keydown', event => {
-    if (event.key === 'Tab') { event.preventDefault(); const el = event.target; const start = el.selectionStart; el.value = el.value.slice(0, start) + '  ' + el.value.slice(el.selectionEnd); el.selectionStart = el.selectionEnd = start + 2; renderLines(); saveTask() }
+    if (event.key === 'Tab') { event.preventDefault(); const el = event.target; const start = el.selectionStart; el.value = el.value.slice(0, start) + '  ' + el.value.slice(el.selectionEnd); el.selectionStart = el.selectionEnd = start + 2; fitEditor(); saveTask() }
   })
   $('#run').onclick = runTests
-  $('#reset').onclick = () => { if (state.task) { $('#code').value = state.task.starter; state.code.set(state.task.id, state.task.starter); renderLines() } }
+  $('#reset').onclick = () => { if (state.task) { $('#code').value = state.task.starter; state.code.set(state.task.id, state.task.starter); fitEditor() } }
   $('#send').onclick = send
   $('#message').addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send() } })
   window.addEventListener('message', event => { if (event.data?.type === 'dsh-coding' && event.data.height) document.documentElement.style.height = '' })
-  if (EMBED) { const app = document.querySelector('.app'); const notify = () => { const height = Math.min(1600, Math.max(720, Math.ceil(app.getBoundingClientRect().height + 18))); try { parent.postMessage({ type: 'dsh-coding-height', height }, '*') } catch {} }; new ResizeObserver(notify).observe(app); setTimeout(notify, 80) }
+  if (EMBED) { const app = document.querySelector('.app'); const notify = () => { const height = Math.max(720, Math.ceil(app.getBoundingClientRect().height + 18)); try { parent.postMessage({ type: 'dsh-coding-height', height }, '*') } catch {} }; new ResizeObserver(notify).observe(app); setTimeout(notify, 80) }
   $('#answer-toggle').onclick = toggleAnswer
   $('#copy-answer').onclick = copyAnswer
   $('#save-key').onclick = saveKey

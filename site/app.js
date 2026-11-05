@@ -594,7 +594,7 @@
     document.title = `AI Coding Lab · ${C.title}`;
     $('#content').innerHTML = `<section class="coding-page">
       <header class="quiz-page-head"><div class="eyebrow">AI CODING LAB · REAL AGENT</div><h1>AI Coding Lab</h1><p>TypeScript 核心题 · 本地 Node 测试 · 真实 DeepSeek agent</p></header>
-      <iframe id="coding-frame" class="coding-frame" src="../docs/coding/index.html?embed=1" title="AI Coding Lab"></iframe>
+      <iframe id="coding-frame" class="coding-frame" src="../docs/coding/index.html?embed=1" title="AI Coding Lab" scrolling="no"></iframe>
     </section>`;
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
@@ -821,7 +821,7 @@
     window.addEventListener('message', (event) => {
       if (event.data?.type !== 'dsh-quiz-height' && event.data?.type !== 'dsh-coding-height') return;
       const frame = event.data.type === 'dsh-quiz-height' ? $('#quiz-frame') : event.data.type === 'dsh-coding-height' ? $('#coding-frame') : null;
-      if (frame) frame.style.height = `${Math.min(1600, Math.max(700, Number(event.data.height) || 0))}px`;
+      if (frame) frame.style.height = `${Math.max(700, Number(event.data.height) || 0)}px`;
     });
     window.addEventListener('scroll', readingProgress, { passive: true });
     $('#theme-toggle').addEventListener('click', () => {
