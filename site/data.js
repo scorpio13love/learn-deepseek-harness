@@ -118,6 +118,14 @@ window.COURSE = {
       "file": "../course/README.md",
       "desc": "课程目录、运行方式、环境约定与代码组织。",
       "badge": "运行指南"
+    },
+    {
+      "id": "frontier",
+      "title": "前沿观察：RSI、Super-agent、DeepInfer",
+      "short": "前沿观察",
+      "file": "../docs/05-frontier.zh.md",
+      "desc": "DeepSeek RSI 的真实边界、Super-agent 落地情况、DeepInfer 推理栈，以及 Harness 行业最近的结构性变化。",
+      "badge": "拓展阅读"
     }
   ],
   "lessons": {

@@ -9,6 +9,7 @@
 - 课程设计：[`../docs/02-course-v3.zh.md`](../docs/02-course-v3.zh.md)
 - 架构阅读笔记：[`../docs/00-architecture.zh.md`](../docs/00-architecture.zh.md)
 - 当前进度：**s01-s28 全部完成**
+- 拓展阅读：[前沿观察：RSI、Super-agent、DeepInfer](../docs/05-frontier.zh.md)
 - 课程网站：[`../site/`](../site/README.md)（`node site/serve.mjs`）
 
 ## 面试自测

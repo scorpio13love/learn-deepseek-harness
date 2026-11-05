@@ -122,6 +122,7 @@ deepseek-harness/   上游源码 clone（不提交，仅本地阅读）
 | [`course/README.md`](course/README.md) | 课程工程说明、运行方式、代码约定 |
 | [`course/lessons/`](course/lessons) | 28 课自包含讲义：每课 README 含源码阅读路径、实现说明、验收、练习与带答案的思考题 |
 | [`docs/02-course-v3.zh.md`](docs/02-course-v3.zh.md) | v3 课程设计：28 课、computer use、每课开篇模板与可视化规范 |
+| [`docs/05-frontier.zh.md`](docs/05-frontier.zh.md) | 前沿观察：RSI、Super-agent、DeepInfer 与 Harness 行业 |
 | [`docs/visuals/README.md`](docs/visuals/README.md) | 21 个实际运行动画、28 张本课地图与生成脚本 |
 
 ## 课程网站
