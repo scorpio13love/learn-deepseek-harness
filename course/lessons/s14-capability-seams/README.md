@@ -192,3 +192,11 @@ s13 有了执行世界。s14 会加入委派：
 - preset 如何给不同 agent 不同工具/提示词？
 
 先读：[`subagent`](../../../deepseek-harness/packages/subagent/subagent/README.md) 与 [`preset`](../../../deepseek-harness/packages/preset/agent-preset-registry/README.md)。
+
+---
+
+## 面试自测
+
+[打开 IV · 执行边界 面试自测 →](../../../site/#/quiz?part=execution)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

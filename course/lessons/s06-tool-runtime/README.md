@@ -382,3 +382,11 @@ s05 解决了工具执行。s06 会解决「模型看到的提示词如何组装
 - 为什么这会影响 KV cache？
 
 先读：[`core/system-prompt/src/index.ts`](../../../deepseek-harness/packages/core/system-prompt/src/index.ts) 与 [`docs/subsystems/system-prompt.zh.md`](../../../deepseek-harness/docs/subsystems/system-prompt.zh.md)。
+
+---
+
+## 面试自测
+
+[打开 I · 内核 面试自测 →](../../../site/#/quiz?part=core)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

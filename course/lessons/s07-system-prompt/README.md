@@ -379,3 +379,11 @@ s06 解决了「模型看到什么提示词」。s07 会解决「运行中的 ag
 - 注入的上下文为什么不能唤醒 idle agent？
 
 先读：[`agent-loop/src/{inbox,agent}.ts`](../../../deepseek-harness/packages/core/agent-loop/src/inbox.ts) 与 [`core.zh.md` 的 inbox 段](../../../deepseek-harness/docs/subsystems/core.zh.md)。
+
+---
+
+## 面试自测
+
+[打开 II · 上下文 面试自测 →](../../../site/#/quiz?part=context)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

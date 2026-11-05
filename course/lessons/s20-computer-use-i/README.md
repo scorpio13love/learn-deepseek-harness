@@ -226,3 +226,11 @@ register(provider) {
 2. **AX 裁剪**：给 `getState` 加 `maxElements` / `maxDepth`，超出时返回 `truncated: true`。
 3. **多显示器**：给窗口加 `displayId` 与 `scale`，思考 point 与 pixel 的关系（s21 会用到）。
 4. **替换 provider**：写一个 `RecordingProvider`，把真实 MCP 的响应录成 fixture，再让 `cua` 工具跑在 fixture 上。
+
+---
+
+## 面试自测
+
+[打开 IV · 执行边界 面试自测 →](../../../site/#/quiz?part=execution)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

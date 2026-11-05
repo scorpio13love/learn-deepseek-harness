@@ -302,3 +302,11 @@ s10 完成了上下文管理。s11 会把前面 10 课重构成插件树：
 - 为什么没有特权内核？
 
 先读：[`vendor/cordis/src/{context,fiber,events}.ts`](../../../deepseek-harness/vendor/cordis/src/context.ts)。
+
+---
+
+## 面试自测
+
+[打开 II · 上下文 面试自测 →](../../../site/#/quiz?part=context)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

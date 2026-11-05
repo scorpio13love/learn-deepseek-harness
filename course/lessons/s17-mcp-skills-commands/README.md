@@ -195,3 +195,11 @@ s15 接入了外部能力。s16 会把状态送到浏览器：
 - 多客户端如何保持一致？
 
 先读：[`session-projection`](../../../deepseek-harness/packages/session/session-projection/src/index.ts) 与 [`host/webserver`](../../../deepseek-harness/packages/host/webserver/src/index.ts)。
+
+---
+
+## 面试自测
+
+[打开 IV · 执行边界 面试自测 →](../../../site/#/quiz?part=execution)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

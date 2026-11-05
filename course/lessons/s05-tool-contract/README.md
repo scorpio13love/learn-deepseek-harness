@@ -413,3 +413,11 @@ s04 解决了「工具是什么、能看见什么」。s05 会解决「一次调
 - 失败步骤如何补齐缺失的工具结果。
 
 先读：[`tool-execution-pipeline.zh.md`](../../../deepseek-harness/docs/tool-execution-pipeline.zh.md) 与 [`core/tools/src/{pipeline,batch}.ts`](../../../deepseek-harness/packages/core/tools/src/pipeline.ts)。
+
+---
+
+## 面试自测
+
+[打开 I · 内核 面试自测 →](../../../site/#/quiz?part=core)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

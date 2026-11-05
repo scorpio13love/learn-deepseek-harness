@@ -347,7 +347,7 @@
 
   function renderSidebar() {
     const nav = $('#lesson-nav');
-    const quizNav = `<div class="nav-practice"><a class="nav-quiz" id="nav-quiz" href="#/quiz"><span><b>DSH 面试自测</b><small>96 题 · 本地判分</small></span><em>开始 →</em></a><a class="nav-quiz nav-coding" id="nav-coding" href="#/coding"><span><b>AI Coding Lab</b><small>真实 agent · TypeScript</small></span><em>打开 →</em></a></div>`
+    const quizNav = `<div class="nav-practice"><a class="nav-quiz" id="nav-quiz" href="#/quiz"><span><b>DSH 面试自测</b><small>6 Part · 概念 + coding</small></span><em>开始 →</em></a><a class="nav-quiz nav-coding" id="nav-coding" href="#/coding"><span><b>AI Coding Lab</b><small>真实 agent · TypeScript</small></span><em>打开 →</em></a></div>`
     const docsNav = `<div class="nav-part nav-docs">
       <div class="nav-part-title"><span>文档</span><span>${C.docs.length} 篇</span></div>
       ${C.docs.map(doc => `<a class="nav-doc" href="#/docs/${doc.id}" data-doc="${doc.id}">
@@ -495,7 +495,7 @@
         <div class="hero-actions">
           <a class="primary-button" href="#/${next}">${completed.size === 0 ? '从 s01 开始' : '继续学习'} <span>→</span></a>
           <a class="secondary-button" href="#/docs/architecture">先读架构笔记 →</a>
-          <a class="secondary-button" href="#/quiz">面试自测 · 96 题 →</a>
+          <a class="secondary-button" href="#/quiz">面试自测 · 6 Part →</a>
         </div>
         <div class="hero-stats">
           ${C.stats.map(stat => `<div class="hero-stat"><strong>${escapeHtml(stat.value)}</strong><span>${escapeHtml(stat.label)}</span></div>`).join('')}
@@ -504,7 +504,7 @@
 
       <section class="section quiz-section">
         <div class="quiz-banner">
-          <div><div class="quiz-kicker">INTERVIEW SELF-TEST · 96 QUESTIONS</div><h2>DSH 面试自测</h2><p>28 课 + 12 道综合题，单选。每题即时判分并给出知识点位置；交卷后看总分、知识域分布和错题。</p></div>
+          <div><div class="quiz-kicker">INTERVIEW SELF-TEST · 96 QUESTIONS</div><h2>DSH 面试自测</h2><p>6 个 Part、约 30 题/Part：单选/多选/判断 + coding。概念题即时判分，coding 单独标记通过。</p></div>
           <a class="primary-button" href="#/quiz">开始自测 <span>→</span></a>
         </div>
       </section>
@@ -583,7 +583,7 @@
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
-  function renderCoding() {
+  function renderCoding(params = new URLSearchParams()) {
     state.current = null;
     state.doc = null;
     document.body.classList.remove('is-home', 'is-quiz');
@@ -595,12 +595,12 @@
     document.title = `AI Coding Lab · ${C.title}`;
     $('#content').innerHTML = `<section class="coding-page">
       <header class="quiz-page-head"><div class="eyebrow">AI CODING LAB · REAL AGENT</div><h1>AI Coding Lab</h1><p>TypeScript 核心题 · 本地 Node 测试 · 真实 DeepSeek agent</p></header>
-      <iframe id="coding-frame" class="coding-frame" src="../docs/coding/index.html?embed=1" title="AI Coding Lab" scrolling="no"></iframe>
+      <iframe id="coding-frame" class="coding-frame" src="../docs/coding/index.html?embed=1${params.get('task') ? `&task=${encodeURIComponent(params.get('task'))}` : ''}" title="AI Coding Lab" scrolling="no"></iframe>
     </section>`;
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
-  function renderQuiz() {
+  function renderQuiz(params = new URLSearchParams()) {
     document.body.classList.remove('is-coding');
     state.current = null;
     state.doc = null;
@@ -612,8 +612,8 @@
     $('#breadcrumb').innerHTML = '<span>面试自测</span>';
     document.title = `DSH 面试自测 · ${C.title}`;
     $('#content').innerHTML = `<section class="quiz-page">
-      <header class="quiz-page-head"><div class="eyebrow">INTERVIEW SELF-TEST</div><h1>DSH 面试自测</h1><p>96 道选择题 · 28 课 + 综合题 · 本地判分</p></header>
-      <iframe id="quiz-frame" class="quiz-frame" src="../docs/quiz/index.html?embed=1" title="DSH 面试自测" scrolling="no"></iframe>
+      <header class="quiz-page-head"><div class="eyebrow">INTERVIEW SELF-TEST</div><h1>DSH 面试自测</h1><p>6 个 Part · 单选 / 多选 / 判断 + coding · 本地判分</p></header>
+      <iframe id="quiz-frame" class="quiz-frame" src="../docs/quiz/index.html?embed=1${params.get('part') ? `&part=${encodeURIComponent(params.get('part'))}` : ''}" title="DSH 面试自测" scrolling="no"></iframe>
     </section>`;
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
@@ -740,13 +740,15 @@
 
   async function route() {
     const hash = location.hash.replace(/^#\/?/, '');
+    const [routePath, query = ''] = hash.split('?');
+    const params = new URLSearchParams(query);
     try {
-      if (!hash) renderHome();
-      else if (hash === 'animations') renderAnimations();
-      else if (hash === 'quiz') renderQuiz();
-      else if (hash === 'coding') renderCoding();
-      else if (hash.startsWith('docs/')) await loadDoc(hash.slice(5));
-      else await loadLesson(hash);
+      if (!routePath) renderHome();
+      else if (routePath === 'animations') renderAnimations();
+      else if (routePath === 'quiz') renderQuiz(params);
+      else if (routePath === 'coding') renderCoding(params);
+      else if (routePath.startsWith('docs/')) await loadDoc(routePath.slice(5));
+      else await loadLesson(routePath);
     } catch (error) {
       $('#content').innerHTML = `<div class="home"><div class="hero"><h1>加载失败</h1><p>${escapeHtml(error instanceof Error ? error.message : String(error))}</p></div></div>`;
     }
@@ -845,6 +847,7 @@
     window.addEventListener('hashchange', route);
     window.addEventListener('resize', updateSidebarToggle);
     window.addEventListener('message', (event) => {
+      if (event.data?.type === 'dsh-open-coding' && event.data.taskId) { location.hash = `#/coding?task=${encodeURIComponent(event.data.taskId)}`; return; }
       if (event.data?.type !== 'dsh-quiz-height' && event.data?.type !== 'dsh-coding-height') return;
       const frame = event.data.type === 'dsh-quiz-height' ? $('#quiz-frame') : event.data.type === 'dsh-coding-height' ? $('#coding-frame') : null;
       if (frame) frame.style.height = `${Math.max(700, Number(event.data.height) || 0)}px`;

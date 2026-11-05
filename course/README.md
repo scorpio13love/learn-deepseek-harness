@@ -13,9 +13,9 @@
 
 ## 面试自测
 
-[**DSH 面试自测 · 96 题 →**](../docs/quiz/index.html)
+[**DSH 面试自测 · 6 个 Part →**](../docs/quiz/index.html)
 
-28 课 + 12 道综合题，单选；每题即时判分并给解释，交卷后看总分、知识域分布和错题。
+6 个 Part、约 30 题/Part：单选、多选、判断，最后几题是 coding。概念题即时判分，coding 单独标记通过。
 
 [**AI Coding Lab →**](../site/#/coding) · TypeScript 核心题，本地测试，真实 DeepSeek agent。
 

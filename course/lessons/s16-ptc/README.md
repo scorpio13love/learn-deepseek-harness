@@ -382,3 +382,11 @@ PTC 把“工具调用”变成“程序”。下一步可以看：
 - **s17**：MCP / skills / commands，如何把外部能力接进同一个工具面；
 - **s19 / s20**：browser-use 与 computer-use，PTC 最适合的细粒度动作场景；
 - **s27**：安全与沙箱，回答“这段模型代码到底能碰什么”。
+
+---
+
+## 面试自测
+
+[打开 IV · 执行边界 面试自测 →](../../../site/#/quiz?part=execution)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

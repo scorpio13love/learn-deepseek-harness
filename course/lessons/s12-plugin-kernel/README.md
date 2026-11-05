@@ -227,3 +227,11 @@ s11 有了内核。s12 会把它组装成产品：
 - HMR 如何重载配置？
 
 先读：[`boot/app-boot`](../../../deepseek-harness/packages/boot/app-boot/README.md) 与 [`bundle/base/cordis.patch.yml`](../../../deepseek-harness/packages/bundle/base/cordis.patch.yml)。
+
+---
+
+## 面试自测
+
+[打开 III · 组合 面试自测 →](../../../site/#/quiz?part=composition)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

@@ -220,3 +220,11 @@ title: Products — Mock Shop
 2. **ref 失效**：`click(ref)` 时校验 ref 是否来自「最近一次快照」，过期返回 `STALE_SNAPSHOT`。做完这个练习，你就理解了 s21 的核心。
 3. **真实 provider 桩**：写一个 `PlaywrightStubProvider`，`open()` 里 spawn 一个假 MCP server，验证工具层零改动。
 4. **截图元数据**：给 `BrowserScreenshot` 加 `viewport` 与 `deviceScaleFactor`，思考真实坐标换算需要哪些字段。
+
+---
+
+## 面试自测
+
+[打开 IV · 执行边界 面试自测 →](../../../site/#/quiz?part=execution)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

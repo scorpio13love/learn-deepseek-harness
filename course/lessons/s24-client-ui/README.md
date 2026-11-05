@@ -162,3 +162,11 @@ node --test tests/*.test.ts
 - [DSH action cards](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/experimental/action-cards/README.zh.md)
 - [DSH client UI action cards](https://github.com/deepseek-ai/deepseek-harness/blob/master/packages/experimental/client-ui-action-cards/README.zh.md)
 - [DSH conversation 与 presentation](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/conversation.zh.md)
+
+---
+
+## 面试自测
+
+[打开 V · 产品面 面试自测 →](../../../site/#/quiz?part=product)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

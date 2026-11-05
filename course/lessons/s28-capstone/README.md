@@ -190,3 +190,11 @@ node src/main.ts --workspace /absolute/path/to/repo --out /tmp/capstone-run
 - [DSH tool execution pipeline](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/tool-execution-pipeline.zh.md)
 - [DSH persistence](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/persistence.zh.md)
 - [DSH session format](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/session-format-status.zh.md)
+
+---
+
+## 面试自测
+
+[打开 VI · 质量 面试自测 →](../../../site/#/quiz?part=quality)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

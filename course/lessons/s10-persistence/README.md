@@ -368,3 +368,11 @@ s09 让会话活过重启。s10 会解决「历史太长，上下文装不下」
 - 为什么压缩本身也是一次模型请求？
 
 先读：[`compaction-basic`](../../../deepseek-harness/packages/compaction/compaction-basic/src/index.ts) 与 [`token-meter`](../../../deepseek-harness/packages/llm/token-meter/src/index.ts)。
+
+---
+
+## 面试自测
+
+[打开 II · 上下文 面试自测 →](../../../site/#/quiz?part=context)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

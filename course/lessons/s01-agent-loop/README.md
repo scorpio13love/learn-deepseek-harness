@@ -415,3 +415,11 @@ turn/start → step/start → user/message → request/header
 - 为什么工具结果必须在 `step/end` 之前提交？
 
 先把本课的 `agent.ts` 读透，再进入 s02。
+
+---
+
+## 面试自测
+
+[打开 I · 内核 面试自测 →](../../../site/#/quiz?part=core)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

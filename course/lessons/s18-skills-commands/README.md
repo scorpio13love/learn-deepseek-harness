@@ -272,3 +272,11 @@ catalog 是稳定、短小、可缓存的“菜单”；正文是长尾、按需
 - **s17**：MCP / skills / commands 合在一起，看外部工具协议如何接入同一工具面；
 - **s19 / s20**：browser-use / computer-use，skill 常用来描述复杂 UI 流程；
 - **s24**：client UI，命令如何变成可发现的 slash 菜单。
+
+---
+
+## 面试自测
+
+[打开 IV · 执行边界 面试自测 →](../../../site/#/quiz?part=execution)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

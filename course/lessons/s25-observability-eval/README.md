@@ -206,3 +206,11 @@ session log + surface
 1. 用 mini harness 跑一个真实任务（读写文件、跑测试、修复 bug）；
 2. 对照 `dsh --profile headless` 的事件日志；
 3. 选一个真实 DSH 子系统，按本课格式继续深挖。
+
+---
+
+## 面试自测
+
+[打开 VI · 质量 面试自测 →](../../../site/#/quiz?part=quality)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

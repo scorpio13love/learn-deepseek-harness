@@ -180,3 +180,11 @@ node --test tests/*.test.ts
 - [DSH session telemetry](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/subsystems/session-telemetry.zh.md)
 - [DSH tool execution pipeline](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/tool-execution-pipeline.zh.md)
 - [DSH defensive patterns](https://github.com/deepseek-ai/deepseek-harness/blob/master/docs/defensive-patterns/general.zh.md)
+
+---
+
+## 面试自测
+
+[打开 VI · 质量 面试自测 →](../../../site/#/quiz?part=quality)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

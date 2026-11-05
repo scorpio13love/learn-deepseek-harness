@@ -432,3 +432,11 @@ s03 解决了「模型输出怎么结算」。s04 会转向模型能调用的能
 - 工具 schema 如何进入系统提示词？
 
 先读：[`core/tools/src/{contracts,schema}.ts`](../../../deepseek-harness/packages/core/tools/src/contracts.ts) 与 [`docs/cookbook/adding-a-tool.zh.md`](../../../deepseek-harness/docs/cookbook/adding-a-tool.zh.md)。
+
+---
+
+## 面试自测
+
+[打开 I · 内核 面试自测 →](../../../site/#/quiz?part=core)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

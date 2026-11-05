@@ -185,3 +185,11 @@ s12 组装了插件树。s13 会加入真实执行世界：
 - 如何把本地后端换成远程后端？
 
 先读：[`fs`](../../../deepseek-harness/packages/fs/README.md)、[`shell`](../../../deepseek-harness/packages/shell/README.md)、[`sandbox`](../../../deepseek-harness/packages/sandbox/README.md)。
+
+---
+
+## 面试自测
+
+[打开 III · 组合 面试自测 →](../../../site/#/quiz?part=composition)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

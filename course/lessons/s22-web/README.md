@@ -179,3 +179,11 @@ s16 把状态送到浏览器。s17 会把 harness 变成进程外服务：
 - SDK 和 ACP 的差异？
 
 先读：[`sdk/protocol`](../../../deepseek-harness/packages/sdk/protocol/src/index.ts)。
+
+---
+
+## 面试自测
+
+[打开 V · 产品面 面试自测 →](../../../site/#/quiz?part=product)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

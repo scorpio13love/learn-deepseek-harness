@@ -168,3 +168,11 @@ s17 把 harness 变成服务。s18 会让它可诊断、可回归：
 - 故障注入覆盖哪些路径？
 
 先读：[`telemetry`](../../../deepseek-harness/packages/telemetry/README.md) 与 [`testing.zh.md`](../../../deepseek-harness/docs/testing.zh.md)。
+
+---
+
+## 面试自测
+
+[打开 V · 产品面 面试自测 →](../../../site/#/quiz?part=product)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

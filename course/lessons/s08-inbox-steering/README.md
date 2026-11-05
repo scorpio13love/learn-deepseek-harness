@@ -388,3 +388,11 @@ s07 解决了输入路由。s08 会转向模型适配器 seam：
 - DeepSeek Messages 的 content block 与字符串消息有什么差异？
 
 先读：[`llm/llm/src/call-config.ts`](../../../deepseek-harness/packages/llm/llm/src/call-config.ts) 与 [`llm-deepseek`](../../../deepseek-harness/packages/llm/llm-deepseek/)。
+
+---
+
+## 面试自测
+
+[打开 II · 上下文 面试自测 →](../../../site/#/quiz?part=context)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*

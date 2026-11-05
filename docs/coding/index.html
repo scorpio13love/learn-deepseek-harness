@@ -128,6 +128,7 @@
   const EMBED = new URLSearchParams(location.search).has('embed')
   if (EMBED) document.documentElement.classList.add('embed')
   const state = { tasks: [], task: null, code: new Map(), chats: new Map(), lastRun: null, busy: false, key: false }
+  const WANTED_TASK = new URLSearchParams(location.search).get('task')
 
   function esc(value) { return String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;') }
   function notify(text, kind = '') { $('#notice').innerHTML = text ? `<div class="notice ${kind}">${text}</div>` : '' }
@@ -195,7 +196,7 @@
       const result = await api('run', { method: 'POST', body: JSON.stringify({ taskId: state.task.id, code: $('#code').value }) })
       state.lastRun = { ...result, taskId: state.task.id }
       renderResults(state.lastRun)
-      if (result.ok) addChat('system', '全部测试通过。可以继续问为什么，或者换下一题。')
+      if (result.ok) { localStorage.setItem(`dsh-coding-completed:${state.task.id}`, '1'); addChat('system', '全部测试通过。quiz 里会把这个 coding 任务标记为完成。') }
     } catch (error) { notify(`运行失败：${esc(error.message)}`); $('#result-status').textContent = '运行失败'; $('#result-status').className = 'pill bad' }
     finally { state.busy = false; $('#run').disabled = false; $('#run').textContent = '运行测试' }
   }
@@ -270,7 +271,8 @@
       state.tasks = data.tasks
       $('#tasks').innerHTML = state.tasks.map(task => `<button class="task" data-task="${task.id}"><b>${esc(task.title)}</b><small>${esc(task.lesson)}</small></button>`).join('')
       document.querySelectorAll('[data-task]').forEach(button => button.onclick = () => loadTask(button.dataset.task))
-      loadTask(state.tasks[0].id)
+      const wanted = WANTED_TASK ? state.tasks.find(task => task.id === WANTED_TASK) : undefined
+      loadTask(wanted?.id ?? state.tasks[0].id)
     } catch (error) {
       notify(`无法连接本地服务：${esc(error.message)}。请运行 <code>node site/serve.mjs</code>，然后通过 <code>http://127.0.0.1:4173/site/#/coding</code> 打开。`)
       $('#status').innerHTML = '<span class="pill bad">未连接</span>'

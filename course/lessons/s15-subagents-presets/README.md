@@ -191,3 +191,11 @@ s14 解决了委派。s15 会接入外部能力：
 - 外部工具的错误如何映射成模型可见结果？
 
 先读：[`mcp`](../../../deepseek-harness/packages/mcp/README.md)、[`skill`](../../../deepseek-harness/packages/skill/README.md)。
+
+---
+
+## 面试自测
+
+[打开 IV · 执行边界 面试自测 →](../../../site/#/quiz?part=execution)
+
+*概念题覆盖 DSH 架构；该 Part 的最后几题是 coding 任务。*
