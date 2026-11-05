@@ -32,6 +32,8 @@
   .prompt h2 { margin:0 0 6px; font-size:16px; }
   .prompt p { margin:0; color:var(--muted); font-size:12.5px; }
   .knowledge { margin-top:8px; border-left:3px solid var(--brand); background:#f7f7fb; padding:8px 10px; color:var(--soft); font-size:12px; border-radius:0 6px 6px 0; }
+  .source-link { display:inline-block; margin-top:8px; color:var(--brand); font:9.5px var(--mono); text-decoration:none; border-bottom:1px dotted currentColor; }
+  .source-link:hover { text-decoration:none; }
   .editor-panel { overflow:hidden; }
   .toolbar { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 12px; border-bottom:1px solid var(--line); background:#fbfbfd; }
   .toolbar strong { font-size:11px; font-family:var(--mono); color:var(--soft); font-weight:600; }
@@ -53,6 +55,11 @@
   .test-row span { color:var(--soft); }
   .raw { display:none; margin:0; padding:10px 13px; max-height:180px; overflow:auto; background:#fbfbfd; color:#686b75; font:10px/1.55 var(--mono); white-space:pre-wrap; border-top:1px solid var(--line); }
   .raw.show { display:block; }
+  .answer { margin-top:12px; overflow:hidden; }
+  .answer-head { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 13px; border-bottom:1px solid var(--line); background:#fbfbfd; }
+  .answer-head strong { font:11px var(--mono); color:var(--soft); }
+  .answer-head .btn { padding:5px 9px; font-size:10.5px; }
+  .answer pre { margin:0; padding:14px; overflow:auto; max-height:520px; background:#fbfbfd; color:#2c2c32; font:11.5px/1.6 var(--mono); white-space:pre; }
   .agent-panel { position:sticky; top:16px; display:flex; flex-direction:column; height:calc(100vh - 44px); min-height:600px; }
   .agent-head { padding:12px 14px; border-bottom:1px solid var(--line); }
   .agent-head b { display:block; font-size:13px; }
@@ -103,10 +110,11 @@
     <main class="workspace">
       <section class="panel prompt" id="prompt"><div class="eyebrow">LOADING…</div></section>
       <section class="panel editor-panel">
-        <div class="toolbar"><strong>submission.ts</strong><div><button class="btn" id="reset">重置</button> <button class="btn primary" id="run">运行测试</button></div></div>
+        <div class="toolbar"><strong>submission.ts</strong><div><button class="btn" id="answer-toggle" aria-expanded="false">查看参考答案</button> <button class="btn" id="reset">重置</button> <button class="btn primary" id="run">运行测试</button></div></div>
         <div class="editor-wrap"><div class="lines" id="lines">1</div><textarea id="code" spellcheck="false" aria-label="TypeScript 代码"></textarea></div>
       </section>
       <section class="panel results" id="results"><div class="results-head"><strong>测试结果</strong><span class="pill" id="result-status">未运行</span></div><div id="test-list"><div class="test-row"><span>点击“运行测试”开始。</span></div></div><pre class="raw" id="raw"></pre></section>
+      <section class="panel answer hidden" id="answer-panel"><div class="answer-head"><strong>参考答案</strong><button class="btn" id="copy-answer">复制</button></div><pre id="answer-code"></pre></section>
     </main>
     <aside class="panel agent-panel">
       <div class="agent-head"><b>AI coding agent</b><span id="agent-status">真实 DeepSeek Messages</span></div>
@@ -146,7 +154,12 @@
     state.task = task
     if (!state.code.has(task.id)) state.code.set(task.id, task.starter)
     $('#code').value = state.code.get(task.id)
-    $('#prompt').innerHTML = `<div class="eyebrow">${esc(task.lesson)}</div><h2>${esc(task.title)}</h2><p>${esc(task.prompt)}</p><div class="knowledge"><b>知识点。</b>${esc(task.knowledge)}</div>`
+    const source = task.source ? `<a class="source-link" href="https://github.com/scorpio13love/learn-deepseek-harness/blob/main/${task.source.path}" target="_blank" rel="noreferrer">实际代码：${esc(task.source.path)} · ${esc(task.source.label)} ↗</a>` : ''
+    $('#prompt').innerHTML = `<div class="eyebrow">${esc(task.lesson)}</div><h2>${esc(task.title)}</h2><p>${esc(task.prompt)}</p><div class="knowledge"><b>知识点。</b>${esc(task.knowledge)}</div>${source}`
+    $('#answer-code').textContent = task.answer || '（暂无参考答案）'
+    $('#answer-panel').classList.add('hidden')
+    $('#answer-toggle').textContent = '查看参考答案'
+    $('#answer-toggle').setAttribute('aria-expanded', 'false')
     document.querySelectorAll('[data-task]').forEach(button => button.classList.toggle('active', button.dataset.task === task.id))
     renderLines(); renderChat(); renderResults(state.lastRun && state.lastRun.taskId === task.id ? state.lastRun : null)
   }
@@ -229,6 +242,16 @@
     $('#config-key')?.addEventListener('click', () => showSetup(true))
     $('#test-connection')?.addEventListener('click', testConnection)
   }
+  function toggleAnswer() {
+    const panel = $('#answer-panel')
+    const hidden = panel.classList.toggle('hidden')
+    $('#answer-toggle').textContent = hidden ? '查看参考答案' : '隐藏参考答案'
+    $('#answer-toggle').setAttribute('aria-expanded', String(!hidden))
+  }
+  async function copyAnswer() {
+    const text = $('#answer-code').textContent
+    try { await navigator.clipboard.writeText(text); $('#copy-answer').textContent = '已复制' ; setTimeout(() => { $('#copy-answer').textContent = '复制' }, 1200) } catch {}
+  }
   async function boot() {
     try {
       const health = await api('health')
@@ -258,6 +281,8 @@
   $('#message').addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send() } })
   window.addEventListener('message', event => { if (event.data?.type === 'dsh-coding' && event.data.height) document.documentElement.style.height = '' })
   if (EMBED) { const app = document.querySelector('.app'); const notify = () => { const height = Math.min(1600, Math.max(720, Math.ceil(app.getBoundingClientRect().height + 18))); try { parent.postMessage({ type: 'dsh-coding-height', height }, '*') } catch {} }; new ResizeObserver(notify).observe(app); setTimeout(notify, 80) }
+  $('#answer-toggle').onclick = toggleAnswer
+  $('#copy-answer').onclick = copyAnswer
   $('#save-key').onclick = saveKey
   $('#test-conn').onclick = testConnection
   $('#clear-key').onclick = clearKey

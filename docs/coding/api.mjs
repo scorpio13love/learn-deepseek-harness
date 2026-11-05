@@ -42,6 +42,8 @@ function publicTask(task) {
     knowledge: task.knowledge,
     prompt: task.prompt,
     starter: task.starter,
+    answer: task.answer,
+    source: task.source ?? null,
     tests: task.tests.map((_, index) => `test ${index + 1}`),
   }
 }

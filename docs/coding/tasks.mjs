@@ -2,6 +2,10 @@
  * AI Coding Lab 题库：每个任务都是 DSH 的核心知识点。
  * 测试在本地 Node 里运行，submission.ts 由用户编辑。
  */
+import { readFileSync } from 'node:fs'
+
+const answers = JSON.parse(readFileSync(new URL('./answers.json', import.meta.url), 'utf8'))
+
 const baseTasks = [
   {
     id: 'pair-tool-results',
@@ -842,4 +846,41 @@ export function auditRun(events: RunEvent[]): string[] {
   },
 ]
 
-export const tasks = [...baseTasks, ...extraTasks].sort((a, b) => Number(a.lesson.slice(1, 3)) - Number(b.lesson.slice(1, 3)))
+
+
+const sources = {
+  'turn-window': ['course/lessons/s01-agent-loop/src/agent.ts', 'turn/step 生命周期'],
+  'pair-tool-results': ['course/lessons/s02-tool-round-trip/src/agent.ts', 'tool-call / tool/result 配对'],
+  'derive-surface': ['course/lessons/s03-session-log/src/session.ts', 'deriveMessages / surface'],
+  'assemble-text': ['course/lessons/s04-streaming/src/stream.ts', 'StreamAssembler'],
+  'missing-args': ['course/lessons/s05-tool-contract/src/schema.ts', 'validateParameters'],
+  'plan-batches': ['course/lessons/s06-tool-runtime/src/batch.ts', 'planBatches'],
+  'render-sections': ['course/lessons/s07-system-prompt/src/prompt.ts', 'renderPrompt / sections'],
+  'partition-inbox': ['course/lessons/s08-inbox-steering/src/inbox.ts', 'next-turn / next-step'],
+  'normalize-failure': ['course/lessons/s09-llm-seam/src/messages.ts', 'mapHttpError'],
+  'parse-jsonl': ['course/lessons/s10-persistence/src/storage.ts', 'JSONL 解析 / torn tail'],
+  'should-compact': ['course/lessons/s11-compaction/src/compaction.ts', 'Compaction / overflow'],
+  'dispose-effects': ['course/lessons/s12-plugin-kernel/src/kernel.ts', 'Fiber / effect dispose'],
+  'apply-patch': ['course/lessons/s13-composition-boot/src/boot.ts', 'applyPatch / 整段替换'],
+  'workspace-path': ['course/lessons/s14-capability-seams/src/capabilities.ts', 'Workspace 路径边界'],
+  'can-spawn': ['course/lessons/s15-subagents-presets/src/subagent.ts', 'maxDepth / maxActive'],
+  'safe-serialize': ['course/lessons/s16-ptc/src/ptc.ts', 'PTC 返回值序列化'],
+  'mcp-name': ['course/lessons/s17-mcp-skills-commands/src/mcp.ts', 'MCP 工具命名'],
+  'select-skills': ['course/lessons/s18-skills-commands/src/skills/catalog.ts', 'catalog / 按需加载'],
+  'stale-ref': ['course/lessons/s19-browser-use/src/registry.ts', 'ref 与快照'],
+  'scale-point': ['course/lessons/s20-computer-use-i/src/tool.ts', 'scale / 原生坐标'],
+  'stale-reason': ['course/lessons/s21-computer-use-ii/src/coordinates.ts', 'stale snapshot / window'],
+  'apply-delta': ['course/lessons/s22-web/src/projection.ts', 'snapshot + SSE delta'],
+  'parse-jsonrpc': ['course/lessons/s23-sdk-headless/src/jsonrpc.ts', 'JSON-RPC line'],
+  'card-status': ['course/lessons/s24-client-ui/src/projection.ts', 'ActionCard 状态'],
+  'normalize-span': ['course/lessons/s25-observability-eval/src/observability.ts', 'span / snapshot'],
+  'matrix-summary': ['course/lessons/s26-eval/src/faults.ts', 'faultMatrix / report'],
+  'redact-secrets': ['course/lessons/s27-security/src/redact.ts', 'redactText / redactValue'],
+  'audit-run': ['course/lessons/s28-capstone/src/eval.ts', 'evaluate / tool pairing'],
+}
+
+const allTasks = [...baseTasks, ...extraTasks].sort((a, b) => Number(a.lesson.slice(1, 3)) - Number(b.lesson.slice(1, 3)))
+export const tasks = allTasks.map(task => {
+  const [path, label] = sources[task.id] ?? ['', '']
+  return { ...task, answer: answers[task.id] ?? '', source: path ? { path, label } : undefined }
+})
